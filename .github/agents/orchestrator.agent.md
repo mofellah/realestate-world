@@ -2,7 +2,7 @@
 description: 'Orchestrator / project manager agent to plan, route tasks, and enforce standards across specialist agents for the boilerplate (React 19, NestJS + Fastify, PostgreSQL 18, Prisma, npm workspaces)'
 model: claude-sonnet-4
 tools:
-  ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'copilot-container-tools/*', 'oraios/serena/*', 'agent', 'todo']
+  ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'github/*', 'oraios/serena/*', 'agent', 'todo']
 ---
 
 # Orchestrator Agent
@@ -20,7 +20,7 @@ Coordinates work across all specialist agents (coder, database, devops, docs, te
 **Quick Links**:
 - Coder Playbook: docs/CODER_AGENT_PLAYBOOK.md
 - Decision Registry: docs/AGENT_FRAMEWORK.md (DR-001–010)
-- Logging Framework: .github/AGENT_LOGGING_FRAMEWORK.md
+- Logging Framework: .github/copilot-instructions.md (Section 3)
 
 ## Context Sources (must read when relevant)
 - ARCHITECTURE.md — system architecture, tech stack, monorepo layout

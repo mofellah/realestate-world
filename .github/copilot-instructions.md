@@ -191,7 +191,7 @@ All agents (Coder, Test, DevOps, Database, Docs, and Orchestrator) must follow t
 **Owned Areas**:
 - `docs/**` (all documentation files)
 - `docs/AGENT_FRAMEWORK.md` (decision registry)
-- `README.md` and `START_HERE.md`
+- `README.md`
 - API contract examples
 - Code comments and docstrings (guide Coder on format)
 
@@ -209,7 +209,7 @@ All agents (Coder, Test, DevOps, Database, Docs, and Orchestrator) must follow t
 
 **When**: After completing a phase  
 **Where**: `.github/AGENT_WORK_LOG.md`  
-**Format**: Structured completion report (see AGENT_LOGGING_FRAMEWORK.md)
+**Format**: Structured completion report (detailed below)
 
 **Report Must Include**:
 ```markdown
@@ -249,6 +249,72 @@ All agents (Coder, Test, DevOps, Database, Docs, and Orchestrator) must follow t
 4. **Blockers documented** (root cause + solution, not hidden)
 5. **Deliverables listed** (exact file paths)
 6. **Timestamp included** (ISO format, UTC)
+
+### Detailed Logging Template
+
+**Location**: `.github/AGENT_WORK_LOG.md` (append after each phase)
+
+**Template**:
+
+```markdown
+## Phase X - [Agent Name] Report
+
+**Status**: ✅ Complete | ⚠️ Blocked | ❌ Failed  
+**Timestamp**: YYYY-MM-DD HH:MM UTC  
+**Agent**: [Coder | Database | Test | DevOps | Docs]  
+**Task**: [Brief 1-2 line description]
+
+### What Was Done
+
+- [Task 1]: ✅ Completed (or ⚠️ Blocked due to X, or ❌ Failed: Y)
+- [Task 2]: ✅ Completed
+- [Task 3]: ⚠️ Blocked - reason explained below
+
+### Verification Results
+
+- **Build**: ✅ Pass / ❌ Errors (list errors if failed)
+- **Linting**: ✅ Pass / ❌ Errors (list specific files with errors)
+- **Type Check**: ✅ Pass / ❌ Errors (list specific files with errors)
+- **Tests** (if applicable): X passed, Y failed (list failing tests)
+- **Coverage** (if applicable): Z% achieved
+- **Startup** (if applicable): ✅ Server running on port XXXX / ❌ Failed to start
+
+### Deliverables
+
+- [File 1] - Brief description
+- [File 2] - Brief description
+- [Directory 1/] - Brief description
+
+### Blockers / Limitations / Errors
+
+**If Status = ⚠️ or ❌, document**:
+
+1. **Blocker 1**: Description
+   - Root cause: Why did this happen?
+   - Impact: What's broken?
+   - Attempted solutions: What did agent try?
+   - Recommended fix: How to resolve?
+   - Blocking further progress: Yes/No
+
+2. **Limitation**: [e.g., "runSubagent tool doesn't relay output"]
+   - Workaround needed: [describe workaround]
+
+### Recommended Next Steps
+
+- If Status = ✅: "Proceed to Phase X+1"
+- If Status = ⚠️: "Fix blocker before proceeding, specifically: [list what needs fixing]"
+- If Status = ❌: "Phase failed. Agent recommends: [detailed recommendation]"
+
+---
+```
+
+### Unacceptable Outcomes
+
+- ❌ Agent completes work silently (no log entry)
+- ❌ Agent fails but doesn't document why
+- ❌ Agent encounters blocker but doesn't report it
+- ❌ Agent's log entry is incomplete (missing verification or deliverables)
+- ❌ Orchestrator proceeds without reading agent log
 
 ---
 

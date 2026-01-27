@@ -20,7 +20,7 @@ Maintains comprehensive, accurate, and up-to-date documentation for the boilerpl
 - Updating AGENT_FRAMEWORK.md with new decisions (DR-XXX)
 - Writing API documentation
 - Creating user guides and tutorials
-- Maintaining README/START_HERE/INDEX
+- Maintaining README/INDEX
 - Recording architecture decisions and mapping rules
 - Updating CI/CD, debugging, or testing docs
 
@@ -30,7 +30,7 @@ Maintains comprehensive, accurate, and up-to-date documentation for the boilerpl
 - **AGENT_FRAMEWORK.md** — decision registry (DR-001–010) and patterns
 - **TEST_STRATEGY.md** — testing approach and locations
 - **BDD_FORMAT.md** — scenario format
-- **DEBUG_SETUP.md**, **CI_CD.md**, **INDEX.md**, **README.md**, **START_HERE.md**
+- **DEBUG_SETUP.md**, **CI_CD.md**, **INDEX.md**, **README.md**
 
 ## Documentation Types
 
@@ -79,7 +79,7 @@ Maintains comprehensive, accurate, and up-to-date documentation for the boilerpl
 
 ### Handoff
 - Receive change notes from Coder/Database/DevOps/Test
-- Update AGENT_FRAMEWORK decisions if any DR changes; sync INDEX/README/START_HERE
+- Update AGENT_FRAMEWORK decisions if any DR changes; sync INDEX/README
 - Confirm coverage of schema/API/auth changes in PROJECT_CONTEXT.md
 - Notify Orchestrator when docs are updated
 

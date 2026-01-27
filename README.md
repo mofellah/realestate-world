@@ -53,6 +53,23 @@ docs/
 
 ## 🚀 Quick Start
 
+### 📚 Recommended Reading Order
+
+**New to this project?** Read documentation in this order:
+
+1. **This file** (README.md) — 5 min overview
+2. [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — 20 min system design
+3. [docs/PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md) — 30 min database, auth, APIs
+4. [docs/AGENT_FRAMEWORK.md](docs/AGENT_FRAMEWORK.md) — 30 min for AI agents (decision registry)
+5. [docs/TEST_STRATEGY.md](docs/TEST_STRATEGY.md) — 20 min testing approach
+6. [specs/BDD_FORMAT.md](specs/BDD_FORMAT.md) — 15 min BDD scenarios
+7. [docs/DEBUG_SETUP.md](docs/DEBUG_SETUP.md) — 15 min debugging
+8. [docs/INDEX.md](docs/INDEX.md) — Complete documentation index
+
+**For AI Agents**: Start with [docs/AGENT_FRAMEWORK.md](docs/AGENT_FRAMEWORK.md) (decision registry DR-001 to DR-010)
+
+---
+
 ### 1. Prerequisites
 - Docker & Docker Compose installed
 - Node.js 20+ (for local development)

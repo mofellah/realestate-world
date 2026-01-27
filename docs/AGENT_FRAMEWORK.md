@@ -15,7 +15,7 @@ This document is your **decision registry**. Before you implement anything, chec
 
 ### Quick Links
 - Coder Playbook: docs/CODER_AGENT_PLAYBOOK.md
-- Logging protocol: .github/AGENT_LOGGING_FRAMEWORK.md
+- Logging protocol: .github/copilot-instructions.md (Section 3)
 
 ### Decision Quick Digest (DR-001–DR-010)
 - DR-001 Monorepo: npm workspaces; apps/*, packages/*, db/
@@ -35,7 +35,7 @@ This document is your **decision registry**. Before you implement anything, chec
 - Follow monorepo placement: backend in apps/backend, frontend in apps/frontend, shared code in packages/*, schema/migrations in db/.
 - Put tests where they belong: backend __tests__/ (unit/integration), frontend src/__tests__/ (RTL/Jest), E2E in apps/frontend/e2e.
 - Use shared packages (@boilerplate/types, utils, config, logger) instead of duplicating code.
-- Log every phase in .github/AGENT_WORK_LOG.md using .github/AGENT_LOGGING_FRAMEWORK.md.
+- Log every phase in .github/AGENT_WORK_LOG.md using .github/copilot-instructions.md Section 3 template.
 
 ---
 
@@ -702,7 +702,7 @@ Each agent owns specific folders and has clear decision rights within them. **Cr
 | **Database** | `db/` (schema, migrations, seeds) | Schema design, migrations, seed data, indexing | Data model, relationships, constraints |
 | **Test** | `**/__tests__/`, `**/e2e/`, `cypress.config.ts` | Test files, test fixtures, BDD scenario mapping | Test locations, coverage targets, test patterns |
 | **DevOps** | `ops/`, `.github/workflows/`, `docker-compose*.yml`, `.env.example` | Docker, Compose, CI/CD, infrastructure | Container strategy, deployment pipeline |
-| **Docs** | `docs/`, `specs/bdd/`, `README.md`, `START_HERE.md` | Documentation, decision registry (AGENT_FRAMEWORK.md), examples | Doc structure, decision tracking, communication |
+| **Docs** | `docs/`, `specs/bdd/`, `README.md` | Documentation, decision registry (AGENT_FRAMEWORK.md), examples | Doc structure, decision tracking, communication |
 | **Orchestrator** | `.github/agents/`, `IMPLEMENTATION_CHECKLIST.md` | Plans, routes, gates, overall coherence | Workflow, phase ownership, cross-agent coordination |
 
 **Coordination Rules**:
@@ -730,7 +730,7 @@ Agents complete work but don't report back. The Orchestrator assumes silence = s
 
 **EVERY agent MUST append a completion report** to `.github/AGENT_WORK_LOG.md` after each phase.
 
-**Full protocol**: See `.github/AGENT_LOGGING_FRAMEWORK.md` (this is the authoritative source)
+**Full protocol**: See `.github/copilot-instructions.md` Section 3 (this is the authoritative source)
 
 ### Quick Checklist for Agents
 
@@ -768,7 +768,7 @@ When you hit a tool limitation:
 
 - **"Where should I put this code?"** → Check ARCHITECTURE.md directory structure
 - **"How do I write a test?"** → Check TEST_STRATEGY.md
-- **"Where do I log my work?"** → Append to `.github/AGENT_WORK_LOG.md` per `.github/AGENT_LOGGING_FRAMEWORK.md`
+- **"Where do I log my work?"** → Append to `.github/AGENT_WORK_LOG.md` per `.github/copilot-instructions.md` Section 3
 - **"What if I hit a blocker?"** → Document in completion report, don't proceed silently
 - **"What's the auth flow?"** → Check PROJECT_CONTEXT.md
 - **"Why Prisma instead of TypeORM?"** → Check DR-004 above

@@ -10,7 +10,7 @@
 3. docs/PROJECT_CONTEXT.md (schema, auth/RBAC, API flows)
 4. docs/TEST_STRATEGY.md (test locations, coverage targets)
 5. specs/BDD_FORMAT.md + specs/bdd/*.feature (scenarios to implement)
-6. .github/AGENT_LOGGING_FRAMEWORK.md (log every phase)
+6. .github/copilot-instructions.md Section 3 (log every phase)
 
 ---
 
@@ -60,7 +60,7 @@
 ---
 
 ## Logging & Handover
-- After each phase, append to .github/AGENT_WORK_LOG.md using .github/AGENT_LOGGING_FRAMEWORK.md template (status, verification, deliverables, timestamp).
+- After each phase, append to .github/AGENT_WORK_LOG.md using .github/copilot-instructions.md Section 3 template (status, verification, deliverables, timestamp).
 
 ---
 

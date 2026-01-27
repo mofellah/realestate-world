@@ -6,7 +6,7 @@
 
 **Authority**: This log is the single source of truth for phase status. Orchestrator gates phases on log status (✅ only).
 
-**Strengthened Protocol** (2026-01-24): See `.github/AGENT_LOGGING_FRAMEWORK.md` for mandatory agent logging rules, structured templates, and orchestrator enforcement.
+**Strengthened Protocol** (2026-01-24): See `.github/copilot-instructions.md` Section 3 for mandatory agent logging rules, structured templates, and orchestrator enforcement.
 
 ---
 
