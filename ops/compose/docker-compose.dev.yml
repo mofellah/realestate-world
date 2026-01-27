@@ -1,0 +1,67 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:18-alpine
+    container_name: boilerplate_db_dev
+    environment:
+      POSTGRES_DB: ${DB_NAME:-boilerplate}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - boilerplate_dev
+
+  # NestJS Backend
+  backend:
+    build:
+      context: ../..
+      dockerfile: ops/docker/backend.dockerfile
+    container_name: boilerplate_backend_dev
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-boilerplate}
+      JWT_SECRET: ${JWT_SECRET:-dev_jwt_secret_32_chars_minimum_123456}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-900}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-your_refresh_secret_dev}
+      REFRESH_TOKEN_EXPIRATION: ${REFRESH_TOKEN_EXPIRATION:-604800}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    networks:
+      - boilerplate_dev
+
+  # React Frontend (Vite dev server)
+  frontend:
+    build:
+      context: ../..
+      dockerfile: ops/docker/frontend.dev.dockerfile
+    container_name: boilerplate_frontend_dev
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    volumes:
+      - ../../../apps/frontend/src:/app/apps/frontend/src
+      - ../../../apps/frontend/styles:/app/apps/frontend/styles
+    networks:
+      - boilerplate_dev
+
+volumes:
+  postgres_data_dev:
+
+networks:
+  boilerplate_dev:
+    driver: bridge

@@ -1,0 +1,68 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:18-alpine
+    container_name: boilerplate_db_prod
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"  # For backups/management; not exposed publicly
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - boilerplate_prod
+    restart: always
+
+  # NestJS Backend
+  backend:
+    build:
+      context: ../..
+      dockerfile: ops/docker/backend.dockerfile
+    container_name: boilerplate_backend_prod
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-900}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+      REFRESH_TOKEN_EXPIRATION: ${REFRESH_TOKEN_EXPIRATION:-604800}
+    ports:
+      - "3000:3000"
+    networks:
+      - boilerplate_prod
+    restart: always
+
+  # React Frontend (Nginx static server)
+  frontend:
+    build:
+      context: ../..
+      dockerfile: ops/docker/frontend.dockerfile
+    container_name: boilerplate_frontend_prod
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"  # For HTTPS (requires cert mount)
+    volumes:
+      - ../docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      # - ./certs:/etc/nginx/certs:ro  # SSL certificates (uncomment when available)
+    networks:
+      - boilerplate_prod
+    restart: always
+
+volumes:
+  postgres_data_prod:
+
+networks:
+  boilerplate_prod:
+    driver: bridge

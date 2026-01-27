@@ -1,0 +1,50 @@
+{
+  "name": "boilerplate",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "db"
+  ],
+  "scripts": {
+    "install:all": "npm install",
+    "clean": "npm run clean --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "dev:backend": "npm run dev --workspace=apps/backend",
+    "dev:frontend": "npm run dev --workspace=apps/frontend",
+    "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
+    "type-check": "npm run type-check --workspaces --if-present",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:all": "npm run test && npm run e2e",
+    "e2e": "cypress run",
+    "e2e:open": "cypress open",
+    "prisma:studio": "npm run studio --workspace=db",
+    "prisma:migrate": "npm run migrate:dev --workspace=db",
+    "prisma:seed": "npm run seed --workspace=db",
+    "docker:dev": "docker compose -f ops/compose/docker-compose.dev.yml up",
+    "docker:dev:build": "docker compose -f ops/compose/docker-compose.dev.yml up --build",
+    "docker:prod": "docker compose -f ops/compose/docker-compose.prod.yml up",
+    "docker:down": "docker compose -f ops/compose/docker-compose.dev.yml down"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.19",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "cypress": "^13.6.4",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.2.5",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.3.3"
+  }
+}
