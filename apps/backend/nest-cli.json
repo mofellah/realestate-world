@@ -4,6 +4,9 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "tsConfigPath": "tsconfig.json",
-    "outDir": "dist"
-  }
+    "outDir": "dist",
+    "deleteOutDir": true
+  },
+  "monorepo": false,
+  "root": "."
 }

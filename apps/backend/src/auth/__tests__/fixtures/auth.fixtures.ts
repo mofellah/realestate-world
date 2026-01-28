@@ -9,78 +9,28 @@ import { JwtPayload, LoginRequest, LoginResponse, TokenPair, RefreshToken } from
 export const mockUserWithAdminRole = {
   id: 'user-123',
   email: 'admin@example.com',
-  password: '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36DvDlFm', // hashed "Admin123!"
-  name: 'Admin User',
+  passwordHash: '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36DvDlFm', // hashed "Admin123!"
+  avatarUrl: null,
+  role: 'admin' as const,
   isActive: true,
+  country_code: null,
+  personId: null,
   createdAt: new Date('2026-01-01'),
   updatedAt: new Date('2026-01-01'),
-  userRoles: [
-    {
-      userId: 'user-123',
-      roleId: 'role-admin',
-      role: {
-        id: 'role-admin',
-        name: 'admin',
-        description: 'Administrator role',
-        rolePermissions: [
-          {
-            roleId: 'role-admin',
-            permissionId: 'perm-users-read',
-            permission: {
-              id: 'perm-users-read',
-              resource: 'users',
-              action: 'read',
-              description: 'Read users',
-            },
-          },
-          {
-            roleId: 'role-admin',
-            permissionId: 'perm-users-write',
-            permission: {
-              id: 'perm-users-write',
-              resource: 'users',
-              action: 'write',
-              description: 'Write users',
-            },
-          },
-        ],
-      },
-    },
-  ],
 };
 
 // Mock user with regular user role
 export const mockUserWithUserRole = {
   id: 'user-456',
   email: 'user@example.com',
-  password: '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36DvDlFm', // hashed password
-  name: 'Regular User',
+  passwordHash: '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWdeS86E36DvDlFm', // hashed password
+  avatarUrl: null,
+  role: 'user' as const,
   isActive: true,
+  country_code: null,
+  personId: null,
   createdAt: new Date('2026-01-02'),
   updatedAt: new Date('2026-01-02'),
-  userRoles: [
-    {
-      userId: 'user-456',
-      roleId: 'role-user',
-      role: {
-        id: 'role-user',
-        name: 'user',
-        description: 'Regular user role',
-        rolePermissions: [
-          {
-            roleId: 'role-user',
-            permissionId: 'perm-users-read',
-            permission: {
-              id: 'perm-users-read',
-              resource: 'users',
-              action: 'read',
-              description: 'Read users',
-            },
-          },
-        ],
-      },
-    },
-  ],
 };
 
 // Mock JWT payload for admin
@@ -149,8 +99,12 @@ export const mockLoginResponse: LoginResponse = {
   user: {
     id: 'user-123',
     email: 'admin@example.com',
-    name: 'Admin User',
+    passwordHash: '$2a$10$mockHashedPasswordForTestingOnly',
+    avatarUrl: null,
+    role: 'admin' as const,
     isActive: true,
+    country_code: null,
+    personId: null,
     createdAt: new Date('2026-01-01'),
     updatedAt: new Date('2026-01-01'),
   },

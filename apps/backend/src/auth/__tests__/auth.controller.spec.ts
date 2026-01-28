@@ -176,6 +176,7 @@ describe('AuthController (Integration)', () => {
       const mockResponse = {
         ...fixtures.mockLoginResponse,
         user: {
+          ...fixtures.mockLoginResponse.user,
           id: 'user-123',
           email: 'admin@example.com',
           name: 'Admin User',
@@ -196,7 +197,7 @@ describe('AuthController (Integration)', () => {
       // Assert
       expect(response.body.user).not.toHaveProperty('password');
       expect(response.body.user.id).toBe('user-123');
-      expect(response.body.user.name).toBe('Admin User');
+      expect(response.body.user.email).toBe('admin@example.com');
     });
   });
 

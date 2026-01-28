@@ -1,10 +1,14 @@
 services:
-  # PostgreSQL Database
+  # =========================================
+  # PostgreSQL Database with PostGIS
+  # =========================================
   db:
-    image: postgres:18-alpine
-    container_name: boilerplate_db_dev
+    build:
+      context: ../..
+      dockerfile: ops/docker/db.dockerfile
+    container_name: realestate_db_dev
     environment:
-      POSTGRES_DB: ${DB_NAME:-boilerplate}
+      POSTGRES_DB: ${DB_NAME:-realestate}
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
     ports:
@@ -17,51 +21,79 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - boilerplate_dev
+      - realestate_dev
+    restart: unless-stopped
 
-  # NestJS Backend
+  # =========================================
+  # NestJS Backend (Development with hot reload)
+  # =========================================
   backend:
     build:
       context: ../..
-      dockerfile: ops/docker/backend.dockerfile
-    container_name: boilerplate_backend_dev
+      dockerfile: ops/docker/backend.dev.dockerfile
+    container_name: realestate_backend_dev
     depends_on:
       db:
         condition: service_healthy
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-boilerplate}
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-realestate}
       JWT_SECRET: ${JWT_SECRET:-dev_jwt_secret_32_chars_minimum_123456}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-900}
-      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-your_refresh_secret_dev}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-dev_refresh_secret_32_chars_min_123456}
       REFRESH_TOKEN_EXPIRATION: ${REFRESH_TOKEN_EXPIRATION:-604800}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+      PORT: 3000
     ports:
       - "${BACKEND_PORT:-3000}:3000"
+      - "9229:9229"  # Node.js debugger port
+    volumes:
+      # Mount source for hot-reload
+      - ../../apps/backend/src:/app/apps/backend/src
+      # Preserve node_modules to prevent conflicts
+      - backend_node_modules:/app/node_modules
+    command: sh -c "npx prisma migrate deploy --schema=./db/schema.prisma && cd apps/backend && npx nest start --watch --preserveWatchOutput"
     networks:
-      - boilerplate_dev
+      - realestate_dev
+    restart: unless-stopped
 
-  # React Frontend (Vite dev server)
+  # =========================================
+  # React Frontend (Vite Dev Server with HMR)
+  # =========================================
   frontend:
     build:
       context: ../..
       dockerfile: ops/docker/frontend.dev.dockerfile
-    container_name: boilerplate_frontend_dev
+    container_name: realestate_frontend_dev
     depends_on:
       - backend
     environment:
+      NODE_ENV: development
       VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
+      VITE_HMR_HOST: localhost
+      VITE_HMR_PORT: 5173
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
     volumes:
-      - ../../../apps/frontend/src:/app/apps/frontend/src
-      - ../../../apps/frontend/styles:/app/apps/frontend/styles
+      # Mount source for hot-reload
+      - ../../apps/frontend/src:/app/apps/frontend/src
+      - ../../apps/frontend/public:/app/apps/frontend/public
+      - ../../apps/frontend/index.html:/app/apps/frontend/index.html
+      - ../../apps/frontend/vite.config.ts:/app/apps/frontend/vite.config.ts
+      - ../../apps/frontend/tailwind.config.js:/app/apps/frontend/tailwind.config.js
+      - ../../apps/frontend/postcss.config.js:/app/apps/frontend/postcss.config.js
+      # Preserve node_modules
+      - frontend_node_modules:/app/node_modules
     networks:
-      - boilerplate_dev
+      - realestate_dev
+    restart: unless-stopped
 
 volumes:
   postgres_data_dev:
+  backend_node_modules:
+  backend_dist:
+  frontend_node_modules:
 
 networks:
-  boilerplate_dev:
+  realestate_dev:
     driver: bridge

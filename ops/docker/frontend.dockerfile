@@ -1,24 +1,49 @@
-# Stage 1: Build
+# =========================================
+# Stage 1: Build Stage
+# =========================================
 FROM node:20-alpine AS builder
+
+# Set working directory
 WORKDIR /app
 
+# Copy package files for all workspaces
 COPY package*.json ./
 COPY tsconfig.json ./
 COPY apps/frontend/package*.json ./apps/frontend/
+COPY packages/types/package*.json ./packages/types/
+COPY packages/config/package*.json ./packages/config/
+
+# Install dependencies
+RUN npm ci --workspace=apps/frontend --include-workspace-root
+
+# Copy source code
 COPY apps/frontend/ ./apps/frontend/
 COPY packages/types ./packages/types
 COPY packages/config ./packages/config
 
-RUN npm ci
-
+# Build Vite application for production
 RUN npm run build --workspace=@boilerplate/frontend
 
-# Stage 2: Runtime (nginx)
-FROM nginx:alpine
+# =========================================
+# Stage 2: Runtime Stage (Nginx)
+# =========================================
+FROM nginx:1.25-alpine AS runtime
+
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
+# Copy custom nginx configuration
 COPY ops/docker/nginx.conf /etc/nginx/nginx.conf
+
+# Copy built application from builder stage
 COPY --from=builder /app/apps/frontend/dist /usr/share/nginx/html
 
-EXPOSE 80
+# Expose port 8080 (not 80 to allow running without root if needed)
+EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost/health || exit 1
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:8080/ || exit 1
+
+# Start nginx in foreground
+CMD ["nginx", "-g", "daemon off;"]

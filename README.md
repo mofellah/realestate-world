@@ -1,19 +1,39 @@
-# Boilerplate: Production-Ready Monorepo
+# Real Estate World Platform
 
-A **scalable, type-safe, BDD/TDD-first boilerplate** with React 19 + NestJS + PostgreSQL + Prisma, optimized for AI-driven development.
+A **subscription-based real estate platform** enabling property owners, agencies, and agents to list properties with multiple contract types (sale, rent, Airbnb, lease), optimized for **searchers-first** with powerful, intuitive map-based discovery.
+
+**MVP Target**: Belgium, Holland, Switzerland (3-month timeline, launching Mar 31, 2026)
+
+[![Issues](https://img.shields.io/github/issues/mofellah/realestate-world)](https://github.com/mofellah/realestate-world/issues)
+[![CI Status](https://github.com/mofellah/realestate-world/workflows/CI/badge.svg)](https://github.com/mofellah/realestate-world/actions)
+
+---
+
+## 🚀 Quick Start
+
+### For Developers
+1. **[Git Workflow Setup](.github/GIT_SETUP_QUICK_START.md)** - Initialize branches and start development
+2. **[View MVP Issues](.github/GITHUB_ISSUES_ROADMAP.md)** - 23 issues organized by milestone
+3. **[Git Workflow Guide](.github/GIT_WORKFLOW.md)** - Branching strategy and commit conventions
+
+### For Product Owners
+- **[Product Vision](specs/PRODUCT_VISION.md)** - Business model, revenue streams, target markets
+- **[User Stories](specs/USER_STORIES.md)** - 14 detailed user stories with acceptance criteria
+- **[Implementation Checklist](IMPLEMENTATION_CHECKLIST.md)** - Week-by-week breakdown (12 weeks)
 
 ---
 
 ## 🎯 What This Is
 
-A **reusable foundation** for building web applications with:
-- ✅ **Modern stack**: React 19 (Vite), NestJS (Fastify), PostgreSQL 18, Prisma ORM
+A **production-ready real estate platform** with:
+- ✅ **Modern stack**: React 19 (Vite), NestJS (Fastify), PostgreSQL + PostGIS, Prisma ORM
 - ✅ **Monorepo ready**: npm workspaces, shared packages (types, utils, config, logger)
 - ✅ **Secure auth**: JWT + refresh tokens + role-based access control (RBAC)
-- ✅ **Observable**: Structured JSON logging, correlation IDs, health checks
-- ✅ **Developer-friendly**: Hot-reload (frontend + backend), debugging support, test-first
-- ✅ **AI-optimized**: Explicit decisions, patterns, and locations for AI coding agents
-- ✅ **Production-ready**: Multi-environment Docker Compose (dev, prod), CI/CD pipeline
+- ✅ **Map-first UI**: Interactive property search with clustering, filters, proximity search
+- ✅ **Multi-contract**: Sale, rent (short/long), Airbnb, lease support
+- ✅ **Subscription model**: Owners, agencies, investors with tiered pricing
+- ✅ **BDD/TDD-first**: Comprehensive test coverage (80%+ backend, 70%+ frontend)
+- ✅ **Production-ready**: Docker Compose (dev/prod), CI/CD pipeline, monitoring
 
 ---
 
