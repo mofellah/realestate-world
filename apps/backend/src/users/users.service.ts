@@ -20,21 +20,6 @@ export class UsersService {
   async getUserById(userId: string): Promise<UserWithRoles> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      include: {
-        userRoles: {
-          include: {
-            role: {
-              include: {
-                rolePermissions: {
-                  include: {
-                    permission: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
     });
 
     if (!user) {
@@ -45,25 +30,15 @@ export class UsersService {
       });
     }
 
-    // Transform roles and permissions
-    const roles = user.userRoles.map((ur: typeof user.userRoles[number]) => ur.role);
-    const permissions = user.userRoles.flatMap((ur: typeof user.userRoles[number]) =>
-      ur.role.rolePermissions.map((rp: typeof ur.role.rolePermissions[number]) => ({
-        id: rp.permission.id,
-        resource: rp.permission.resource,
-        action: rp.permission.action,
-        description: rp.permission.description,
-      })),
-    );
-
-    // Remove password from response
+    // Remove passwordHash from response
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _password, ...userWithoutPassword } = user;
+    const { passwordHash: _passwordHash, ...userWithoutPassword } = user;
 
     return {
       ...userWithoutPassword,
-      roles,
-      permissions,
+      name: null, // User table doesn't have name - it's in the Person table via personId
+      roles: [user.role], // Single role enum
+      permissions: [], // Permissions would need to be implemented via separate system
     };
   }
 }

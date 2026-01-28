@@ -1,0 +1,162 @@
+name: Test
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  test-backend:
+    name: Backend Tests (Jest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: realestate_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run backend unit tests
+        run: npm run test --workspace=@boilerplate/backend -- --coverage --maxWorkers=2
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/realestate_test
+          JWT_SECRET: test-jwt-secret-key-for-ci-pipeline
+          REFRESH_TOKEN_SECRET: test-refresh-secret-for-ci
+
+      - name: Upload backend coverage
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          files: ./apps/backend/coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+          fail_ci_if_error: false
+
+  test-frontend:
+    name: Frontend Tests (Jest + RTL)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run frontend unit tests
+        run: npm run test --workspace=@boilerplate/frontend -- --coverage --maxWorkers=2
+
+      - name: Upload frontend coverage
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          files: ./apps/frontend/coverage/lcov.info
+          flags: frontend
+          name: frontend-coverage
+          fail_ci_if_error: false
+
+  test-e2e:
+    name: E2E Tests (Cypress)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: realestate_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run database migrations
+        run: npm run migrate:dev --workspace=db
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/realestate_test
+
+      - name: Seed database
+        run: npm run seed --workspace=db
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/realestate_test
+
+      - name: Build backend
+        run: npm run build --workspace=@boilerplate/backend
+
+      - name: Build frontend
+        run: npm run build --workspace=@boilerplate/frontend
+
+      - name: Run Cypress E2E tests
+        run: npm run e2e
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/realestate_test
+          JWT_SECRET: test-jwt-secret-for-e2e
+          REFRESH_TOKEN_SECRET: test-refresh-secret-for-e2e
+          VITE_API_URL: http://localhost:3000
+
+      - name: Upload Cypress screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: apps/frontend/cypress/screenshots
+
+      - name: Upload Cypress videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos
+          path: apps/frontend/cypress/videos

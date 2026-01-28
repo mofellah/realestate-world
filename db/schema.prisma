@@ -1,5 +1,16 @@
-// Prisma schema for authentication and authorization (RBAC)
-// Aligned with PROJECT_CONTEXT.md and packages/types/src/index.ts
+// Prisma schema for Real Estate MVP
+// Complete inheritance and polymorphic design
+// Multi-country support (Belgium, Holland, Switzerland)
+// PostgreSQL 18 with PostGIS for geospatial queries
+// Last Updated: 2026-01-28 (Design Complete - All User Decisions Applied)
+//
+// DESIGN DECISIONS APPLIED:
+// 1. Person: Generic table (firstName, lastName, email) → users reference it
+// 2. Amenity: Separate type-specific child tables (Hospital, School, Restaurant, TransitStop)
+// 3. Subject: Base Subject + ListingSubject (extensible to PropertySubject, InquirySubject)
+// 4. UserRole: Simplified to user | admin only (contextual roles via AgencyRole)
+// 5. ExternalPropertyOwner: Full documentation fields
+// 6. PaymentTerms: Separate table for flexible per-listing-type parameters
 
 datasource db {
   provider = "postgresql"
@@ -11,103 +22,1058 @@ generator client {
 }
 
 // ============================================================================
-// User Management
+// ENUMS
+// ============================================================================
+
+enum UserRole {
+  user
+  admin
+}
+
+enum PropertyType {
+  house
+  apartment
+  villa
+  land
+  room
+  commercial
+  other
+}
+
+enum ListingType {
+  sale
+  rental
+  short_term
+  lease
+}
+
+enum ListingStatus {
+  draft
+  published
+  paused
+  expired
+}
+
+enum PaymentTermType {
+  onetime
+  periodic
+  composite
+}
+
+enum PaymentCompositionType {
+  split          // Multiple parties split payment
+  phased         // Payment in multiple phases
+  combined       // Combination of different payment types
+}
+
+enum AgencyTierType {
+  basic
+  pro
+  premium
+}
+
+enum AgencyRoleType {
+  owner
+  manager
+  agent
+  sales_manager
+  support_agent
+}
+
+enum AdminBoundaryType {
+  admin_level_1   // Top-level administrative division (e.g., states in federal countries)
+  admin_level_2   // Countries
+  admin_level_3   // Regions
+  admin_level_4   // States/Provinces
+  admin_level_5   // Districts
+  admin_level_6   // Counties
+  admin_level_7   // Municipalities
+  admin_level_8   // Cities/Towns
+  admin_level_9   // City districts
+  admin_level_10  // Suburbs/Neighborhoods
+}
+
+enum AmenityTypeEnum {
+  hospital
+  school
+  park
+  shopping
+  restaurant
+  cafe
+  bank
+  pharmacy
+  gym
+  public_transport
+  library
+  police
+  fire_station
+  supermarket
+  gas_station
+  other
+}
+
+enum SubscriptionStatus {
+  active
+  canceled
+  suspended
+  expired
+}
+
+enum SubscriptionTierName {
+  local
+  regional
+  national
+  premium
+}
+
+enum SubscriptionPlanType {
+  individual
+  organization
+}
+
+enum MessageType {
+  inquiry
+  response
+}
+
+enum ViewType {
+  preview
+  detail
+}
+
+enum SubjectType {
+  listing
+  property
+  inquiry
+}
+
+enum GeoObjectType {
+  point
+  polygon
+  multipolygon
+  linestring
+}
+
+// ============================================================================
+// 1. PERSON MODEL (Generic base - stores person reference)
+// ============================================================================
+
+model Person {
+  id            String        @id @default(cuid())
+  
+  email         String        @unique
+  phone         String?
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  user          User?         @relation("PersonToUser")
+  physicalPerson PhysicalPerson?
+  organization  Organization?
+  ownedProperties Property[]   @relation("PropertyOwnerPerson")
+  agency        Agency?       @relation("AgencyPerson")
+
+  @@map("people")
+}
+
+// ============================================================================
+// 1.1 PHYSICAL PERSON (Child of Person)
+// ============================================================================
+
+model PhysicalPerson {
+  id            String        @id @default(cuid())
+  personId      String        @unique
+  person        Person        @relation(fields: [personId], references: [id], onDelete: Cascade)
+  
+  firstName     String
+  lastName      String
+  nationality   String?       // ISO country code
+  
+  // Address
+  addressId     String?
+  address       Address?      @relation("PhysicalPersonAddress", fields: [addressId], references: [id], onDelete: SetNull)
+  
+  // KYC/Verification
+  idNumber      String?       @unique
+  idType        String?       // passport, national_id, drivers_license
+  idVerified    Boolean       @default(false)
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([personId])
+  @@index([addressId])
+  @@map("physical_people")
+}
+
+// ============================================================================
+// 1.2 ORGANIZATION (Child of Person)
+// ============================================================================
+
+model Organization {
+  id            String        @id @default(cuid())
+  personId      String        @unique
+  person        Person        @relation(fields: [personId], references: [id], onDelete: Cascade)
+  
+  businessName  String
+  businessRegNumber String?
+  taxId         String?
+  registrationCountry String
+  
+  // Address
+  addressId     String?
+  address       Address?      @relation("OrganizationAddress", fields: [addressId], references: [id], onDelete: SetNull)
+  
+  // Contact person in organization
+  contactFirstName String?
+  contactLastName String?
+  contactTitle  String?       // CEO, Manager, etc.
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([personId])
+  @@index([addressId])
+  @@index([registrationCountry])
+  @@map("organizations")
+}
+
+
+// ============================================================================
+// 2. USER MODEL (Simplified roles)
 // ============================================================================
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String // bcrypt hash
-  name      String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String        @id @default(cuid())
+  email         String        @unique
+  passwordHash  String
+  avatarUrl     String?
+  
+  // Single role: user or admin (contextual roles via AgencyRole)
+  role          UserRole      @default(user)
+  
+  isActive      Boolean       @default(true)
+  country_code  String?
+  
+  // Link to Person (generic table)
+  personId      String?       @unique
+  person        Person?       @relation("PersonToUser", fields: [personId], references: [id], onDelete: SetNull)
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   // Relations
-  userRoles     UserRole[]
   refreshTokens RefreshToken[]
+  properties    Property[]    @relation("PropertyOwner")
+  listings      Listing[]     @relation("ListingCreator")
+  sentMessages  Message[]     @relation("MessageSender")
+  receivedMessages Message[]  @relation("MessageRecipient")
+  agencyRoles   AgencyRole[]
+  individualSubscription IndividualSubscriptionPlan?
+  views         View[]        @relation("ViewerUser")
 
   @@index([email])
+  @@index([role])
+  @@index([country_code])
   @@map("users")
 }
 
 // ============================================================================
-// Role-Based Access Control (RBAC)
+// 3. GEO OBJECT MODEL (Geographical data - points, polygons)
 // ============================================================================
 
-model Role {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model GeoObject {
+  id            String        @id @default(cuid())
+  type          GeoObjectType
+  
+  // Coordinates (for points)
+  latitude      Float?
+  longitude     Float?
+  
+  // For polygons/multipolygons (GeoJSON)
+  geoJson       Json?
+  
+  name          String?
+  metadata      Json?
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   // Relations
-  userRoles       UserRole[]
-  rolePermissions RolePermission[]
+  addresses     Address[]     @relation("AddressGeoObject")
+  amenities     Amenity[]     @relation("AmenityGeoObject")
+  geographicalAreas GeographicalArea[] @relation("AreaGeoObject")
+  adminBoundaries AdminBoundary[] @relation("BoundaryGeoObject")
 
-  @@map("roles")
-}
-
-model Permission {
-  id          String   @id @default(cuid())
-  resource    String // e.g., "posts", "users", "comments"
-  action      String // e.g., "create", "read", "update", "delete"
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  rolePermissions RolePermission[]
-
-  @@unique([resource, action])
-  @@map("permissions")
-}
-
-// ============================================================================
-// Many-to-Many Junction Tables
-// ============================================================================
-
-model UserRole {
-  userId String
-  roleId String
-
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
-
-  @@id([userId, roleId])
-  @@map("user_roles")
-}
-
-model RolePermission {
-  roleId       String
-  permissionId String
-
-  // Relations
-  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-
-  @@id([roleId, permissionId])
-  @@map("role_permissions")
+  @@index([type])
+  @@index([latitude, longitude])
+  @@map("geo_objects")
 }
 
 // ============================================================================
-// Authentication Tokens
+// 4. ADDRESS MODEL (Street address - with optional geo reference)
+// ============================================================================
+
+model Address {
+  id            String        @id @default(cuid())
+  
+  streetName    String
+  streetNumber  String?
+  unit          String?       // Apartment, suite number
+  postalCode    String
+  city          String
+  region        String?       // State, province, region
+  country_code  String
+  
+  // Link to geographical object (optional)
+  geoObjectId   String?
+  geoObject     GeoObject?    @relation("AddressGeoObject", fields: [geoObjectId], references: [id], onDelete: SetNull)
+  
+  metadata      Json?
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  properties    Property[]
+  physicalPeople PhysicalPerson[] @relation("PhysicalPersonAddress")
+  organizations Organization[] @relation("OrganizationAddress")
+
+  @@index([postalCode])
+  @@index([city])
+  @@index([country_code])
+  @@index([geoObjectId])
+  @@unique([streetName, streetNumber, unit, postalCode, country_code])
+  @@map("addresses")
+}
+
+
+
+// ============================================================================
+// 5. PROPERTY MODEL (Asset - with ownership tracking)
+// ============================================================================
+
+model Property {
+  id             String        @id @default(cuid())
+  title          String
+  description    String?
+  
+  // Address
+  addressId      String
+  address        Address       @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  
+  // Ownership (reference to Person - can be user's person or external person)
+  ownerPersonId  String
+  ownerPerson    Person        @relation("PropertyOwnerPerson", fields: [ownerPersonId], references: [id], onDelete: Restrict)
+  
+  // Optional: Link to system user if owner is a registered user
+  userId         String?       // Nullable if owner is not a system user
+  user           User?         @relation("PropertyOwner", fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Owner documentation (part of property docs)
+  ownerDocumentUrl String?     // Contract, title deed, etc.
+  
+  // Property details
+  propertyType   PropertyType
+  bedrooms       Int?
+  bathrooms      Int?
+  surfaceArea    Float?        // Square meters
+  gardenSize     Float?        // Square meters
+  yearBuilt      Int?
+  amenitiesList  String[]      // Array of amenity names
+  metadata       Json?         // Extensible data
+  
+  // Hierarchy (sub-properties like garage)
+  parentPropertyId String?
+  parentProperty  Property?    @relation("PropertyHierarchy", fields: [parentPropertyId], references: [id], onDelete: SetNull)
+  childProperties Property[]   @relation("PropertyHierarchy")
+  
+  isAvailable    Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations
+  listings       Listing[]
+  listingSubjects ListingSubject[]
+
+  @@index([userId])
+  @@index([ownerPersonId])
+  @@index([addressId])
+  @@index([propertyType])
+  @@map("properties")
+}
+
+// ============================================================================
+// 6. PAYMENT TERMS MODEL (Base - with inheritance)
+// ============================================================================
+
+model PaymentTerms {
+  id            String        @id @default(cuid())
+  
+  termType      PaymentTermType  // onetime or periodic discriminator
+  description   String?
+  currency      String        @default("EUR")
+  
+  metadata      Json?
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations (polymorphic)
+  onetimePayment OnetimePaymentTerm?
+  periodicPayment PeriodicPaymentTerm?
+  compositePayment CompositePaymentTerm?
+  listings      Listing[]
+
+  @@index([termType])
+  @@map("payment_terms")
+}
+
+// ============================================================================
+// 6.1 ONETIME PAYMENT TERM (Single payment)
+// ============================================================================
+
+model OnetimePaymentTerm {
+  id            String        @id @default(cuid())
+  paymentTermsId String       @unique
+  paymentTerms  PaymentTerms  @relation(fields: [paymentTermsId], references: [id], onDelete: Cascade)
+  
+  amount        Float
+  
+  // For installment options
+  installmentCount Int?
+  installmentAmount Float?
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([paymentTermsId])
+  @@map("onetime_payment_terms")
+}
+
+// ============================================================================
+// 6.2 PERIODIC PAYMENT TERM (Recurring payments)
+// ============================================================================
+
+model PeriodicPaymentTerm {
+  id            String        @id @default(cuid())
+  paymentTermsId String       @unique
+  paymentTerms  PaymentTerms  @relation(fields: [paymentTermsId], references: [id], onDelete: Cascade)
+  
+  amountPerPeriod Float
+  periodType    String        // "monthly", "quarterly", "biannual", "annual", "per_night", "per_week"
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([paymentTermsId])
+  @@map("periodic_payment_terms")
+}
+
+// ============================================================================
+// 6.3 COMPOSITE PAYMENT TERM (Combining multiple payment terms)
+// ============================================================================
+
+model CompositePaymentTerm {
+  id            String        @id @default(cuid())
+  paymentTermsId String       @unique
+  paymentTerms  PaymentTerms  @relation(fields: [paymentTermsId], references: [id], onDelete: Cascade)
+  
+  compositionType PaymentCompositionType
+  
+  // References to component payment terms (stored as JSON array of IDs)
+  componentTerms Json         // Array of {paymentTermId: string, percentage?: number, phase?: number}
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([paymentTermsId])
+  @@map("composite_payment_terms")
+}
+
+// ============================================================================
+// 7. LISTING MODEL (Base - Polymorphic with type-specific children)
+// ============================================================================
+
+model Listing {
+  id             String        @id @default(cuid())
+  
+  // Discriminator for type
+  type           ListingType
+  
+  propertyId     String
+  property       Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  // Who created this listing (user or agent)
+  createdBy      String
+  creator        User          @relation("ListingCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  
+  // Payment terms (moved from child models)
+  paymentTermsId String
+  paymentTerms   PaymentTerms  @relation(fields: [paymentTermsId], references: [id], onDelete: Restrict)
+  
+  status         ListingStatus @default(draft)
+  
+  visibilityStart DateTime?
+  visibilityEnd DateTime?
+  visibilityDays Int?
+  
+  publishedAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations (polymorphic type-specific data)
+  saleListing    SaleListing?  @relation("ListingToSale")
+  rentalListing  RentalListing? @relation("ListingToRental")
+  shortTermListing ShortTermListing? @relation("ListingToShortTerm")
+  leaseListing   LeaseListing? @relation("ListingToLease")
+  
+  // Subjects and views
+  listingSubjects ListingSubject[]
+  views          View[]
+
+  @@index([propertyId])
+  @@index([createdBy])
+  @@index([paymentTermsId])
+  @@index([status])
+  @@index([type])
+  @@index([visibilityEnd])
+  @@map("listings")
+}
+
+// ============================================================================
+// 7.1 SALE LISTING (Type-specific fields for sale)
+// ============================================================================
+
+model SaleListing {
+  id             String        @id @default(cuid())
+  listingId      String        @unique
+  listing        Listing       @relation("ListingToSale", fields: [listingId], references: [id], onDelete: Cascade)
+  
+  condition      String?       // excellent, good, fair, needs_work
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([listingId])
+  @@map("sale_listings")
+}
+
+// ============================================================================
+// 7.2 RENTAL LISTING (Type-specific fields for rental)
+// ============================================================================
+
+model RentalListing {
+  id             String        @id @default(cuid())
+  listingId      String        @unique
+  listing        Listing       @relation("ListingToRental", fields: [listingId], references: [id], onDelete: Cascade)
+  
+  leaseTermMonths Int?         // Minimum lease length
+  utilitiesIncluded Boolean    @default(false)
+  utilitiesDetails String?
+  petFriendly    Boolean       @default(false)
+  petDetails     String?
+  furnishingStatus String?     // unfurnished, semi_furnished, furnished
+  
+  // Deposit/security requirements
+  depositRequired Float?
+  depositPercent Float?       // Percentage of monthly rent
+  
+  autoRenew      Boolean       @default(false)
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([listingId])
+  @@map("rental_listings")
+}
+
+// ============================================================================
+// 7.3 SHORT-TERM LISTING (Type-specific fields for vacation/short stays)
+// ============================================================================
+
+model ShortTermListing {
+  id             String        @id @default(cuid())
+  listingId      String        @unique
+  listing        Listing       @relation("ListingToShortTerm", fields: [listingId], references: [id], onDelete: Cascade)
+  
+  minStayNights  Int?          // Minimum stay (3, 7, 30)
+  maxGuestsAllowed Int?
+  
+  cancellationPolicy String?   // flexible, moderate, strict, super_strict
+  checkInTime    String?       // HH:MM format
+  checkOutTime   String?       // HH:MM format
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([listingId])
+  @@map("short_term_listings")
+}
+
+// ============================================================================
+// 7.4 LEASE LISTING (Type-specific fields for commercial/long-term)
+// ============================================================================
+
+model LeaseListing {
+  id             String        @id @default(cuid())
+  listingId      String        @unique
+  listing        Listing       @relation("ListingToLease", fields: [listingId], references: [id], onDelete: Cascade)
+  
+  leaseType      String?       // residential, commercial, industrial, mixed_use
+  leaseTermYears Int?          // Standard lease duration
+  renewalOptions Boolean       @default(false)
+  securityDeposit Float?
+  commercialUseAllowed Boolean @default(false)
+  businessType   String?       // If commercial use allowed
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([listingId])
+  @@map("lease_listings")
+}
+
+// ============================================================================
+// 8. AGENCY MODEL (Real estate agency)
+// ============================================================================
+
+model Agency {
+  id             String        @id @default(cuid())
+  
+  // Agency IS a Person (Organization)
+  personId       String        @unique
+  person         Person        @relation("AgencyPerson", fields: [personId], references: [id], onDelete: Cascade)
+  
+  tier           AgencyTierType @default(basic)
+  
+  profileImageUrl String?
+  description    String?
+  
+  maxAgents      Int           @default(5)
+  maxListings    Int           @default(50)
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations
+  employees      AgencyRole[]
+  subscriptions  OrganizationSubscriptionPlan[]
+
+  @@index([personId])
+  @@index([tier])
+  @@map("agencies")
+}
+
+// ============================================================================
+// 8.1 AGENCY ROLE (Contextual roles for users in agencies)
+// ============================================================================
+
+model AgencyRole {
+  id            String        @id @default(cuid())
+  
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  agencyId      String
+  agency        Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  
+  role          AgencyRoleType
+  permissions   Json?         // Custom permissions per role
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@unique([userId, agencyId])
+  @@index([agencyId])
+  @@map("agency_roles")
+}
+
+// ============================================================================
+// 9. GEOGRAPHICAL AREA MODEL (Market-specific zones)
+// ============================================================================
+
+model GeographicalArea {
+  id             String        @id @default(cuid())
+  name           String
+  code           String        @unique
+  description    String?
+  
+  // Hierarchy for nested areas
+  parentAreaId   String?
+  parentArea     GeographicalArea? @relation("AreaHierarchy", fields: [parentAreaId], references: [id], onDelete: SetNull)
+  childAreas     GeographicalArea[] @relation("AreaHierarchy")
+  
+  // Geographical representation
+  geoObjectId    String?
+  geoObject      GeoObject?    @relation("AreaGeoObject", fields: [geoObjectId], references: [id], onDelete: SetNull)
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([code])
+  @@index([geoObjectId])
+  @@map("geographical_areas")
+}
+
+// ============================================================================
+// 10. ADMIN BOUNDARY MODEL (Official administrative jurisdictions)
+// ============================================================================
+
+model AdminBoundary {
+  id             String        @id @default(cuid())
+  name           String
+  officialCode   String?
+  boundaryType   AdminBoundaryType
+  country_code   String
+  
+  // Hierarchy
+  parentBoundaryId String?
+  parentBoundary  AdminBoundary? @relation("BoundaryHierarchy", fields: [parentBoundaryId], references: [id], onDelete: SetNull)
+  childBoundaries AdminBoundary[] @relation("BoundaryHierarchy")
+  
+  // Geographical representation
+  geoObjectId    String?
+  geoObject      GeoObject?    @relation("BoundaryGeoObject", fields: [geoObjectId], references: [id], onDelete: SetNull)
+  
+  population     Int?
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([country_code])
+  @@index([boundaryType])
+  @@index([geoObjectId])
+  @@unique([name, country_code, boundaryType])
+  @@map("admin_boundaries")
+}
+
+// ============================================================================
+// 11. AMENITY MODEL (Base - POI with type-specific children)
+// ============================================================================
+
+model Amenity {
+  id             String        @id @default(cuid())
+  name           String
+  type           AmenityTypeEnum
+  
+  // Geographical location
+  geoObjectId    String
+  geoObject      GeoObject     @relation("AmenityGeoObject", fields: [geoObjectId], references: [id], onDelete: Cascade)
+  
+  // Contact info
+  address        String?
+  city           String?
+  country_code   String
+  phone          String?
+  website        String?
+  openingHours   String?
+  
+  // Rating/Review
+  avgRating      Float?
+  reviewCount    Int?
+  
+  metadata       Json?
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations (type-specific)
+  hospital       HospitalAmenity?
+  school         SchoolAmenity?
+  restaurant     RestaurantAmenity?
+  transitStop    TransitStopAmenity?
+
+  @@index([type])
+  @@index([geoObjectId])
+  @@index([city])
+  @@index([country_code])
+  @@map("amenities")
+}
+
+// ============================================================================
+// 11.1 HOSPITAL AMENITY (Type-specific for hospitals)
+// ============================================================================
+
+model HospitalAmenity {
+  id             String        @id @default(cuid())
+  amenityId      String        @unique
+  amenity        Amenity       @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+  
+  specializations String[]
+  beds           Int?
+  emergencyDept  Boolean       @default(false)
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([amenityId])
+  @@map("hospital_amenities")
+}
+
+// ============================================================================
+// 11.2 SCHOOL AMENITY (Type-specific for schools)
+// ============================================================================
+
+model SchoolAmenity {
+  id             String        @id @default(cuid())
+  amenityId      String        @unique
+  amenity        Amenity       @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+  
+  grades         Int[]
+  type           String?       // public, private, charter
+  pupils         Int?
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([amenityId])
+  @@map("school_amenities")
+}
+
+// ============================================================================
+// 11.3 RESTAURANT AMENITY (Type-specific for restaurants)
+// ============================================================================
+
+model RestaurantAmenity {
+  id             String        @id @default(cuid())
+  amenityId      String        @unique
+  amenity        Amenity       @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+  
+  cuisine        String?
+  seatsAvailable Int?
+  priceRange     String?       // €, $$, $$$, $$$$
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([amenityId])
+  @@map("restaurant_amenities")
+}
+
+// ============================================================================
+// 11.4 TRANSIT STOP AMENITY (Type-specific for public transport)
+// ============================================================================
+
+model TransitStopAmenity {
+  id             String        @id @default(cuid())
+  amenityId      String        @unique
+  amenity        Amenity       @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+  
+  lines          String[]      // Bus routes, metro lines
+  frequency      String?       // Every X minutes
+  accessibility  Boolean       @default(false)
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([amenityId])
+  @@map("transit_stop_amenities")
+}
+
+// ============================================================================
+// 12. SUBJECT MODEL (Base - for conversations)
+// ============================================================================
+
+model Subject {
+  id             String        @id @default(cuid())
+  subjectType    SubjectType   // listing, property, inquiry
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations
+  listingSubject ListingSubject?
+  messages       Message[]
+
+  @@index([subjectType])
+  @@map("subjects")
+}
+
+// ============================================================================
+// 12.1 LISTING SUBJECT (Conversation about a listing)
+// ============================================================================
+
+model ListingSubject {
+  id             String        @id @default(cuid())
+  subjectId      String        @unique
+  subject        Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  
+  listingId      String
+  listing        Listing       @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  
+  propertyId     String
+  property       Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@unique([listingId])
+  @@index([subjectId])
+  @@index([listingId])
+  @@map("listing_subjects")
+}
+
+// ============================================================================
+// 13. MESSAGE MODEL (Linked to Subject for polymorphic conversations)
+// ============================================================================
+
+model Message {
+  id             String        @id @default(cuid())
+  
+  senderId       String
+  sender         User          @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  
+  recipientId    String
+  recipient      User          @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  
+  // Subject polymorphism (can be about listing, property, inquiry, etc.)
+  subjectId      String?
+  subject        Subject?      @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  
+  // Thread for conversation grouping
+  threadId       String?
+  
+  messageType    MessageType   @default(inquiry)
+  
+  subject_line   String?
+  body           String
+  
+  // For agency distribution
+  distributionList Json?       // Array of user IDs for forwarding
+  
+  isRead         Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+
+  @@index([senderId])
+  @@index([recipientId])
+  @@index([subjectId])
+  @@index([threadId])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+// ============================================================================
+// 14. VIEW MODEL (Tracking listing views for analytics)
+// ============================================================================
+
+model View {
+  id             String        @id @default(cuid())
+  
+  listingId      String
+  listing        Listing       @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  
+  viewerId       String?
+  viewer         User?         @relation("ViewerUser", fields: [viewerId], references: [id], onDelete: SetNull)
+  
+  viewType       ViewType      @default(preview)
+  
+  ipAddress      String?       // Hashed for privacy
+  userAgent      String?
+  
+  timestamp      DateTime      @default(now())
+
+  @@index([listingId])
+  @@index([viewerId])
+  @@index([timestamp])
+  @@map("views")
+}
+
+// ============================================================================
+// 15. SUBSCRIPTION PLAN MODEL (Base - Polymorphic)
+// ============================================================================
+
+model SubscriptionPlan {
+  id             String        @id @default(cuid())
+  
+  planType       SubscriptionPlanType
+  tierName       SubscriptionTierName
+  monthlyPrice   Float
+  features       Json?
+  
+  status         SubscriptionStatus @default(active)
+  renewalDate    DateTime
+  canceledAt     DateTime?
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations
+  individualPlan IndividualSubscriptionPlan?
+  organizationPlan OrganizationSubscriptionPlan?
+
+  @@index([planType])
+  @@index([status])
+  @@index([renewalDate])
+  @@map("subscription_plans")
+}
+
+// ============================================================================
+// 15.1 INDIVIDUAL SUBSCRIPTION PLAN (User-level subscription)
+// ============================================================================
+
+model IndividualSubscriptionPlan {
+  id             String        @id @default(cuid())
+  planId         String        @unique
+  plan           SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  
+  userId         String        @unique
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  maxListingsActive Int
+  maxAreas       Int
+  hasAdvancedAnalytics Boolean  @default(false)
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([planId])
+  @@map("individual_subscription_plans")
+}
+
+// ============================================================================
+// 15.2 ORGANIZATION SUBSCRIPTION PLAN (Agency-level subscription)
+// ============================================================================
+
+model OrganizationSubscriptionPlan {
+  id             String        @id @default(cuid())
+  planId         String        @unique
+  plan           SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  
+  agencyId       String        @unique
+  agency         Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  
+  maxAgents      Int
+  maxListingsActive Int
+  maxAreas       Int
+  hasTeamManagement Boolean    @default(true)
+  hasAdvancedAnalytics Boolean @default(true)
+  hasApiAccess    Boolean      @default(false)
+  
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([agencyId])
+  @@index([planId])
+  @@map("organization_subscription_plans")
+}
+
+// ============================================================================
+// 16. REFRESH TOKEN MODEL (Authentication)
 // ============================================================================
 
 model RefreshToken {
-  id        String    @id @default(cuid())
-  userId    String
-  token     String    @unique // JWT token hash
-  expiresAt DateTime
-  revokedAt DateTime? // NULL if active, set if revoked (logout)
-  createdAt DateTime  @default(now())
+  id             String        @id @default(cuid())
+  userId         String
+  token          String        @unique
+  expiresAt      DateTime
+  revokedAt      DateTime?
+  createdAt      DateTime      @default(now())
 
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([token])
   @@map("refresh_tokens")
 }

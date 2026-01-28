@@ -4,19 +4,25 @@
  */
 
 // ============================================================================
-// Database Models (mirror Prisma schema from db/schema.prisma)
+// Database Models (aligned with Prisma schema from db/schema.prisma)
 // ============================================================================
+
+export type UserRoleEnum = 'user' | 'admin';
 
 export interface User {
   id: string;
   email: string;
-  password: string; // bcrypt hash
-  name: string | null;
+  passwordHash: string; // bcrypt hash
+  avatarUrl: string | null;
+  role: UserRoleEnum; // Single role enum
   isActive: boolean;
+  country_code: string | null;
+  personId: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
 
+// Legacy types (kept for compatibility, but not used in current schema)
 export interface Role {
   id: string;
   name: string;
@@ -69,9 +75,10 @@ export interface TokenPair {
   expiresIn: number; // seconds until access token expires
 }
 
-export interface UserWithRoles extends Omit<User, 'password'> {
-  roles: Role[];
-  permissions: Permission[];
+export interface UserWithRoles extends Omit<User, 'passwordHash'> {
+  name: string | null; // Name from Person table (for convenience)
+  roles: UserRoleEnum[]; // Array for compatibility (single role for now)
+  permissions: string[]; // Permissions (empty for now, future RBAC)
 }
 
 // ============================================================================

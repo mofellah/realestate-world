@@ -10,6 +10,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { UserRole } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { comparePassword, hashPassword } from '@boilerplate/utils';
 import { backendConfig } from '@boilerplate/config';
@@ -45,21 +46,6 @@ export class AuthService {
     // Find user by email
     const user = await this.prisma.user.findUnique({
       where: { email },
-      include: {
-        userRoles: {
-          include: {
-            role: {
-              include: {
-                rolePermissions: {
-                  include: {
-                    permission: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
     });
 
     if (!user) {
@@ -75,7 +61,7 @@ export class AuthService {
     }
 
     // Verify password
-    const isPasswordValid = await comparePassword(password, user.password);
+    const isPasswordValid = await comparePassword(password, user.passwordHash);
 
     if (!isPasswordValid) {
       this.logger.warn('Login attempt failed: invalid password', {
@@ -103,8 +89,12 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        name: user.name,
+        role: user.role,
         isActive: user.isActive,
+        passwordHash: user.passwordHash, // Included but will be filtered by API response DTOs
+        avatarUrl: user.avatarUrl,
+        country_code: user.country_code,
+        personId: user.personId,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
@@ -125,23 +115,7 @@ export class AuthService {
     const refreshTokenRecord = await this.prisma.refreshToken.findUnique({
       where: { token: tokenHash },
       include: {
-        user: {
-          include: {
-            userRoles: {
-              include: {
-                role: {
-                  include: {
-                    rolePermissions: {
-                      include: {
-                        permission: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
+        user: true,
       },
     });
 
@@ -181,7 +155,7 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string; expiresIn: number; user: any }> {
     this.logger.setCorrelationId(correlationId);
 
-    const { email, password, passwordConfirmation, name } = registerRequest;
+    const { email, password, passwordConfirmation } = registerRequest;
 
     // Validate password confirmation
     if (password !== passwordConfirmation) {
@@ -225,56 +199,16 @@ export class AuthService {
       });
     }
 
-    // Get default "user" role
-    const userRole = await this.prisma.role.findUnique({
-      where: { name: 'user' },
-      include: {
-        rolePermissions: {
-          include: {
-            permission: true,
-          },
-        },
-      },
-    });
-
-    if (!userRole) {
-      this.logger.error('Registration failed: user role not found', {
-        email,
-        correlationId,
-      });
-      throw new Error('Default user role not found');
-    }
-
     // Hash password
     const hashedPassword = await hashPassword(password);
 
-    // Create user
+    // Create user with default 'user' role
     const newUser = await this.prisma.user.create({
       data: {
         email,
-        password: hashedPassword,
-        name: name || null,
+        passwordHash: hashedPassword,
+        role: UserRole.user,
         isActive: true,
-        userRoles: {
-          create: {
-            roleId: userRole.id,
-          },
-        },
-      },
-      include: {
-        userRoles: {
-          include: {
-            role: {
-              include: {
-                rolePermissions: {
-                  include: {
-                    permission: true,
-                  },
-                },
-              },
-            },
-          },
-        },
       },
     });
 
@@ -292,8 +226,12 @@ export class AuthService {
       user: {
         id: newUser.id,
         email: newUser.email,
-        name: newUser.name,
+        role: newUser.role,
         isActive: newUser.isActive,
+        passwordHash: newUser.passwordHash, // Included but will be filtered by API response DTOs
+        avatarUrl: newUser.avatarUrl,
+        country_code: newUser.country_code,
+        personId: newUser.personId,
         createdAt: newUser.createdAt,
         updatedAt: newUser.updatedAt,
       },

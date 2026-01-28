@@ -1,10 +1,21 @@
-# Implementation Checklist
+# Real Estate Platform - Implementation Checklist
 
-**Purpose**: Track progress through each phase of boilerplate implementation.
+**Last Updated**: 2026-01-27  
+**Timeline**: 3 Months (MVP Launch)  
+**Target Markets**: Belgium, Holland, Switzerland
 
 ---
 
-## Phase 1: Monorepo & Infrastructure
+## Phase Overview
+
+- **Phase 1 (MVP)**: Core search + listing + contact (3 months, Jan–Mar 2026)
+- **Phase 2**: Premium features + analytics (3 months, Apr–Jun 2026)
+- **Phase 3**: Property management + ecosystem (3 months, Jul–Sep 2026)
+- **Ongoing**: Data import (OSM, transactions, POIs)
+
+---
+
+## Phase 1: MVP (3 Months)
 
 ### Monorepo Setup
 - [ ] Create root `package.json` with npm workspaces
@@ -316,17 +327,264 @@
 
 ## Success: ✅ Boilerplate Complete!
 
-When all checkboxes are checked, your boilerplate is production-ready and can be used as a template for multiple projects.
+### Gate: Requirements Complete ✅
+
+- [x] Product Vision documented
+- [x] User stories defined
+- [x] Feature specifications complete
+- [x] Data model defined
+- [x] NFR defined
+- [x] BDD scenarios written
+- [x] Stakeholder approval received
+
+**Status**: ✅ Complete (2026-01-27)
 
 ---
 
-## Next: Using the Boilerplate
+### Week 1-2: Planning & Setup
 
-For new projects:
+#### Database Agent Tasks
+- [ ] Design Database Schema
+  - [ ] Create Prisma schema (Property, Listing, User, Agency, Area, Subscription, Message, View)
+  - [ ] Define migrations (init schema)
+  - [ ] Create seed data (test properties, users, agencies, areas for Belgium/Holland/Switzerland)
+  - [ ] Validate schema with Product Owner
+  - [ ] **Status**: Not started
+  - [ ] **Timeline**: 4 days
 
-1. **Copy boilerplate** to new directory
-2. **Update package names** (change @mono to @yourproject)
-3. **Update environment** (.env for your setup)
+#### DevOps Agent Tasks
+- [ ] Docker & Compose Setup
+  - [ ] Create backend Dockerfile (NestJS + Fastify)
+  - [ ] Create frontend Dockerfile (React 19 + Vite)
+  - [ ] Create docker-compose.dev.yml (hot-reload, debuggers)
+  - [ ] Create docker-compose.prod.yml (optimized, nginx)
+  - [ ] Test: docker-compose up starts all services
+  - [ ] **Timeline**: 2 days
+
+- [ ] CI/CD Pipeline
+  - [ ] Create GitHub Actions workflow
+  - [ ] Configure Docker image registry
+  - [ ] **Timeline**: 2 days
+
+---
+
+### Week 3-4: Backend Foundation
+
+#### Database Agent
+- [ ] Finalize and test all migrations
+- [ ] Create indexes for performance
+- [ ] Provide seed data
+- [ ] **Deliverables**: db/schema.prisma, migrations, seeds
+
+#### Coder Agent
+- [ ] Backend: User & Auth Module (register, login, JWT, roles, guards)
+- [ ] Backend: Property & Listing Module (CRUD, publishing, payment integration, expiry)
+- [ ] Tests: 80%+ coverage for auth
+- [ ] **Timeline**: 5 days
+
+#### Test Agent
+- [ ] Test Plan for Auth Module (unit + integration)
+- [ ] Test Plan for Property/Listing Module
+- [ ] **Timeline**: 2 days
+
+---
+
+### Week 5-6: More Backend (Agency, Contact)
+
+#### Coder Agent
+- [ ] Backend: Agency & Agent Module (team management, subscriptions, area restrictions)
+- [ ] Backend: Messaging Module (inquiries, distribution lists, email routing)
+- [ ] Tests: 80%+ coverage
+- [ ] **Timeline**: 9 days
+
+#### Test Agent
+- [ ] Test Plan for Agency & Messaging Modules
+- [ ] **Timeline**: 2 days
+
+---
+
+### Week 7-8: Frontend & Maps
+
+#### Coder Agent
+- [ ] Frontend: Setup (React 19, Vite, Tailwind, API client)
+- [ ] Frontend: Map Search (Mapbox/Google Maps, filters, proximity, amenities)
+- [ ] Frontend: Property Detail Page
+- [ ] Frontend: Auth Pages (login, register)
+- [ ] Tests: 70%+ coverage
+- [ ] **Timeline**: 13 days
+
+#### Test Agent
+- [ ] Test Plan for Frontend Components & Pages
+- [ ] E2E tests for search user journey
+- [ ] **Timeline**: 3 days
+
+---
+
+### Week 9-10: Contact & Owner Dashboard
+
+#### Coder Agent
+- [ ] Frontend: Contact Form & Messaging
+- [ ] Frontend: Owner Dashboard (assets, listings, renewals)
+- [ ] Frontend: Agency Dashboard (agents, portfolio)
+- [ ] Tests: 70%+ coverage
+- [ ] **Timeline**: 7 days
+
+---
+
+### Week 11-12: Polish, Testing, Launch
+
+#### DevOps Agent
+- [ ] Pre-launch checklist (monitoring, backups, SSL, DNS)
+- [ ] Performance baselines (map load, filter response)
+- [ ] **Timeline**: 2 days
+
+#### Test Agent
+- [ ] Manual QA (all features across browsers/mobile)
+- [ ] Performance testing (map <2s, filter <500ms)
+- [ ] Load testing (100 concurrent users)
+- [ ] Accessibility testing (WCAG 2.1 AA)
+- [ ] Security testing (XSS, SQL injection, CSRF)
+- [ ] **Timeline**: 3 days
+
+#### Orchestrator
+- [ ] **Go/No-Go Gate Check**
+  - [ ] All features complete?
+  - [ ] All tests passing (80%+ backend, 70%+ frontend)?
+  - [ ] No critical bugs?
+  - [ ] Performance targets met?
+  - [ ] GDPR compliance ready?
+  - [ ] Infrastructure ready?
+  - [ ] If all pass: Approve launch
+
+---
+
+## Phase 1 MVP Deliverables
+
+### Must Deliver (Week 12)
+- [x] **Database**: schema.prisma, migrations, seeds
+- [x] **Backend**: Auth, Property, Listing, Agency, Messaging modules (80%+ test coverage)
+- [x] **Frontend**: Map search, property detail, auth pages, owner/agency dashboards (70%+ test coverage)
+- [x] **DevOps**: Docker setup, CI/CD pipeline, monitoring
+- [x] **Testing**: Unit + integration + E2E tests, performance/accessibility verified
+- [x] **Docs**: PRODUCT_VISION.md, USER_STORIES.md, NFR.md, feature specs, BDD scenarios
+- [x] **Infrastructure**: Staging or production environment ready, backups configured
+
+### Success Criteria (End of Month 3)
+- [ ] Platform accessible (99.5% uptime)
+- [ ] 10,000+ searchersm registered
+- [ ] 500+ properties listed
+- [ ] 50+ agencies onboarded
+- [ ] €30,000+ MRR (monthly recurring revenue)
+- [ ] <2s map load time (p95)
+- [ ] <500ms filter response (p95)
+- [ ] 0 critical bugs
+- [ ] 60%+ owner/agency response rate to inquiries
+
+---
+
+## Phase 2: Premium Features (Months 4-6)
+
+### Features
+- [ ] Whitelist & premium listings (certification, investor access)
+- [ ] Complex alerts (rules-based, nightly recalculation)
+- [ ] AI Assistant (photo analysis, market reports)
+- [ ] Advanced analytics dashboards
+- [ ] Custom agent permissions & distribution lists
+- [ ] Investor portfolio management
+
+**Owner**: Product Owner + Coder + Test agents
+
+---
+
+## Phase 3: Property Management & Ecosystem (Months 7-9)
+
+### Features
+- [ ] Locative (rent collection, tenant management)
+- [ ] Airbnb-style booking (calendar, instant booking)
+- [ ] Commercial/industrial asset types
+- [ ] Expert services marketplace
+- [ ] International expansion (France, Spain, Italy)
+
+**Owner**: Product Owner + Coder + Database agents
+
+---
+
+## Ongoing: Data Imports (Before MVP Launch)
+
+### Critical (Must complete before launch)
+- [ ] OSM import: Property boundaries, building data
+- [ ] POI import: Schools (with ratings), transit stops, hospitals, parks, shops
+- [ ] Area definitions: Geographic boundaries for Belgium, Holland, Switzerland
+- [ ] **Owner**: Data team (parallel to development, not blocking)
+- [ ] **Timeline**: 2-4 weeks
+
+---
+
+## Risk Assessment
+
+### High Risk
+| Risk | Mitigation | Owner |
+|------|-----------|-------|
+| **Map performance** (1000+ listings) | Implement clustering, pagination, caching | DevOps + Frontend |
+| **Payment processing** (failed payments, PCI) | Use Stripe (handles PCI), webhook validation | Backend |
+| **Email delivery** (critical workflow) | Use SendGrid/Mailgun, monitor delivery rate | DevOps + Backend |
+
+### Medium Risk
+| Risk | Mitigation | Owner |
+|------|-----------|-------|
+| **Multi-country complexity** | Extensible schema, store country_code | Database + Backend |
+| **Concurrent user growth** | Connection pooling, read replicas, caching | DevOps |
+
+---
+
+## Go/No-Go Launch Criteria (Week 12)
+
+### MUST HAVE
+- [ ] Map search <2s load time, <500ms filter
+- [ ] Property listing (owner can publish)
+- [ ] Contact workflow (searcher → owner/agency)
+- [ ] Agency subscription & agent management
+- [ ] Payment processing (Stripe + test transactions)
+- [ ] All tests passing (80%+ backend, 70%+ frontend)
+- [ ] No critical bugs
+- [ ] GDPR compliance (privacy policy, consent)
+- [ ] Uptime monitoring + alerts
+- [ ] Database backups working
+
+### SHOULD HAVE (If time)
+- [ ] Performance optimizations (CDN, caching)
+- [ ] Advanced error messages + user feedback
+
+### CAN DEFER (Phase 2+)
+- [ ] SMS notifications
+- [ ] In-app notifications (vs. email)
+- [ ] Advanced analytics
+- [ ] Feature flags for gradual rollout
+
+---
+
+## Launch Readiness Checklist (Day 1)
+
+Before going live:
+- [ ] Database backups tested (can restore)
+- [ ] Monitoring alerts configured
+- [ ] Error tracking (Sentry/DataDog) active
+- [ ] Performance baselines captured
+- [ ] SSL certificates valid
+- [ ] Domain DNS pointing to load balancer
+- [ ] Load balancer health checks passing
+- [ ] Database read replicas synced
+- [ ] Email delivery tested (test inquiry → verify in inbox)
+- [ ] Payment processing tested (test charge in Stripe)
+- [ ] Smoke tests passing (map loads, search works, contact sends)
+- [ ] Runbook created (how to debug issues, emergency contacts)
+- [ ] On-call rotation scheduled (first week)
+
+---
+
+**Status**: MVP Ready for Implementation  
+**Last Updated**: 2026-01-27  
+**Next Review**: 2026-02-10 (after Week 2)
 4. **Start from Phase 5** (add your features, follow BDD/TDD)
 
 ---

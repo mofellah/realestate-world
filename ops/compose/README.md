@@ -1,90 +1,157 @@
 # Docker Compose Setup
 
-This directory contains Docker Compose configurations for local development and production deployment.
+This directory contains Docker Compose configurations for local development and production deployment of the Real Estate World MVP platform.
 
 ## Files
 
 - **docker-compose.dev.yml** - Development stack with hot-reload for backend and frontend
-- **docker-compose.prod.yml** - Production stack with optimized builds and nginx proxy
-- **.env.local** - Development environment variables (git-ignored)
-- **.env.prod** - Production environment template (git-ignored after customization)
-- **.env.example** - Public template for all environment variables
+- **docker-compose.prod.yml** - Production stack with optimized builds, nginx reverse proxy, and healthchecks
+- **.env.example** - Public template for all environment variables (located in project root)
+
+## Architecture
+
+### Development Stack
+- **Database**: PostgreSQL 18 + PostGIS extension
+- **Backend**: NestJS + Fastify (Node.js 20, hot-reload enabled, debugger on port 9229)
+- **Frontend**: React 19 + Vite (HMR enabled on port 8080)
+
+### Production Stack
+- **Database**: PostgreSQL 18 + PostGIS (persistent volumes)
+- **Backend**: NestJS + Fastify (production build, healthchecks)
+- **Frontend**: React 19 + Vite (nginx serving static build on port 8080)
+- **Nginx Reverse Proxy**: Routes /api to backend, serves frontend static files on port 80/443
 
 ## Prerequisites
 
-- Docker and Docker Compose installed
+- Docker 24+ and Docker Compose v2
 - Node.js 20+ (for local development outside containers)
+- At least 4GB RAM available for containers
+- Ports available: 3000 (backend), 8080 (frontend), 5432 (database), 9229 (debugger)
 
-## Development
+## Quick Start (Development)
 
-### Quick Start
+### 1. Setup Environment Variables
+
+```bash
+# Copy environment template
+cp ../../.env.example .env.local
+
+# Edit .env.local with your configuration
+# At minimum, update JWT_SECRET and REFRESH_TOKEN_SECRET
+```
+
+### 2. Start Development Stack
 
 ```bash
 cd ops/compose
 
-# Start dev stack (builds and runs with hot-reload)
-docker-compose -f docker-compose.dev.yml up --build
+# Build and start all services (first time)
+docker compose -f docker-compose.dev.yml up --build
+
+# Or use npm script from project root
+npm run docker:dev:build
 ```
 
-### Access Services
+### 3. Access Services
 
-- **Frontend**: http://localhost:5173 (Vite dev server with HMR)
+- **Frontend**: http://localhost:8080 (Vite dev server with HMR)
 - **Backend API**: http://localhost:3000
-- **Database**: localhost:5432 (postgres:postgres)
 - **Backend Health**: http://localhost:3000/health
+- **Database**: localhost:5432 (user: postgres, password: postgres, db: realestate)
+- **Node Debugger**: localhost:9229 (attach VS Code debugger)
 
-### Development Workflow
+## Development Workflow
 
 ```bash
 # View logs
-docker-compose -f docker-compose.dev.yml logs -f backend
-docker-compose -f docker-compose.dev.yml logs -f frontend
+docker compose -f docker-compose.dev.yml logs -f backend
+docker compose -f docker-compose.dev.yml logs -f frontend
 
-# Run migrations
-docker-compose -f docker-compose.dev.yml exec backend npm run prisma:migrate
+# Run database migrations
+docker compose -f docker-compose.dev.yml exec backend npx prisma migrate deploy --schema=./db/schema.prisma
 
 # Seed database
-docker-compose -f docker-compose.dev.yml exec backend npm run prisma:seed
+docker compose -f docker-compose.dev.yml exec backend npm run seed --workspace=db
+
+# Rebuild specific service
+docker compose -f docker-compose.dev.yml up --build backend
 
 # Stop containers
-docker-compose -f docker-compose.dev.yml down
+docker compose -f docker-compose.dev.yml down
 
 # Clean up volumes (reset database)
-docker-compose -f docker-compose.dev.yml down -v
+docker compose -f docker-compose.dev.yml down -v
+
+# Restart single service
+docker compose -f docker-compose.dev.yml restart backend
 ```
 
-## Production
+### Hot Reload & Debugging
 
-### Setup
+- **Backend HMR**: Source files in `apps/backend/src` are mounted, changes trigger automatic restart
+- **Frontend HMR**: Vite watches `apps/frontend/src`, changes appear instantly in browser
+- **Node Debugger**: Attach VS Code debugger to port 9229 for backend debugging
+
+**VS Code Debug Configuration** (add to `.vscode/launch.json`):
+```json
+{
+  "type": "node",
+  "request": "attach",
+  "name": "Docker: Attach to Backend",
+  "port": 9229,
+  "address": "localhost",
+  "localRoot": "${workspaceFolder}/apps/backend",
+  "remoteRoot": "/app/apps/backend",
+  "protocol": "inspector"
+}
+```
+
+## Production Deployment
+
+### Setup Environment
 
 ```bash
 cd ops/compose
 
-# Copy environment template and configure
-cp .env.prod .env.production
+# Create production environment file
+cp ../../.env.example .env.production
 
-# Edit with real values (use secure secret management)
+# Edit with REAL production values (use secrets manager in production!)
+# CRITICAL: Change JWT_SECRET, REFRESH_TOKEN_SECRET, DB_PASSWORD, STRIPE keys
 nano .env.production
 ```
 
-### Deployment
+### Build and Deploy
 
 ```bash
 # Build and start production stack
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml up -d --build
 
 # View logs
-docker-compose -f docker-compose.prod.yml logs -f
+docker compose -f docker-compose.prod.yml logs -f
 
-# Stop services
-docker-compose -f docker-compose.prod.yml down
+# Check health of all services
+docker compose -f docker-compose.prod.yml ps
+
+# Stop services gracefully
+docker compose -f docker-compose.prod.yml down
 ```
 
-### Access Services
+### Access Production Services
 
-- **Frontend**: http://localhost (served by nginx)
-- **Backend API**: http://localhost:3000 (internal)
-- **Database**: localhost:5432 (for backups/management)
+- **Public URL**: http://localhost (nginx reverse proxy on port 80)
+- **Backend API** (via proxy): http://localhost/api/* → routed to backend:3000
+- **Frontend**: http://localhost → served from nginx
+- **Health Check**: http://localhost/health
+- **Database**: localhost:5432 (for backups/management only, should not be publicly exposed)
+
+### Production Healthchecks
+
+All services have healthchecks that ensure proper startup sequence:
+1. **Database**: `pg_isready` confirms PostgreSQL is accepting connections
+2. **Backend**: `curl http://localhost:3000/health` validates API is responding
+3. **Frontend**: `curl http://localhost:8080/` confirms nginx is serving files
+4. **Nginx Proxy**: `curl http://localhost/health` validates reverse proxy
 
 ## Environment Variables
 

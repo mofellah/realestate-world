@@ -2,8 +2,7 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   rootDir: 'src',
-  testRegex: '.*\\.spec\\.ts$',
-  moduleFileExtensions: ['js', 'json', 'ts'],
+  moduleFileExtensions: ['ts', 'js', 'json'],
   moduleNameMapper: {
     '^@boilerplate/types(.*)$': '<rootDir>/../../../packages/types/src$1',
     '^@boilerplate/utils(.*)$': '<rootDir>/../../../packages/utils/src$1',
@@ -19,7 +18,19 @@ module.exports = {
   coverageDirectory: '../../../coverage/backend',
   testTimeout: 10000,
   setupFilesAfterEnv: ['<rootDir>/__tests__/setup.ts'],
+  testMatch: ['**/__tests__/**/*.spec.ts', '**/?(*.)+(spec).ts'],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/', '\\.d\\.ts$'],
+  transformIgnorePatterns: ['/node_modules/', '/dist/'],
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
+    '^.+\\.ts$': ['ts-jest', {
+      tsconfig: {
+        module: 'commonjs',
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+        target: 'ES2021',
+        strict: true,
+      },
+      isolatedModules: true,
+    }],
   },
 };

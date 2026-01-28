@@ -149,8 +149,12 @@ export const mockLoginResponse: LoginResponse = {
   user: {
     id: 'user-123',
     email: 'admin@example.com',
-    name: 'Admin User',
+    passwordHash: '$2a$10$mockHashedPasswordForTestingOnly',
+    avatarUrl: null,
+    role: 'admin' as const,
     isActive: true,
+    country_code: null,
+    personId: null,
     createdAt: new Date('2026-01-01'),
     updatedAt: new Date('2026-01-01'),
   },
