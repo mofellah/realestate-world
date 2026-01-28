@@ -10,7 +10,6 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
@@ -26,5 +25,5 @@
       "@boilerplate/logger": ["../../packages/logger/src"]
     }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "../../packages/**/*"]
 }

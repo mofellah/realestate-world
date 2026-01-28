@@ -14,10 +14,19 @@ describe('RolesGuard', () => {
   let reflector: Reflector;
 
   beforeEach(async () => {
+    // Create a fresh reflector instance for mocking
+    reflector = new Reflector();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        RolesGuard,
-        Reflector,
+        {
+          provide: RolesGuard,
+          useValue: new RolesGuard(reflector, { warn: jest.fn(), error: jest.fn() } as any),
+        },
+        {
+          provide: Reflector,
+          useValue: reflector,
+        },
         {
           provide: Logger,
           useValue: {
@@ -29,7 +38,6 @@ describe('RolesGuard', () => {
     }).compile();
 
     guard = module.get<RolesGuard>(RolesGuard);
-    reflector = module.get<Reflector>(Reflector);
   });
 
   afterEach(() => {

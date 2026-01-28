@@ -34,35 +34,32 @@ describe('AuthService', () => {
   let jwtService: JwtService;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AuthService,
-        {
-          provide: PrismaService,
-          useValue: {
-            user: {
-              findUnique: jest.fn(),
-            },
-            refreshToken: {
-              findUnique: jest.fn(),
-              updateMany: jest.fn(),
-              create: jest.fn(),
-            },
-          },
-        },
-        {
-          provide: JwtService,
-          useValue: {
-            sign: jest.fn(),
-            verifyAsync: jest.fn(),
-          },
-        },
-      ],
-    }).compile();
+    // Create mock instances
+    prismaService = {
+      user: {
+        findUnique: jest.fn(),
+        findFirst: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+      },
+      refreshToken: {
+        findUnique: jest.fn(),
+        findFirst: jest.fn(),
+        updateMany: jest.fn(),
+        create: jest.fn(),
+        delete: jest.fn(),
+      },
+    } as unknown as PrismaService;
 
-    service = module.get<AuthService>(AuthService);
-    prismaService = module.get<PrismaService>(PrismaService);
-    jwtService = module.get<JwtService>(JwtService);
+    jwtService = {
+      sign: jest.fn(),
+      signAsync: jest.fn(),
+      verify: jest.fn(),
+      verifyAsync: jest.fn(),
+    } as unknown as JwtService;
+
+    // Create service instance manually with mocks
+    service = new AuthService(prismaService, jwtService);
   });
 
   afterEach(() => {

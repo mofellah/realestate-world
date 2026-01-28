@@ -36,21 +36,29 @@ describe('JwtGuard', () => {
   let reflector: Reflector;
 
   beforeEach(async () => {
+    // Create a fresh reflector instance for mocking
+    reflector = new Reflector();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        JwtGuard,
+        {
+          provide: JwtGuard,
+          useValue: new JwtGuard(reflector, { validateJwt: jest.fn() } as any),
+        },
         {
           provide: AuthService,
           useValue: {
             validateJwt: jest.fn(),
           },
         },
-        Reflector,
+        {
+          provide: Reflector,
+          useValue: reflector,
+        },
       ],
     }).compile();
 
     guard = module.get<JwtGuard>(JwtGuard);
-    reflector = module.get<Reflector>(Reflector);
   });
 
   afterEach(() => {
