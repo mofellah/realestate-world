@@ -24,27 +24,14 @@ module.exports = {
   globals: {
     'ts-jest': {
       useESM: false,
-      tsconfig: {
-        jsx: 'react',
-      },
+      isolatedModules: true,
+      babelConfig: false,
     },
   },
   transform: {
     '^.+\\.ts$': ['ts-jest', {
       useESM: false,
-      tsconfig: {
-        module: 'commonjs',
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true,
-        target: 'ES2021',
-        lib: ['ES2021'],
-        strict: true,
-        experimentalDecorators: true,
-        emitDecoratorMetadata: true,
-        resolveJsonModule: true,
-        skipLibCheck: true,
-        skipDefaultLibCheck: true,
-      },
+      tsconfig: '<rootDir>/tsconfig.json',
       isolatedModules: true,
       babelConfig: false,
     }],

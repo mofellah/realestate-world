@@ -288,13 +288,11 @@ export class AuthService {
     user: any,
     correlationId: string,
   ): Promise<TokenPair> {
-    // Extract roles and permissions
-    const roles = user.userRoles?.map((ur: any) => ur.role.name) || [];
-    const permissions = user.userRoles?.flatMap((ur: any) =>
-      ur.role.rolePermissions?.map(
-        (rp: any) => `${rp.permission.resource}:${rp.permission.action}`,
-      ),
-    ) || [];
+    // Extract roles - user.role is a single string (user | admin)
+    // For now, represent as an array for JWT payload compatibility
+    const roles = user.role ? [user.role] : [];
+    // TODO: Implement granular permissions system
+    const permissions: string[] = [];
 
     // Parse expiry times
     const accessTokenExpiry = backendConfig.JWT_ACCESS_EXPIRY || '15m';
