@@ -102,7 +102,7 @@ export function createMockPrismaClient(): jest.Mocked<PrismaService> {
       count: jest.fn(),
       aggregate: jest.fn(),
     },
-  } as any;
+  } as unknown as PrismaService;
 }
 
 /**
@@ -110,7 +110,7 @@ export function createMockPrismaClient(): jest.Mocked<PrismaService> {
  * @param model - The model object to mock (e.g., prismaService.user)
  * @param returnValue - The value to return when findUnique is called
  */
-export function mockFindUnique<T>(model: any, returnValue: T): jest.Mock {
+export function mockFindUnique<T>(model: Record<string, unknown>, returnValue: T): jest.Mock {
   return (model.findUnique = jest.fn().mockResolvedValue(returnValue));
 }
 
@@ -119,7 +119,7 @@ export function mockFindUnique<T>(model: any, returnValue: T): jest.Mock {
  * @param model - The model object to mock (e.g., prismaService.user)
  * @param returnValue - The values to return when findMany is called
  */
-export function mockFindMany<T>(model: any, returnValue: T[]): jest.Mock {
+export function mockFindMany<T>(model: Record<string, unknown>, returnValue: T[]): jest.Mock {
   return (model.findMany = jest.fn().mockResolvedValue(returnValue));
 }
 
@@ -128,7 +128,7 @@ export function mockFindMany<T>(model: any, returnValue: T[]): jest.Mock {
  * @param model - The model object to mock (e.g., prismaService.user)
  * @param returnValue - The created entity to return
  */
-export function mockCreate<T>(model: any, returnValue: T): jest.Mock {
+export function mockCreate<T>(model: Record<string, unknown>, returnValue: T): jest.Mock {
   return (model.create = jest.fn().mockResolvedValue(returnValue));
 }
 
@@ -137,7 +137,7 @@ export function mockCreate<T>(model: any, returnValue: T): jest.Mock {
  * @param model - The model object to mock (e.g., prismaService.user)
  * @param returnValue - The updated entity to return
  */
-export function mockUpdate<T>(model: any, returnValue: T): jest.Mock {
+export function mockUpdate<T>(model: Record<string, unknown>, returnValue: T): jest.Mock {
   return (model.update = jest.fn().mockResolvedValue(returnValue));
 }
 
@@ -146,7 +146,7 @@ export function mockUpdate<T>(model: any, returnValue: T): jest.Mock {
  * @param model - The model object to mock (e.g., prismaService.user)
  * @param returnValue - The deleted entity to return
  */
-export function mockDelete<T>(model: any, returnValue: T): jest.Mock {
+export function mockDelete<T>(model: Record<string, unknown>, returnValue: T): jest.Mock {
   return (model.delete = jest.fn().mockResolvedValue(returnValue));
 }
 
@@ -155,7 +155,7 @@ export function mockDelete<T>(model: any, returnValue: T): jest.Mock {
  * @param model - The model object to mock (e.g., prismaService.user)
  * @param count - The count to return
  */
-export function mockCount(model: any, count: number): jest.Mock {
+export function mockCount(model: Record<string, unknown>, count: number): jest.Mock {
   return (model.count = jest.fn().mockResolvedValue(count));
 }
 
@@ -163,7 +163,7 @@ export function mockCount(model: any, count: number): jest.Mock {
  * Reset all mocks on a model
  * @param model - The model to reset
  */
-export function resetModelMocks(model: any): void {
+export function resetModelMocks(model: Record<string, unknown>): void {
   Object.values(model).forEach((method: any) => {
     if (typeof method === 'function' && method.mockReset) {
       method.mockReset();

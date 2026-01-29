@@ -29,11 +29,9 @@ beforeEach(() => {
 
 // Declare custom commands for TypeScript
 declare global {
-  namespace Cypress {
-    interface Chainable {
-      login(email?: string, password?: string): Chainable<void>;
-      logout(): Chainable<void>;
-    }
+  interface Cypress {
+    login(email?: string, password?: string): void;
+    logout(): void;
   }
 }
 

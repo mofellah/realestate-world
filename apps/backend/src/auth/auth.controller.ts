@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Auth Controller
  * Endpoints for login, refresh, logout

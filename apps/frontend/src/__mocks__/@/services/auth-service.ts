@@ -3,8 +3,6 @@
  * Provides mock implementations of authentication methods for testing
  */
 
-import type { LoginResponse } from '@boilerplate/types';
-
 class AuthServiceMock {
   login = jest.fn();
   logout = jest.fn();

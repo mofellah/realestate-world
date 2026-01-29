@@ -19,7 +19,6 @@ describe('ListingsController (Integration)', () => {
   let testUser: any;
   let testToken: string;
   let testAddress: any;
-  let testProperty: any;
   let testPaymentTerms: any;
 
   beforeAll(async () => {

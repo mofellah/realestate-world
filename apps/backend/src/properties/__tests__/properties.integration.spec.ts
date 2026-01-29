@@ -15,7 +15,6 @@ import { JwtService } from '@nestjs/jwt';
 describe('PropertiesController (Integration)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let authService: AuthService;
   let jwtService: JwtService;
 
   let testUser: any;
@@ -459,7 +458,7 @@ describe('PropertiesController (Integration)', () => {
         .expect(HttpStatus.NO_CONTENT);
 
       // Verify deleted
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .get(`/properties/${testProperty.id}`)
         .set('Authorization', `Bearer ${testToken}`)
         .expect(HttpStatus.NOT_FOUND);
@@ -537,7 +536,7 @@ describe('PropertiesController (Integration)', () => {
         },
       });
 
-      const prop2 = await prisma.property.create({
+      await prisma.property.create({
         data: {
           title: 'Brussels House',
           addressId: addr1.id,
