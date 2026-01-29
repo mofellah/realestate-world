@@ -51,6 +51,12 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/realestate_test
 
+      - name: Seed database with test data
+        run: npm run seed --workspace=db
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/realestate_test
+          SEED_TEST_DATA: 'true'
+
       - name: Run backend unit tests
         run: npm run test --workspace=@boilerplate/backend -- --coverage --maxWorkers=2
         env:
