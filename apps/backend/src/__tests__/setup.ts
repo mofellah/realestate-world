@@ -119,7 +119,9 @@ afterEach(() => {
 // ============================================================================
 
 declare global {
+  // eslint-disable-next-line no-var
   var testCorrelationId: string;
+  // eslint-disable-next-line no-var
   var testContext: {
     correlationId: string;
     userId?: string;

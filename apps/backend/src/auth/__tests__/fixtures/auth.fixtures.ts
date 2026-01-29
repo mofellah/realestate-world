@@ -36,6 +36,7 @@ export const mockUserWithUserRole = {
 };
 
 // Extended mock user with admin role (includes relationship data for service tests)
+// Note: This fixture includes relationship data not in the actual Prisma schema for testing purposes
 export const mockUserWithAdminRoleExtended = {
   ...mockUserWithAdminRole,
   userRoles: [
@@ -56,7 +57,7 @@ export const mockUserWithAdminRoleExtended = {
               action: 'read',
               description: 'Read users',
             },
-          },
+          } as unknown,
           {
             roleId: 'role-admin',
             permissionId: 'perm-2',
@@ -66,14 +67,15 @@ export const mockUserWithAdminRoleExtended = {
               action: 'write',
               description: 'Write users',
             },
-          },
-        ],
+          } as unknown,
+        ] as unknown,
       },
     },
   ],
-};
+} as unknown;
 
 // Extended mock user with user role (includes relationship data for service tests)
+// Note: This fixture includes relationship data not in the actual Prisma schema for testing purposes
 export const mockUserWithUserRoleExtended = {
   ...mockUserWithUserRole,
   userRoles: [
@@ -94,12 +96,12 @@ export const mockUserWithUserRoleExtended = {
               action: 'read',
               description: 'Read posts',
             },
-          },
-        ],
+          } as unknown,
+        ] as unknown,
       },
     },
   ],
-};
+} as unknown;
 
 // Mock JWT payload for admin
 export const mockJwtPayloadAdmin: JwtPayload = {
