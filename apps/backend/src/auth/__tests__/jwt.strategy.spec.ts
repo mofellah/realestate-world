@@ -67,7 +67,8 @@ describe('JwtStrategy', () => {
       // Assert
       expect(result).toHaveProperty('id');
       expect(result.id).toBe(payload.sub);
-      expect(result).not.toHaveProperty('sub');
+      expect(result).toHaveProperty('sub');
+      expect(result.sub).toBe(payload.sub);
     });
 
     it('should include email in validated user', () => {

@@ -209,6 +209,7 @@ export class AuthService {
         passwordHash: hashedPassword,
         role: UserRole.user,
         isActive: true,
+        name: registerRequest.name,
       },
     });
 
@@ -226,6 +227,7 @@ export class AuthService {
       user: {
         id: newUser.id,
         email: newUser.email,
+        name: newUser.name ?? undefined,
         role: newUser.role,
         isActive: newUser.isActive,
         passwordHash: newUser.passwordHash, // Included but will be filtered by API response DTOs

@@ -1,66 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-interface Property {
-  id: string;
-  title: string;
-  propertyType: string;
-  price: number;
-  status: 'draft' | 'active' | 'sold' | 'rented';
-  address: {
-    street: string;
-    city: string;
-    state: string;
-  };
-  imageUrl?: string;
-  bedrooms?: number;
-  bathrooms?: number;
-  area?: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { usePropertyStore } from '../../stores/propertyStore';
+import { Property } from '../../types';
 
 export default function MyPropertiesPage() {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { properties, isLoading, fetchProperties } = usePropertyStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
     fetchProperties();
-  }, []);
-
-  const fetchProperties = async () => {
-    try {
-      setLoading(true);
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/properties/my-properties');
-      // const data = await response.json();
-      // setProperties(data);
-      
-      // Mock data for now
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setProperties([]);
-    } catch (error) {
-      console.error('Error fetching properties:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [fetchProperties]);
 
   const filteredProperties = properties.filter(property => {
     const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          property.address.city.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || property.status === statusFilter;
+    const derivedStatus = property.isAvailable ? 'active' : 'inactive';
+    const matchesStatus = statusFilter === 'all' || derivedStatus === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusBadge = (status: Property['status']) => {
+  const getStatusBadge = (property: Property) => {
+    const status = property.isAvailable ? 'active' : 'inactive';
     const styles = {
-      draft: 'bg-gray-100 text-gray-800',
       active: 'bg-green-100 text-green-800',
-      sold: 'bg-blue-100 text-blue-800',
-      rented: 'bg-purple-100 text-purple-800',
+      inactive: 'bg-gray-100 text-gray-800',
     };
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status]}`}>
@@ -117,7 +81,7 @@ export default function MyPropertiesPage() {
         </div>
 
         {/* Properties Grid */}
-        {loading ? (
+        {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="bg-white rounded-lg shadow animate-pulse">
@@ -152,9 +116,9 @@ export default function MyPropertiesPage() {
               <div key={property.id} className="bg-white rounded-lg shadow hover:shadow-lg transition">
                 {/* Property Image */}
                 <div className="h-48 bg-gray-200 rounded-t-lg overflow-hidden">
-                  {property.imageUrl ? (
+                  {property.images?.[0] ? (
                     <img
-                      src={property.imageUrl}
+                      src={property.images[0]}
                       alt={property.title}
                       className="w-full h-full object-cover"
                     />
@@ -173,15 +137,15 @@ export default function MyPropertiesPage() {
                     <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
                       {property.title}
                     </h3>
-                    {getStatusBadge(property.status)}
+                    {getStatusBadge(property)}
                   </div>
 
                   <p className="text-gray-600 text-sm mb-2">
-                    {property.address.street}, {property.address.city}
+                    {property.address.streetName} {property.address.streetNumber || ''}, {property.address.city}
                   </p>
 
-                  <p className="text-xl font-bold text-blue-600 mb-3">
-                    ${property.price.toLocaleString()}
+                  <p className="text-xs text-gray-500 mb-3">
+                    {property.propertyType.replace('_', ' ')} • {property.address.country_code}
                   </p>
 
                   <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
@@ -196,21 +160,21 @@ export default function MyPropertiesPage() {
                     {property.bathrooms && (
                       <span>{property.bathrooms} bath</span>
                     )}
-                    {property.area && (
-                      <span>{property.area} sqft</span>
+                    {property.surfaceArea && (
+                      <span>{property.surfaceArea} m²</span>
                     )}
                   </div>
 
                   {/* Actions */}
                   <div className="flex gap-2">
                     <Link
-                      to={`/properties/${property.id}`}
+                      to={`/property/${property.id}`}
                       className="flex-1 text-center bg-gray-100 text-gray-700 px-3 py-2 rounded hover:bg-gray-200 transition text-sm"
                     >
                       View
                     </Link>
                     <Link
-                      to={`/dashboard/properties/edit/${property.id}`}
+                      to={`/dashboard/properties/${property.id}/edit`}
                       className="flex-1 text-center bg-blue-100 text-blue-700 px-3 py-2 rounded hover:bg-blue-200 transition text-sm"
                     >
                       Edit

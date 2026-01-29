@@ -17,6 +17,7 @@ export const mockUserWithAdminRole = {
   personId: null,
   createdAt: new Date('2026-01-01'),
   updatedAt: new Date('2026-01-01'),
+  name: 'Admin User',
 };
 
 // Mock user with regular user role
@@ -31,6 +32,73 @@ export const mockUserWithUserRole = {
   personId: null,
   createdAt: new Date('2026-01-02'),
   updatedAt: new Date('2026-01-02'),
+  name: 'Regular User',
+};
+
+// Extended mock user with admin role (includes relationship data for service tests)
+export const mockUserWithAdminRoleExtended = {
+  ...mockUserWithAdminRole,
+  userRoles: [
+    {
+      userId: 'user-123',
+      roleId: 'role-admin',
+      role: {
+        id: 'role-admin',
+        name: 'admin',
+        description: 'Administrator',
+        rolePermissions: [
+          {
+            roleId: 'role-admin',
+            permissionId: 'perm-1',
+            permission: {
+              id: 'perm-1',
+              resource: 'users',
+              action: 'read',
+              description: 'Read users',
+            },
+          },
+          {
+            roleId: 'role-admin',
+            permissionId: 'perm-2',
+            permission: {
+              id: 'perm-2',
+              resource: 'users',
+              action: 'write',
+              description: 'Write users',
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+
+// Extended mock user with user role (includes relationship data for service tests)
+export const mockUserWithUserRoleExtended = {
+  ...mockUserWithUserRole,
+  userRoles: [
+    {
+      userId: 'user-456',
+      roleId: 'role-user',
+      role: {
+        id: 'role-user',
+        name: 'user',
+        description: 'Regular User',
+        rolePermissions: [
+          {
+            roleId: 'role-user',
+            permissionId: 'perm-1',
+            permission: {
+              id: 'perm-1',
+              resource: 'posts',
+              action: 'read',
+              description: 'Read posts',
+            },
+          },
+        ],
+      },
+    },
+  ],
 };
 
 // Mock JWT payload for admin

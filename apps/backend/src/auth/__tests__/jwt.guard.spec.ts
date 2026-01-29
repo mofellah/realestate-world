@@ -43,7 +43,7 @@ describe('JwtGuard', () => {
       providers: [
         {
           provide: JwtGuard,
-          useValue: new JwtGuard(reflector, { validateJwt: jest.fn() } as any),
+          useValue: new JwtGuard(reflector),
         },
         {
           provide: AuthService,

@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Logger } from '@boilerplate/logger';
+import { Prisma } from '@prisma/client';
 import crypto from 'crypto';
 
 /**
@@ -46,7 +47,7 @@ export class PropertiesService {
           addressId: data.addressId,
           ownerPersonId: user.person.id,
           userId,
-          propertyType: data.propertyType || 'residential',
+          propertyType: (data.propertyType as any) || 'house',
           bedrooms: data.bedrooms || null,
           bathrooms: data.bathrooms || null,
           surfaceArea: data.surfaceArea || null,
@@ -64,6 +65,12 @@ export class PropertiesService {
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Unknown';
       this.logger.error(`Property create failed: ${msg}`);
+      
+      // Handle Prisma foreign key constraint errors
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+        throw new BadRequestException('Invalid address ID');
+      }
+      
       throw error;
     }
   }

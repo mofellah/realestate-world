@@ -8,6 +8,7 @@ import { HealthModule } from './health/health.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PropertiesModule } from './properties/properties.module';
+import { ListingsModule } from './listings/listings.module';
 import { PrismaService } from './prisma/prisma.service';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -18,6 +19,7 @@ import { AppService } from './app.service';
     AuthModule,
     UsersModule,
     PropertiesModule,
+    ListingsModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

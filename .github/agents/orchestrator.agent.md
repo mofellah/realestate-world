@@ -2,7 +2,7 @@
 description: 'Orchestrator / project manager agent to plan, route tasks, and enforce standards across specialist agents for the boilerplate (React 19, NestJS + Fastify, PostgreSQL 18, Prisma, npm workspaces)'
 model: claude-sonnet-4
 tools:
-  ['vscode', 'execute', 'read', 'github/*', 'oraios/serena/*', 'agent', 'edit', 'search', 'web', 'todo']
+  ['execute', 'read', 'edit', 'search', 'web', 'agent', 'ms-azuretools.vscode-containers/containerToolsConfig', 'todo']
 ---
 
 # Orchestrator Agent
