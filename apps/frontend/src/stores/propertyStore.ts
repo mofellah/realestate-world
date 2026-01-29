@@ -13,6 +13,7 @@ interface PropertyState {
   isLoading: boolean;
   
   // Actions
+  fetchProperties: () => Promise<void>;
   fetchListings: () => Promise<void>;
   fetchListingById: (id: string) => Promise<void>;
   fetchPropertyById: (id: string) => Promise<void>;
@@ -30,6 +31,17 @@ export const usePropertyStore = create<PropertyState>((set, get) => ({
   selectedProperty: null,
   filters: {},
   isLoading: false,
+
+  fetchProperties: async () => {
+    set({ isLoading: true });
+
+    setTimeout(() => {
+      set({
+        properties: mockDatabase.properties,
+        isLoading: false,
+      });
+    }, 400);
+  },
 
   fetchListings: async () => {
     set({ isLoading: true });

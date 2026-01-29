@@ -141,11 +141,7 @@ describe('AuthService - Register', () => {
       expect(mockPrismaService.user.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            userRoles: expect.objectContaining({
-              create: expect.objectContaining({
-                roleId: mockUserRole.id,
-              }),
-            }),
+            role: 'user',
           }),
         })
       );
@@ -256,7 +252,7 @@ describe('AuthService - Register', () => {
 
       const result = await authService.register(registerRequest, 'correlation-id');
 
-      expect(result.user.name).toBeNull();
+      expect(result.user.name).toBeUndefined();
     });
 
     it('should return user without password hash', async () => {

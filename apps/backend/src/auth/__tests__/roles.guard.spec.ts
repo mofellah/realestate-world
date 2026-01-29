@@ -7,7 +7,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RolesGuard } from '../guards/roles.guard';
-import { Logger } from '@boilerplate/logger';
 
 describe('RolesGuard', () => {
   let guard: RolesGuard;
@@ -21,18 +20,11 @@ describe('RolesGuard', () => {
       providers: [
         {
           provide: RolesGuard,
-          useValue: new RolesGuard(reflector, { warn: jest.fn(), error: jest.fn() } as any),
+          useValue: new RolesGuard(reflector),
         },
         {
           provide: Reflector,
           useValue: reflector,
-        },
-        {
-          provide: Logger,
-          useValue: {
-            warn: jest.fn(),
-            error: jest.fn(),
-          },
         },
       ],
     }).compile();

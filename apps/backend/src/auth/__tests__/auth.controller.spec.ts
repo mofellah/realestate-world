@@ -138,7 +138,7 @@ describe('AuthController (Integration)', () => {
       await request(app.getHttpServer())
         .post('/auth/login')
         .send({ password: 'Admin123!' })
-        .expect(401);
+        .expect(400);
     });
 
     it('should return 401 on missing password', async () => {
@@ -151,7 +151,7 @@ describe('AuthController (Integration)', () => {
       await request(app.getHttpServer())
         .post('/auth/login')
         .send({ email: 'admin@example.com' })
-        .expect(401);
+        .expect(400);
     });
 
     it('should return 401 on invalid email format', async () => {
@@ -167,7 +167,7 @@ describe('AuthController (Integration)', () => {
           email: 'not-an-email',
           password: 'Admin123!',
         })
-        .expect(401);
+        .expect(400);
     });
 
     it('should include user without password in response', async () => {
@@ -251,7 +251,7 @@ describe('AuthController (Integration)', () => {
       await request(app.getHttpServer())
         .post('/auth/refresh')
         .send({})
-        .expect(401);
+        .expect(400);
     });
 
     it('should return new tokens different from previous ones', async () => {

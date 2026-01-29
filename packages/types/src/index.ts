@@ -162,3 +162,60 @@ export interface PaginatedResponse<T> {
   take: number;
   hasMore: boolean;
 }
+
+// Property types
+export interface Property {
+  id: string;
+  title: string;
+  description: string | null;
+  address: string;
+  city: string | null;
+  state: string | null;
+  zipCode: string | null;
+  country: string | null;
+  price: number | null;
+  propertyType: string | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  squareFeet: number | null;
+  yearBuilt: number | null;
+  imageUrl: string | null;
+  isAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePropertyDto {
+  title: string;
+  description?: string;
+  address: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  price?: number;
+  propertyType?: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  squareFeet?: number;
+  yearBuilt?: number;
+  imageUrl?: string;
+}
+
+export interface UpdatePropertyDto {
+  title?: string;
+  description?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  price?: number;
+  propertyType?: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  squareFeet?: number;
+  yearBuilt?: number;
+  imageUrl?: string;
+  isAvailable?: boolean;
+}

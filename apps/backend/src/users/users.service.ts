@@ -37,7 +37,7 @@ export class UsersService {
     return {
       ...userWithoutPassword,
       name: null, // User table doesn't have name - it's in the Person table via personId
-      roles: [user.role], // Single role enum
+      roles: user.role ? [user.role] : [],
       permissions: [], // Permissions would need to be implemented via separate system
     };
   }

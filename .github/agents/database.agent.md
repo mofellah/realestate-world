@@ -2,16 +2,7 @@
 description: 'PostgreSQL 18 + Prisma database expert for schema design, migrations, seeds, and performance'
 model: claude-sonnet-4
 tools:
-  - read_file
-  - write_file
-  - replace_string_in_file
-  - multi_replace_string_in_file
-  - semantic_search
-  - grep_search
-  - list_dir
-  - run_in_terminal
-  - get_terminal_output
-  - get_errors
+  ['vscode', 'execute', 'read', 'github/*', 'agent', 'edit', 'search', 'web', 'todo']
 ---
 
 # Database Agent

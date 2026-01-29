@@ -65,7 +65,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/db/schema.prisma ./db/schema.prisma
 
 # Set environment
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 ENV PORT=3000
 
 # Expose backend port

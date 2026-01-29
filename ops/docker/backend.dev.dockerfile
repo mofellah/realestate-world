@@ -45,4 +45,3 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 # Run backend in development mode with hot reload
 # This is overridden by docker-compose command but serves as a fallback
 CMD ["npm", "run", "start:dev", "--workspace=@boilerplate/backend"]
-CMD ["npm", "run", "start:dev", "--workspace=@boilerplate/backend"]

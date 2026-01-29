@@ -39,7 +39,7 @@ import './styles/layout.scss';
 
 export default function App() {
   const { checkAuth } = useAuthStore();
-  const { fetchListings } = usePropertyStore();
+  const { fetchListings, fetchProperties } = usePropertyStore();
 
   useEffect(() => {
     // Check authentication on app load
@@ -47,7 +47,8 @@ export default function App() {
     
     // Load initial data
     fetchListings();
-  }, [checkAuth, fetchListings]);
+    fetchProperties();
+  }, [checkAuth, fetchListings, fetchProperties]);
 
   return (
     <Router>

@@ -243,14 +243,23 @@ model Organization {
 // ============================================================================
 // 2. USER MODEL (Simplified roles)
 // ============================================================================
+// DECISION: User `name` field is OPTIONAL
+// Rationale: Real estate system allows users to register with just email first,
+// then complete profile later with Person/PhysicalPerson link. Optional name
+// supports both quick registration and full profile completion workflows.
 
 model User {
   id            String        @id @default(cuid())
   email         String        @unique
   passwordHash  String
   avatarUrl     String?
+  name          String?       // Optional - user can register without name initially
   
   // Single role: user or admin (contextual roles via AgencyRole)
+  // DECISION: Simple UserRole enum pattern (NOT RBAC with userRoles table)
+  // Rationale: System uses user/admin for system-level permissions.
+  // Fine-grained permissions managed through AgencyRole for agency context.
+  // This keeps queries fast while still supporting complex agency hierarchies.
   role          UserRole      @default(user)
   
   isActive      Boolean       @default(true)
@@ -495,6 +504,36 @@ model CompositePaymentTerm {
 // ============================================================================
 // 7. LISTING MODEL (Base - Polymorphic with type-specific children)
 // ============================================================================
+
+// ============================================================================
+// 7. LISTING MODEL (Property listing with polymorphic type-specific data)
+// ============================================================================
+// LISTING DESIGN DECISIONS:
+// 1. ListingType enum: sale, rental, short_term, lease
+//    - sale: One-time purchase transactions
+//    - rental: Long-term residential rentals (6+ months)
+//    - short_term: Vacation/temporary stays (days/weeks)
+//    - lease: Commercial/industrial long-term leases (years)
+//
+// 2. Address: REFERENCED via Property model (not embedded in Listing)
+//    - Rationale: Property has addressId, Listing references Property
+//    - One Property can have multiple Listings (sale + rental simultaneously)
+//    - Address normalization prevents data duplication
+//
+// 3. Property-to-Listing: One-to-Many relationship
+//    - One Property can have many Listings (different types, time periods)
+//    - Example: Property for sale AND for rent while awaiting buyer
+//
+// 4. Required Fields:
+//    - propertyId: REQUIRED (every listing must reference a property)
+//    - createdBy: REQUIRED (audit trail of who created listing)
+//    - type: REQUIRED (discriminator for polymorphic child tables)
+//    - status: REQUIRED (draft, published, paused, expired)
+//    - paymentTermsId: REQUIRED (pricing/payment structure)
+//
+// 5. Optional Fields:
+//    - visibilityStart/End: Optional (for scheduled publishing)
+//    - publishedAt: Optional (set when status becomes 'published')
 
 model Listing {
   id             String        @id @default(cuid())
