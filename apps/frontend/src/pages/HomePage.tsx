@@ -1,7 +1,6 @@
 // Home Page - Landing page with hero and featured properties
 import { Link } from 'react-router-dom';
 import { usePropertyStore } from '../stores/propertyStore';
-import { useEffect } from 'react';
 
 export default function HomePage() {
   const { filteredListings, isLoading } = usePropertyStore();

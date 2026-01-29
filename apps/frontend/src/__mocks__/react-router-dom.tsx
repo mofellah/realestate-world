@@ -14,9 +14,10 @@ export const useLocation = jest.fn(() => ({
 }));
 
 export const Navigate = ({ to, _replace }: { to: string; replace?: boolean }) => {
+  const navigate = useNavigate();
   React.useEffect(() => {
-    useNavigate()(to);
-  }, [to]);
+    navigate(to);
+  }, [to, navigate]);
   return null;
 };
 

@@ -18,7 +18,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   isLoading: false,
 
-  login: async (email: string, password: string) => {
+  login: async (email: string, _password: string) => {
     set({ isLoading: true });
     
     // Mock login - find user by email or use first user

@@ -274,7 +274,7 @@ export default function CreatePropertyPage() {
 
             <div className="bg-blue-50 p-4 rounded-lg">
               <p className="text-sm text-blue-800">
-                💡 Tip: We'll automatically geocode your address to show on the map
+                💡 Tip: We&apos;ll automatically geocode your address to show on the map
               </p>
             </div>
           </div>
