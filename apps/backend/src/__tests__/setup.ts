@@ -119,8 +119,8 @@ afterEach(() => {
 // ============================================================================
 
 declare global {
-  let testCorrelationId: string;
-  let testContext: {
+  var testCorrelationId: string;
+  var testContext: {
     correlationId: string;
     userId?: string;
     timestamp: Date;

@@ -102,7 +102,7 @@ export function createMockPrismaClient(): jest.Mocked<PrismaService> {
       count: jest.fn(),
       aggregate: jest.fn(),
     },
-  } as unknown as PrismaService;
+  } as unknown as jest.Mocked<PrismaService>;
 }
 
 /**
