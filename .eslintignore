@@ -1,0 +1,17 @@
+# Build outputs
+dist/
+build/
+**/dist/
+**/build/
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Generated files
+coverage/
+.next/
+.cache/
+
+# Test outputs
+*.log
