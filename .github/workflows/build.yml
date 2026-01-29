@@ -28,6 +28,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate Prisma Client
+        run: npm run generate --workspace=db
+
       - name: TypeScript type check
         run: npm run type-check
 
