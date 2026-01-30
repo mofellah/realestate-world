@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ListingsService } from '../listings.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 describe('ListingsService', () => {
   let service: ListingsService;
@@ -123,6 +124,24 @@ describe('ListingsService', () => {
       };
 
       await expect(service.create('user-001', dto)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw BadRequestException on Prisma P2003 error', async () => {
+      mockPrismaService.property.findUnique.mockResolvedValue(mockProperty);
+      mockPrismaService.listing.create.mockRejectedValue(
+        new Prisma.PrismaClientKnownRequestError('FK error', {
+          code: 'P2003',
+          clientVersion: 'test',
+        })
+      );
+
+      const dto = {
+        propertyId: 'prop-001',
+        type: 'sale',
+        paymentTermsId: 'pt-001',
+      };
+
+      await expect(service.create('user-001', dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should throw ForbiddenException when user does not own property', async () => {

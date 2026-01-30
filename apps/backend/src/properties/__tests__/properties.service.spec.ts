@@ -3,6 +3,8 @@ import { BadRequestException, ForbiddenException, NotFoundException } from '@nes
 import { REQUEST } from '@nestjs/core';
 import { PropertiesService } from '../properties.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CreatePropertySchema, UpdatePropertySchema } from '../schemas/property.schema';
+import crypto from 'crypto';
 
 describe('PropertiesService', () => {
   let service: PropertiesService;
@@ -57,6 +59,13 @@ describe('PropertiesService', () => {
       delete: jest.fn(),
       count: jest.fn(),
     },
+    listing: {
+      findFirst: jest.fn(),
+    },
+    view: {
+      create: jest.fn(),
+    },
+    $queryRaw: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -111,6 +120,30 @@ describe('PropertiesService', () => {
       expect(result).toBeDefined();
       expect(result.id).toBe('prop-001');
       expect(mockPrismaService.property.create).toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException if user not found', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.create('missing-user', { title: 'Test', addressId: 'cltestaddr1234567890001' } as any)
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw BadRequestException for invalid propertyType', async () => {
+      const parseSpy = jest.spyOn(CreatePropertySchema, 'parse').mockReturnValue({
+        title: 'Test Property',
+        addressId: 'cltestaddr1234567890001',
+        propertyType: 'invalid',
+      } as any);
+
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
+
+      await expect(
+        service.create('user-001', { title: 'Test Property', addressId: 'cltestaddr1234567890001' } as any)
+      ).rejects.toThrow(BadRequestException);
+
+      parseSpy.mockRestore();
     });
 
     it('should throw BadRequestException for invalid addressId CUID', async () => {
@@ -193,6 +226,36 @@ describe('PropertiesService', () => {
       expect(result.id).toBe('prop-001');
     });
 
+    it('should not create view if no published listing', async () => {
+      mockPrismaService.property.findUnique.mockResolvedValue(mockProperty);
+      mockPrismaService.listing.findFirst.mockResolvedValue(null);
+
+      await service.findById('prop-001');
+
+      await new Promise((resolve) => setImmediate(resolve));
+
+      expect(mockPrismaService.view.create).not.toHaveBeenCalled();
+    });
+
+    it('should record a view when listing exists', async () => {
+      mockPrismaService.property.findUnique.mockResolvedValue(mockProperty);
+      mockPrismaService.listing.findFirst.mockResolvedValue({ id: 'listing-001' });
+      mockPrismaService.view.create.mockResolvedValue({ id: 'view-001' });
+
+      await service.findById('prop-001');
+
+      await new Promise((resolve) => setImmediate(resolve));
+
+      expect(mockPrismaService.view.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            listingId: 'listing-001',
+            viewType: 'detail',
+          }),
+        })
+      );
+    });
+
     it('should throw NotFoundException if property not found', async () => {
       mockPrismaService.property.findUnique.mockResolvedValue(null);
 
@@ -209,6 +272,37 @@ describe('PropertiesService', () => {
       const result = await service.update('prop-001', 'user-001', { title: 'Updated Title' });
 
       expect(result.title).toBe('Updated Title');
+    });
+
+    it('should update property type when provided', async () => {
+      const updatedProperty = { ...mockProperty, propertyType: 'house' };
+      mockPrismaService.property.findUnique.mockResolvedValue(mockProperty);
+      mockPrismaService.property.update.mockResolvedValue(updatedProperty);
+
+      const result = await service.update('prop-001', 'user-001', { propertyType: 'house' } as any);
+
+      expect(result.propertyType).toBe('house');
+      expect(mockPrismaService.property.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            propertyType: 'house',
+          }),
+        })
+      );
+    });
+
+    it('should throw BadRequestException for invalid propertyType', async () => {
+      const parseSpy = jest.spyOn(UpdatePropertySchema, 'parse').mockReturnValue({
+        propertyType: 'invalid',
+      } as any);
+
+      mockPrismaService.property.findUnique.mockResolvedValue(mockProperty);
+
+      await expect(service.update('prop-001', 'user-001', { propertyType: 'invalid' } as any)).rejects.toThrow(
+        BadRequestException
+      );
+
+      parseSpy.mockRestore();
     });
 
     it('should throw NotFoundException if property not found', async () => {
@@ -246,6 +340,79 @@ describe('PropertiesService', () => {
       mockPrismaService.property.findUnique.mockResolvedValue(mockProperty);
 
       await expect(service.delete('prop-001', 'other-user')).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  describe('search', () => {
+    it('should return empty result when spatial filter finds nothing', async () => {
+      mockPrismaService.$queryRaw.mockResolvedValue([]);
+
+      const result = await service.search({
+        latitude: 50.85,
+        longitude: 4.35,
+        radius: 1000,
+      });
+
+      expect(result).toEqual({ properties: [], total: 0 });
+      expect(mockPrismaService.property.findMany).not.toHaveBeenCalled();
+    });
+
+    it('should apply bedroom filters and return properties', async () => {
+      mockPrismaService.property.findMany.mockResolvedValue([mockProperty]);
+      mockPrismaService.property.count.mockResolvedValue(1);
+
+      const warnSpy = jest.spyOn((service as any).logger, 'warn').mockImplementation(() => undefined);
+
+      const result = await service.search({
+        minBedrooms: 2,
+        maxBedrooms: 4,
+        minPrice: 100000,
+      } as any);
+
+      expect(result.total).toBe(1);
+      expect(mockPrismaService.property.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            bedrooms: { gte: 2, lte: 4 },
+          }),
+        })
+      );
+      expect(warnSpy).toHaveBeenCalled();
+    });
+
+    it('should return properties when spatial filter matches', async () => {
+      mockPrismaService.$queryRaw.mockResolvedValue([{ id: 'prop-001' }]);
+      mockPrismaService.property.findMany.mockResolvedValue([mockProperty]);
+      mockPrismaService.property.count.mockResolvedValue(1);
+
+      const result = await service.search({
+        latitude: 50.85,
+        longitude: 4.35,
+        radius: 1000,
+      });
+
+      expect(result.total).toBe(1);
+      expect(mockPrismaService.property.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            id: { in: ['prop-001'] },
+          }),
+        })
+      );
+    });
+  });
+
+  describe('correlationId fallback', () => {
+    it('should generate correlation id when missing in request', () => {
+      const uuidSpy = jest
+        .spyOn(crypto, 'randomUUID')
+        .mockReturnValue('123e4567-e89b-12d3-a456-426614174000');
+      const fallbackService = new PropertiesService(mockPrismaService as any, {} as any);
+
+      const id = (fallbackService as any).getCorrelationId();
+
+      expect(id).toBe('123e4567-e89b-12d3-a456-426614174000');
+      uuidSpy.mockRestore();
     });
   });
 

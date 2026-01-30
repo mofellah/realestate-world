@@ -3008,3 +3008,37 @@ Infrastructure setup is the only blocker. User needs to choose Option A (Docker)
 Phase 5 E2E Testing can now proceed. Frontend authentication is fully operational.
 
 ---
+
+## Coverage Boost - Throttler Config Tests - Coder Report
+
+**Status**: ✅ Complete  
+**Timestamp**: 2026-01-29 20:57 UTC  
+**Agent**: Coder  
+**Task**: Raise backend branch coverage to meet global threshold
+
+### What Was Done
+
+- ✅ Added throttler config unit tests to exercise skip logic branches and config values.
+- ✅ Fixed TypeScript typing in the new test to align with exported config type.
+
+### Verification Results
+
+- **Build**: Not run
+- **Linting**: Not run
+- **Type Check**: Not run
+- **Tests**: ✅ `npm run test:cov` (All suites passing)
+- **Coverage**: Branches 76.11% (global threshold met)
+
+### Deliverables
+
+- `apps/backend/src/common/config/__tests__/throttler.config.spec.ts` - new tests for throttler config and skip logic
+
+### Blockers / Issues
+
+- None
+
+### Recommended Next Steps
+
+- Proceed to next phase.
+
+---
