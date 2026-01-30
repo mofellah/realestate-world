@@ -55,29 +55,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const response = await authService.login(email, password);
     setUser(response.user);
     navigate('/dashboard');
-    }
   };
 
   const register = async (data: { email: string; password: string; passwordConfirmation: string; name?: string }) => {
-    try {
-      const response = await authService.register(data);
-      setUser(response.user);
-      navigate('/dashboard');
-    } catch (error) {
-      throw error;
-    }
+    const response = await authService.register(data);
+    setUser(response.user);
+    navigate('/dashboard');
   };
 
   const logout = async () => {
-    try {
-      await authService.logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      setUser(null);
-      tokenStorage.clearTokens();
-      navigate('/login');
-    }
+    await authService.logout();
+    setUser(null);
+    tokenStorage.clearTokens();
+    navigate('/login');
   };
 
   return (

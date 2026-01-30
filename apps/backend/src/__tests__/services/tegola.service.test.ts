@@ -207,8 +207,6 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
     test('should handle tile requests at different zoom levels', async () => {
       // Test tiles at various zoom levels (0-14 typical)
       const zoomLevels = [0, 5, 10, 14];
-      const x = 1; // simplified x
-      const y = 1; // simplified y
 
       // For simplification, test that requests would be properly formatted
       zoomLevels.forEach((z) => {

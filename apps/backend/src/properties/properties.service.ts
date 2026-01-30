@@ -477,7 +477,7 @@ export class PropertiesService {
       // Price filtering via listings - note that price is in paymentTerms now
       // For MVP, we'll include all published listings and filter on frontend
       // A more complex implementation would need raw SQL to filter by payment terms
-      let listingWhere: any = { status: 'published' };
+      const listingWhere: any = { status: 'published' };
       
       // TODO: Price filtering requires complex query because price is in polymorphic paymentTerms
       // For now, returning all published listings - frontend can filter by price

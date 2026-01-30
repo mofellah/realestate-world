@@ -16,7 +16,6 @@ interface Property {
 }
 
 export default function MyPropertiesPage() {
-  const { user } = useAuth();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
