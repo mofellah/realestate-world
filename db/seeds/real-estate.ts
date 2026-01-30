@@ -33,9 +33,9 @@ export async function seedRealEstate() {
   const geo1 = await prisma.geoObject.create({
     data: {
       type: GeoObjectType.point,
-      latitude: 40.7506,
-      longitude: -73.9971,
-      name: '123 Main Street',
+      latitude: 50.84805,
+      longitude: 4.3733345,
+      name: '48, Rue Hydraulique',
     },
   });
 
@@ -59,7 +59,8 @@ export async function seedRealEstate() {
 
   const address1 = await prisma.address.create({
     data: {
-      streetName: 'Rue Hydraulique 48',
+      streetNumber: '48',
+      streetName: 'Rue Hydraulique',
       city: 'Saint-Josse-ten-Noode',
       region: 'Brussels',
       country_code: 'BE',
