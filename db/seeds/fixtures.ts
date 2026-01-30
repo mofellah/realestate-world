@@ -4,7 +4,7 @@
  */
 
 import { PrismaClient, UserRole } from '@prisma/client';
-import { hashPassword } from '@boilerplate/utils';
+import { hashPassword } from '../../packages/utils/src/crypto';
 
 const prisma = new PrismaClient();
 
