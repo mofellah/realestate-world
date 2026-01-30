@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { propertiesService } from '../../services/properties-service';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface PropertyFormData {
   title: string;
@@ -49,35 +51,42 @@ export default function EditPropertyPage() {
     videoUrl: '',
   });
 
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
   useEffect(() => {
-    // TODO: Fetch property data from API using id
     const fetchProperty = async () => {
+      if (!id) return;
       try {
-        // Mock data - replace with actual API call
-        const mockData = {
-          title: 'Modern Family Home',
-          description: 'Beautiful 3-bedroom house in a quiet neighborhood',
-          propertyType: 'house',
-          listingType: 'sale' as const,
-          price: '450000',
-          street: '123 Main Street',
-          city: 'Springfield',
-          state: 'IL',
-          zipCode: '62701',
-          country: 'USA',
-          bedrooms: '3',
-          bathrooms: '2',
-          area: '2000',
-          yearBuilt: '2010',
-          parking: '2',
-          amenities: ['pool', 'garden'],
+        setLoading(true);
+        setError(null);
+        const property = await propertiesService.getProperty(id);
+        
+        setFormData({
+          title: property.title || '',
+          description: property.description || '',
+          propertyType: property.type || 'house',
+          listingType: 'sale',
+          price: '',
+          street: property.address?.street || '',
+          city: property.address?.city || '',
+          state: property.address?.state || '',
+          zipCode: property.address?.postalCode || '',
+          country: property.address?.country || 'USA',
+          bedrooms: property.bedrooms?.toString() || '',
+          bathrooms: property.bathrooms?.toString() || '',
+          area: property.surfaceArea?.toString() || '',
+          yearBuilt: property.yearBuilt?.toString() || '',
+          parking: '',
+          amenities: property.amenitiesList || [],
           images: [],
           videoUrl: '',
-        };
-        setFormData(mockData);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching property:', error);
+        });
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Failed to load property';
+        setError(errorMsg);
+        console.error('[EditProperty] Failed to load:', err);
+      } finally {
         setLoading(false);
       }
     };
@@ -89,12 +98,41 @@ export default function EditPropertyPage() {
   };
 
   const handleSubmit = async () => {
+    if (!id) {
+      setError('Property ID not found');
+      return;
+    }
+
     try {
-      // TODO: PUT request to update property
-      console.log('Updating property:', id, formData);
+      setSubmitting(true);
+      setError(null);
+
+      const propertyData = {
+        title: formData.title,
+        description: formData.description,
+        type: formData.propertyType,
+        bedrooms: parseInt(formData.bedrooms) || undefined,
+        bathrooms: parseFloat(formData.bathrooms) || undefined,
+        surfaceArea: parseFloat(formData.area) || undefined,
+        yearBuilt: parseInt(formData.yearBuilt) || undefined,
+        amenitiesList: formData.amenities,
+        address: {
+          street: formData.street,
+          city: formData.city,
+          state: formData.state,
+          postalCode: formData.zipCode,
+          country: formData.country,
+        },
+      };
+
+      await propertiesService.updateProperty(id, propertyData);
       navigate('/dashboard/my-properties');
-    } catch (error) {
-      console.error('Error updating property:', error);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to update property';
+      setError(errorMsg);
+      console.error('[EditProperty] Failed to submit:', err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -225,12 +263,30 @@ export default function EditPropertyPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
-                <input
-                  type="text"
+                <select
                   value={formData.country}
                   onChange={(e) => updateFormData({ country: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+                >
+                  <option value="">Select a country</option>
+                  <option value="USA">United States</option>
+                  <option value="Canada">Canada</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="Germany">Germany</option>
+                  <option value="France">France</option>
+                  <option value="Spain">Spain</option>
+                  <option value="Italy">Italy</option>
+                  <option value="Netherlands">Netherlands</option>
+                  <option value="Belgium">Belgium</option>
+                  <option value="Switzerland">Switzerland</option>
+                  <option value="Australia">Australia</option>
+                  <option value="New Zealand">New Zealand</option>
+                  <option value="Japan">Japan</option>
+                  <option value="China">China</option>
+                  <option value="Singapore">Singapore</option>
+                  <option value="UAE">United Arab Emirates</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
             </div>
           </div>
@@ -378,12 +434,25 @@ export default function EditPropertyPage() {
   };
 
   if (loading) {
-    return <div className="p-8 text-center">Loading property...</div>;
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
+          <div className="text-lg text-gray-600 dark:text-gray-400">Loading property...</div>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="max-w-3xl mx-auto p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Property</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Edit Property</h1>
+
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg p-4 mb-6">
+          <p className="text-red-700 dark:text-red-200 font-semibold">Error</p>
+          <p className="text-red-600 dark:text-red-300 text-sm">{error}</p>
+        </div>
+      )}
 
         {/* Progress Steps */}
         <div className="mb-8">
@@ -392,7 +461,9 @@ export default function EditPropertyPage() {
               <div key={step} className="flex items-center">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    currentStep >= step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+                    currentStep >= step 
+                      ? 'bg-blue-600 dark:bg-blue-700 text-white' 
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                   }`}
                 >
                   {step}
@@ -400,7 +471,7 @@ export default function EditPropertyPage() {
                 {step < 5 && (
                   <div
                     className={`w-16 h-1 mx-2 ${
-                      currentStep > step ? 'bg-blue-600' : 'bg-gray-200'
+                      currentStep > step ? 'bg-blue-600 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-700'
                     }`}
                   />
                 )}
@@ -410,7 +481,7 @@ export default function EditPropertyPage() {
         </div>
 
         {/* Form Content */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           {renderStepContent()}
 
           {/* Navigation */}
@@ -418,23 +489,24 @@ export default function EditPropertyPage() {
             <button
               onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
               disabled={currentStep === 1}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
             {currentStep < 5 ? (
               <button
                 onClick={() => setCurrentStep(prev => prev + 1)}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600"
               >
                 Next
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                disabled={submitting}
+                className="px-6 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save Changes
+                {submitting ? 'Saving...' : 'Save Changes'}
               </button>
             )}
           </div>

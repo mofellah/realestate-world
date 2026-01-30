@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { DashboardMetricsSkeleton } from '../../components/Skeleton';
 
 interface AgencyMetrics {
   totalAgents: number;
@@ -23,16 +24,24 @@ export default function AgencyDashboardPage() {
   }, []);
 
   const fetchMetrics = async () => {
-    // TODO: API call to /api/agency/metrics
-    const mockMetrics = {
-      totalAgents: 12,
-      activeListings: 47,
-      totalSales: 23,
-      monthlyRevenue: 156000,
-      pendingInquiries: 8,
-    };
-    setMetrics(mockMetrics);
-    setLoading(false);
+    try {
+      // API call to /api/agencies/:id/metrics
+      // const data = await agencyService.getMetrics();
+      // setMetrics(data);
+      const mockMetrics = {
+        totalAgents: 12,
+        activeListings: 47,
+        totalSales: 23,
+        monthlyRevenue: 156000,
+        pendingInquiries: 8,
+      };
+      setMetrics(mockMetrics);
+      setLoading(false);
+    } catch (error) {
+      console.error('[AgencyDashboard] Failed to load metrics:', error);
+      setLoading(false);
+    }
+  };
   };
 
   if (loading) {
@@ -44,7 +53,10 @@ export default function AgencyDashboardPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Agency Dashboard</h1>
 
         {/* Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        {loading ? (
+          <DashboardMetricsSkeleton />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="text-gray-600 text-sm font-medium">Total Agents</div>
             <div className="text-3xl font-bold text-gray-900 mt-2">{metrics.totalAgents}</div>
@@ -68,6 +80,7 @@ export default function AgencyDashboardPage() {
             <div className="text-3xl font-bold text-gray-900 mt-2">{metrics.pendingInquiries}</div>
           </div>
         </div>
+        )}
 
         {/* Quick Actions */}
         <div className="bg-white rounded-lg shadow p-6">

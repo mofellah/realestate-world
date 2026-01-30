@@ -14,6 +14,7 @@ export interface User {
   email: string;
   passwordHash: string; // bcrypt hash
   avatarUrl: string | null;
+  name: string | null;
   role: UserRoleEnum; // Single role enum
   isActive: boolean;
   country_code: string | null;
@@ -92,7 +93,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse extends TokenPair {
-  user: Omit<User, 'password'>;
+  user: Omit<User, 'passwordHash'>;
 }
 
 export interface RefreshRequest {

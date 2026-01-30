@@ -1,34 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '@/services/auth-service';
-import { usersService } from '@/services/users-service';
+import { useAuth } from '@/contexts/AuthContext';
 import type { UserWithRoles } from '@boilerplate/types';
 import '../styles/dashboard.scss';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<UserWithRoles | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, logout } = useAuth();
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await usersService.getCurrentUser();
-        setUser(userData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch user');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
 
   const handleLogout = async () => {
     try {
-      await authService.logout();
+      await logout();
       navigate('/login');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Logout failed');

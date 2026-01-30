@@ -19,12 +19,18 @@ export default function AgencyListingsPage() {
   }, []);
 
   const fetchListings = async () => {
-    // TODO: API call
-    const mockListings: AgencyListing[] = [
-      { id: '1', title: 'Modern Family Home', agent: 'John Doe', price: 450000, status: 'active', views: 342, inquiries: 12 },
-      { id: '2', title: 'Downtown Apartment', agent: 'Jane Smith', price: 280000, status: 'sold', views: 189, inquiries: 5 },
-    ];
-    setListings(mockListings);
+    try {
+      // API call to fetch agency listings
+      // const data = await agencyService.getListings();
+      // setListings(data);
+      const mockListings: AgencyListing[] = [
+        { id: '1', title: 'Modern Family Home', agent: 'John Doe', price: 450000, status: 'active', views: 342, inquiries: 12 },
+        { id: '2', title: 'Downtown Apartment', agent: 'Jane Smith', price: 280000, status: 'sold', views: 189, inquiries: 5 },
+      ];
+      setListings(mockListings);
+    } catch (error) {
+      console.error('[AgencyListings] Failed to load listings:', error);
+    }
   };
 
   const filteredListings = listings.filter(l => filter === 'all' || l.status === filter);

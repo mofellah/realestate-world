@@ -15,6 +15,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { comparePassword, hashPassword } from '@boilerplate/utils';
 import { backendConfig } from '@boilerplate/config';
 import { Logger } from '@boilerplate/logger';
+import { UserResponseDto } from './dto/user-response.dto';
+import { ZodError } from 'zod';
+import { LoginSchema, RegisterSchema, RefreshTokenSchema } from './schemas/auth.schema';
 import type {
   LoginRequest,
   LoginResponse,
@@ -37,11 +40,25 @@ export class AuthService {
   /**
    * Login with email and password
    * Returns access and refresh tokens
+   * ✅ Validates input with Zod schema
    */
   async login(loginRequest: LoginRequest, correlationId: string): Promise<LoginResponse> {
     this.logger.setCorrelationId(correlationId);
 
-    const { email, password } = loginRequest;
+    // ✅ Validate input with Zod schema
+    let validatedLogin;
+    try {
+      validatedLogin = LoginSchema.parse(loginRequest);
+    } catch (zodError) {
+      if (zodError instanceof ZodError) {
+        const messages = zodError.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ');
+        this.logger.warn('Login validation failed', { errors: messages, correlationId });
+        throw new BadRequestException(`Validation error: ${messages}`);
+      }
+      throw zodError;
+    }
+
+    const { email, password } = validatedLogin;
 
     // Find user by email
     const user = await this.prisma.user.findUnique({
@@ -86,30 +103,33 @@ export class AuthService {
 
     return {
       ...tokenPair,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        isActive: user.isActive,
-        passwordHash: user.passwordHash, // Included but will be filtered by API response DTOs
-        avatarUrl: user.avatarUrl,
-        country_code: user.country_code,
-        personId: user.personId,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
+      user: new UserResponseDto(user), // ✅ Use DTO - excludes passwordHash and sensitive fields
     };
   }
 
   /**
    * Refresh access token
    * Takes refresh token and returns new token pair
+   * ✅ Validates input with Zod schema
    */
   async refreshToken(refreshTokenString: string, correlationId: string): Promise<TokenPair> {
     this.logger.setCorrelationId(correlationId);
 
+    // ✅ Validate input with Zod schema
+    let validatedRefresh;
+    try {
+      validatedRefresh = RefreshTokenSchema.parse({ refreshToken: refreshTokenString });
+    } catch (zodError) {
+      if (zodError instanceof ZodError) {
+        const messages = zodError.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ');
+        this.logger.warn('Refresh token validation failed', { errors: messages, correlationId });
+        throw new BadRequestException(`Validation error: ${messages}`);
+      }
+      throw zodError;
+    }
+
     // Hash the refresh token for lookup
-    const tokenHash = crypto.createHash('sha256').update(refreshTokenString).digest('hex');
+    const tokenHash = crypto.createHash('sha256').update(validatedRefresh.refreshToken).digest('hex');
 
     // Find refresh token in database
     const refreshTokenRecord = await this.prisma.refreshToken.findUnique({
@@ -148,6 +168,7 @@ export class AuthService {
   /**
    * Register a new user
    * Validates email uniqueness, password strength, creates user with default role
+   * ✅ Validates input with Zod schema
    */
   async register(
     registerRequest: RegisterRequest,
@@ -155,33 +176,20 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string; expiresIn: number; user: any }> {
     this.logger.setCorrelationId(correlationId);
 
-    const { email, password, passwordConfirmation } = registerRequest;
-
-    // Validate password confirmation
-    if (password !== passwordConfirmation) {
-      this.logger.warn('Registration failed: passwords do not match', {
-        email,
-        correlationId,
-      });
-      throw new BadRequestException({
-        message: 'Passwords do not match',
-        error: 'PASSWORD_MISMATCH',
-      });
+    // ✅ Validate input with Zod schema
+    let validatedRegister;
+    try {
+      validatedRegister = RegisterSchema.parse(registerRequest);
+    } catch (zodError) {
+      if (zodError instanceof ZodError) {
+        const messages = zodError.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ');
+        this.logger.warn('Registration validation failed', { errors: messages, correlationId });
+        throw new BadRequestException(`Validation error: ${messages}`);
+      }
+      throw zodError;
     }
 
-    // Validate password strength (minimum 8 chars, at least one uppercase, one number)
-    const passwordStrengthRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-    if (!passwordStrengthRegex.test(password)) {
-      this.logger.warn('Registration failed: weak password', {
-        email,
-        correlationId,
-      });
-      throw new BadRequestException({
-        message:
-          'Password must be at least 8 characters with at least one uppercase letter and one number',
-        error: 'WEAK_PASSWORD',
-      });
-    }
+    const { email, password, passwordConfirmation, name } = validatedRegister;
 
     // Check if user already exists
     const existingUser = await this.prisma.user.findUnique({
@@ -209,7 +217,7 @@ export class AuthService {
         passwordHash: hashedPassword,
         role: UserRole.user,
         isActive: true,
-        name: registerRequest.name,
+        name: name ?? undefined,
       },
     });
 
@@ -224,19 +232,7 @@ export class AuthService {
 
     return {
       ...tokenPair,
-      user: {
-        id: newUser.id,
-        email: newUser.email,
-        name: newUser.name ?? undefined,
-        role: newUser.role,
-        isActive: newUser.isActive,
-        passwordHash: newUser.passwordHash, // Included but will be filtered by API response DTOs
-        avatarUrl: newUser.avatarUrl,
-        country_code: newUser.country_code,
-        personId: newUser.personId,
-        createdAt: newUser.createdAt,
-        updatedAt: newUser.updatedAt,
-      },
+      user: new UserResponseDto(newUser), // ✅ Use DTO - excludes passwordHash and sensitive fields
     };
   }
 

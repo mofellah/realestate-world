@@ -31,9 +31,21 @@ export default defineConfig({
     },
   },
   build: {
-    sourcemap: true,
+    sourcemap: false,
+    minify: 'terser',
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 500,
     outDir: 'dist',
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'map': ['ol'],
+          'utils': ['axios', 'zod', 'zustand'],
+        },
+      },
+    },
   },
   define: {
     __DEV__: JSON.stringify(process.env.NODE_ENV === 'development'),

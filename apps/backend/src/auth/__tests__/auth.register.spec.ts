@@ -252,7 +252,7 @@ describe('AuthService - Register', () => {
 
       const result = await authService.register(registerRequest, 'correlation-id');
 
-      expect(result.user.name).toBeUndefined();
+      expect(result.user.name).toBeNull();
     });
 
     it('should return user without password hash', async () => {

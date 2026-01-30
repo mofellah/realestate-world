@@ -4,20 +4,17 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LoginPage from '@/pages/login';
+import { render } from '../test-utils';
 
 // Mock dependencies
 jest.mock('@/services/api-client');
 jest.mock('@/services/auth-service');
 jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
   useNavigate: jest.fn(),
-  Link: ({ to, children, ...props }: { to: string; children: React.ReactNode; [key: string]: any }) => (
-    <a href={to} {...props}>
-      {children}
-    </a>
-  ),
 }));
 
 // Import mocks after they're declared

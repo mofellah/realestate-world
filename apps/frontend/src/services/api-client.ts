@@ -6,13 +6,17 @@
 import { tokenStorage } from '@/utils/token-storage';
 import { parseApiError } from '@/utils/api-error';
 
-// Support both Vite (import.meta.env) and Jest (process.env)
-let API_URL = 'http://localhost:3000';
-try {
-  API_URL = import.meta.env.VITE_API_URL || API_URL;
-} catch (e) {
-  API_URL = process.env.VITE_API_URL || API_URL;
-}
+// Always use /api proxy in browser (Vite dev server or nginx in production)
+// Only use full URL if we're in Jest/Node tests
+const isNode = typeof window === 'undefined';
+const API_URL = isNode ? (process.env.VITE_API_URL || 'http://localhost:3000') : '/api';
+
+// Log API configuration for debugging
+console.log('[API Client] Config:', {
+  isNode,
+  API_URL,
+  env: process.env.NODE_ENV || 'N/A',
+});
 
 interface FetchOptions extends RequestInit {
   headers?: Record<string, string>;
@@ -52,6 +56,8 @@ class ApiClient {
       ...this.getAuthHeader(),
       ...options.headers,
     };
+
+    console.log(`[API Request] ${options.method || 'GET'} ${url}`);
 
     try {
       const response = await fetch(url, {

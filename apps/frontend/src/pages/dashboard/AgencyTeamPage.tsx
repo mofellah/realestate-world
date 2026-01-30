@@ -20,19 +20,29 @@ export default function AgencyTeamPage() {
   }, []);
 
   const fetchAgents = async () => {
-    // TODO: API call
-    const mockAgents: Agent[] = [
-      { id: '1', name: 'John Doe', email: 'john@agency.com', role: 'manager', activeListings: 12, sales: 5, joinedAt: '2023-01-15' },
-      { id: '2', name: 'Jane Smith', email: 'jane@agency.com', role: 'agent', activeListings: 8, sales: 3, joinedAt: '2023-03-20' },
-    ];
-    setAgents(mockAgents);
+    try {
+      // API call to fetch agents
+      // const data = await agencyService.getAgents();
+      // setAgents(data);
+      const mockAgents: Agent[] = [
+        { id: '1', name: 'John Doe', email: 'john@agency.com', role: 'manager', activeListings: 12, sales: 5, joinedAt: '2023-01-15' },
+        { id: '2', name: 'Jane Smith', email: 'jane@agency.com', role: 'agent', activeListings: 8, sales: 3, joinedAt: '2023-03-20' },
+      ];
+      setAgents(mockAgents);
+    } catch (error) {
+      console.error('[AgencyTeam] Failed to load agents:', error);
+    }
   };
 
   const handleInvite = async () => {
-    // TODO: API call to invite agent
-    console.log('Inviting:', inviteEmail);
-    setInviteEmail('');
-    setShowInviteForm(false);
+    try {
+      // API call to invite agent
+      // await agencyService.inviteAgent(inviteEmail);
+      setInviteEmail('');
+      setShowInviteForm(false);
+    } catch (error) {
+      console.error('[AgencyTeam] Failed to invite agent:', error);
+    }
   };
 
   return (

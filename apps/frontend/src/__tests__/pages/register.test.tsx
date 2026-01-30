@@ -3,33 +3,53 @@
  * React Testing Library tests for registration form
  */
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '../test-utils';
 import RegisterPage from '../../pages/register';
-import { authService } from '../../services/auth-service';
 
-// Mock the auth service
-jest.mock('../../services/auth-service');
-
-// Mock useNavigate
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
+// Mock dependencies FIRST - before any imports
+// Use @ alias to match how AuthContext imports it
+jest.mock('@/services/auth-service', () => ({
+  authService: {
+    register: jest.fn(),
+    login: jest.fn(),
+    logout: jest.fn(),
+    refreshToken: jest.fn(),
+    isAuthenticated: jest.fn(),
+    getRefreshToken: jest.fn(),
+  },
 }));
 
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: jest.fn(),
+}));
+
+// Import mocks after they're declared - use @ alias
+import { authService } from '@/services/auth-service';
+import { useNavigate } from 'react-router-dom';
+
+const mockAuthService = authService as jest.Mocked<typeof authService>;
+const mockUseNavigate = useNavigate as jest.MockedFunction<typeof useNavigate>;
+
 describe('RegisterPage', () => {
+  let mockNavigate: jest.Mock;
+
   beforeEach(() => {
     jest.clearAllMocks();
-    mockNavigate.mockClear();
+    mockNavigate = jest.fn();
+    mockUseNavigate.mockReturnValue(mockNavigate);
+    // Provide a default successful registration response; individual tests override as needed
+    mockAuthService.register.mockResolvedValue({
+      accessToken: 'token',
+      refreshToken: 'refresh',
+      expiresIn: 900,
+      user: { id: 'id', email: 'test@example.com', name: null, isActive: true, createdAt: '', updatedAt: '' },
+    } as any);
   });
 
   const renderComponent = () => {
-    return render(
-      <MemoryRouter>
-        <RegisterPage />
-      </MemoryRouter>
-    );
+    return render(<RegisterPage />);
   };
 
   describe('rendering', () => {
@@ -40,7 +60,7 @@ describe('RegisterPage', () => {
       expect(screen.getByLabelText(/^password/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /register/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
     });
 
     it('should render login link', () => {
@@ -72,7 +92,7 @@ describe('RegisterPage', () => {
       fireEvent.change(passwordInput, { target: { value: 'weak' } });
       fireEvent.change(confirmInput, { target: { value: 'weak' } });
       
-      fireEvent.click(screen.getByRole('button', { name: /register/i }));
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
       await waitFor(() => {
         expect(
@@ -92,7 +112,7 @@ describe('RegisterPage', () => {
       fireEvent.change(passwordInput, { target: { value: 'StrongPass123!' } });
       fireEvent.change(confirmInput, { target: { value: 'DifferentPass123!' } });
       
-      fireEvent.click(screen.getByRole('button', { name: /register/i }));
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
       await waitFor(() => {
         expect(screen.getByText(/passwords do not match/i)).toBeInTheDocument();
@@ -114,7 +134,7 @@ describe('RegisterPage', () => {
         },
       };
 
-      (authService.register as jest.Mock).mockResolvedValueOnce(mockResponse);
+      mockAuthService.register.mockResolvedValueOnce(mockResponse);
 
       renderComponent();
 
@@ -131,10 +151,10 @@ describe('RegisterPage', () => {
         target: { value: 'New User' },
       });
 
-      fireEvent.click(screen.getByRole('button', { name: /register/i }));
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
       await waitFor(() => {
-        expect(authService.register).toHaveBeenCalledWith({
+        expect(mockAuthService.register).toHaveBeenCalledWith({
           email: 'newuser@example.com',
           password: 'ValidPass123!',
           passwordConfirmation: 'ValidPass123!',
@@ -153,7 +173,7 @@ describe('RegisterPage', () => {
         user: { id: 'id', email: 'test@example.com', name: null, isActive: true, createdAt: '', updatedAt: '' },
       };
 
-      (authService.register as jest.Mock).mockResolvedValueOnce(mockResponse);
+      mockAuthService.register.mockResolvedValueOnce(mockResponse);
 
       renderComponent();
 
@@ -167,10 +187,10 @@ describe('RegisterPage', () => {
         target: { value: 'TestPass123!' },
       });
 
-      fireEvent.click(screen.getByRole('button', { name: /register/i }));
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
       await waitFor(() => {
-        expect(authService.register).toHaveBeenCalledWith(
+        expect(mockAuthService.register).toHaveBeenCalledWith(
           expect.objectContaining({
             email: 'test@example.com',
             password: 'TestPass123!',
@@ -180,7 +200,7 @@ describe('RegisterPage', () => {
     });
 
     it('should show loading state while submitting', async () => {
-      (authService.register as jest.Mock).mockImplementationOnce(
+      mockAuthService.register.mockImplementationOnce(
         () => new Promise(resolve => setTimeout(resolve, 100))
       );
 
@@ -196,7 +216,7 @@ describe('RegisterPage', () => {
         target: { value: 'TestPass123!' },
       });
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /create account/i });
       fireEvent.click(submitButton);
 
       expect(submitButton).toBeDisabled();
@@ -210,7 +230,7 @@ describe('RegisterPage', () => {
         user: { id: 'id', email: 'test@example.com', name: null, isActive: true, createdAt: '', updatedAt: '' },
       };
 
-      (authService.register as jest.Mock).mockResolvedValueOnce(mockResponse);
+      mockAuthService.register.mockResolvedValueOnce(mockResponse);
 
       renderComponent();
 
@@ -224,7 +244,7 @@ describe('RegisterPage', () => {
         target: { value: 'TestPass123!' },
       });
 
-      fireEvent.click(screen.getByRole('button', { name: /register/i }));
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
@@ -235,7 +255,7 @@ describe('RegisterPage', () => {
   describe('error handling', () => {
     it('should display conflict error for duplicate email', async () => {
       const errorMessage = 'Email already registered';
-      (authService.register as jest.Mock).mockRejectedValueOnce(
+      mockAuthService.register.mockRejectedValueOnce(
         new Error(errorMessage)
       );
 
@@ -251,7 +271,7 @@ describe('RegisterPage', () => {
         target: { value: 'ValidPass123!' },
       });
 
-      fireEvent.click(screen.getByRole('button', { name: /register/i }));
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
       await waitFor(() => {
         expect(screen.getByText(new RegExp(errorMessage, 'i'))).toBeInTheDocument();
@@ -260,7 +280,7 @@ describe('RegisterPage', () => {
 
     it('should display validation error from API', async () => {
       const errorMessage = 'Password does not meet complexity requirements';
-      (authService.register as jest.Mock).mockRejectedValueOnce(
+      mockAuthService.register.mockRejectedValueOnce(
         new Error(errorMessage)
       );
 
@@ -269,14 +289,15 @@ describe('RegisterPage', () => {
       fireEvent.change(screen.getByLabelText(/email/i), {
         target: { value: 'test@example.com' },
       });
+      // Use a password that passes client-side validation but server rejects
       fireEvent.change(screen.getByLabelText(/^password/i), {
-        target: { value: 'WeakPass' },
+        target: { value: 'WeakPass1' },
       });
       fireEvent.change(screen.getByLabelText(/confirm password/i), {
-        target: { value: 'WeakPass' },
+        target: { value: 'WeakPass1' },
       });
 
-      fireEvent.click(screen.getByRole('button', { name: /register/i }));
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
       await waitFor(() => {
         expect(screen.getByText(new RegExp(errorMessage, 'i'))).toBeInTheDocument();
@@ -284,7 +305,7 @@ describe('RegisterPage', () => {
     });
 
     it('should clear error on retry', async () => {
-      (authService.register as jest.Mock).mockRejectedValueOnce(
+      mockAuthService.register.mockRejectedValueOnce(
         new Error('Registration failed')
       );
 
@@ -300,14 +321,14 @@ describe('RegisterPage', () => {
         target: { value: 'ValidPass123!' },
       });
 
-      fireEvent.click(screen.getByRole('button', { name: /register/i }));
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
       await waitFor(() => {
         expect(screen.getByText(/registration failed/i)).toBeInTheDocument();
       });
 
       // Now mock success for retry
-      (authService.register as jest.Mock).mockResolvedValueOnce({
+      mockAuthService.register.mockResolvedValueOnce({
         accessToken: 'token',
         refreshToken: 'refresh',
         expiresIn: 900,
@@ -315,7 +336,7 @@ describe('RegisterPage', () => {
       });
 
       // Retry submission - error should clear on submit
-      fireEvent.click(screen.getByRole('button', { name: /register/i }));
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
@@ -336,8 +357,9 @@ describe('RegisterPage', () => {
     it('should have submit button with accessible name', () => {
       renderComponent();
 
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByRole('button', { name: /create account/i });
       expect(submitButton).toBeInTheDocument();
     });
   });
 });
+

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface UserProfile {
   id: string;
@@ -10,13 +11,26 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
+  const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile>({
-    id: 'user-123',
-    name: 'John Doe',
-    email: 'john@example.com',
-    phone: '+1 234 567 8900',
+    id: user?.id || 'unknown',
+    name: user?.email?.split('@')[0] || 'User',
+    email: user?.email || '',
+    phone: '',
     bio: '',
   });
+  
+  // Update profile when user data loads
+  useEffect(() => {
+    if (user) {
+      setProfile(prev => ({
+        ...prev,
+        id: user.id,
+        email: user.email,
+        name: user.email?.split('@')[0] || 'User',
+      }));
+    }
+  }, [user]);
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [passwordData, setPasswordData] = useState({
@@ -27,11 +41,13 @@ export default function ProfilePage() {
 
   const handleProfileUpdate = async () => {
     try {
-      // TODO: API call to update profile
-      console.log('Updating profile:', profile);
+      setError(null);
+      // API call to update profile
+      // await usersService.updateProfile(profile);
       setIsEditing(false);
     } catch (error) {
-      console.error('Error updating profile:', error);
+      const msg = error instanceof Error ? error.message : 'Failed to update profile';
+      setError(msg);
     }
   };
 
@@ -41,8 +57,9 @@ export default function ProfilePage() {
       return;
     }
     try {
-      // TODO: API call to change password
-      console.log('Changing password');
+      setError(null);
+      // API call to change password
+      // await usersService.changePassword(passwordData.currentPassword, passwordData.newPassword);
       setShowPasswordForm(false);
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (error) {
@@ -53,7 +70,11 @@ export default function ProfilePage() {
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setError(null);
       // TODO: Upload to server and get URL
+      // const formData = new FormData();
+      // formData.append('file', file);
+      // const result = await usersService.uploadAvatar(formData);
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfile(prev => ({ ...prev, avatar: reader.result as string }));

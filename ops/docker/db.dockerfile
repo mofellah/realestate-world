@@ -1,12 +1,13 @@
 # PostgreSQL 18 with PostGIS Extension
 # Production-ready database container
 
-FROM postgres:18-alpine
+FROM postgres:18-bookworm
 
 # Install PostGIS extension and dependencies
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     postgis \
-    && rm -rf /var/cache/apk/*
+    postgresql-18-postgis-3 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy initialization script for PostGIS
 COPY ops/docker/init-postgis.sh /docker-entrypoint-initdb.d/
@@ -21,5 +22,5 @@ EXPOSE 5432
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD pg_isready -U postgres || exit 1
 
-# Data persistence volume
-VOLUME ["/var/lib/postgresql/data"]
+# Note: Volume mount configured in docker-compose.yml
+# PostgreSQL 18+ uses /var/lib/postgresql (not /var/lib/postgresql/data)

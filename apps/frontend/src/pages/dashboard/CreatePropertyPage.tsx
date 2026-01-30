@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { propertiesService } from '../../services/properties-service';
+import { useAuth } from '../../contexts/AuthContext';
 
 type FormStep = 'basic' | 'location' | 'details' | 'media' | 'review';
 
@@ -38,7 +40,10 @@ const AMENITIES = ['Pool', 'Gym', 'Parking', 'Garden', 'Balcony', 'Security', 'E
 
 export default function CreatePropertyPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<FormStep>('basic');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<PropertyFormData>({
     title: '',
     description: '',
@@ -86,13 +91,48 @@ export default function CreatePropertyPage() {
   };
 
   const handleSubmit = async () => {
+    if (!user) {
+      setError('You must be logged in to create a property');
+      return;
+    }
+
     try {
-      // TODO: Implement API call
-      console.log('Submitting property:', formData);
-      // await createProperty(formData);
+      setSubmitting(true);
+      setError(null);
+
+      // First, create the address
+      const addressData = {
+        street: formData.street,
+        city: formData.city,
+        state: formData.state,
+        postalCode: formData.zipCode,
+        country: formData.country,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+      };
+
+      // For now, we'll need to create address separately or handle it in backend
+      // This is a simplified version - backend should handle address creation
+      const propertyData = {
+        type: formData.propertyType,
+        bedrooms: parseInt(formData.bedrooms) || undefined,
+        bathrooms: parseFloat(formData.bathrooms) || undefined,
+        surfaceArea: parseFloat(formData.area) || undefined,
+        yearBuilt: parseInt(formData.yearBuilt) || undefined,
+        amenities: formData.amenities,
+        // Backend expects addressId, so we'll include address data inline for now
+        address: addressData,
+      };
+
+      const property = await propertiesService.createProperty(propertyData);
+      
       navigate('/dashboard/properties');
-    } catch (error) {
-      console.error('Error creating property:', error);
+    } catch (err) {
+      console.error('[CreateProperty] Error:', err);
+      const errorMsg = err instanceof Error ? err.message : 'Failed to create property';
+      setError(errorMsg);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -540,6 +580,12 @@ export default function CreatePropertyPage() {
 
         {/* Form Content */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
+          {error && (
+            <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-700 font-semibold">Error</p>
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
           {renderStepContent()}
         </div>
 
@@ -556,9 +602,10 @@ export default function CreatePropertyPage() {
           {currentStep === 'review' ? (
             <button
               onClick={handleSubmit}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              disabled={submitting}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create Property
+              {submitting ? 'Creating...' : 'Create Property'}
             </button>
           ) : (
             <button

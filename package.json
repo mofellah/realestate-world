@@ -8,7 +8,6 @@
     "db"
   ],
   "scripts": {
-    "install:all": "npm install",
     "clean": "npm run clean --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "dev:backend": "npm run dev --workspace=apps/backend",
@@ -22,16 +21,24 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:all": "npm run test && npm run e2e",
-    "e2e": "cypress run",
-    "e2e:open": "cypress open",
+    "test:integration": "jest --testPathPattern=__tests__/integration",
+    "test:unit": "jest --testPathPattern=\"__tests__/services|__tests__/fixtures\"",
+    "test:all": "npm run test:unit && npm run test:integration && npm run e2e --workspace=apps/frontend",
+    "e2e": "npm run e2e --workspace=apps/frontend",
+    "e2e:open": "npm run e2e:open --workspace=apps/frontend",
     "prisma:studio": "npm run studio --workspace=db",
+    "prisma:generate": "npm run generate --workspace=db",
     "prisma:migrate": "npm run migrate:dev --workspace=db",
+    "prisma:migrate:deploy": "npm run migrate:deploy --workspace=db",
+    "prisma:migrate:reset": "npm run migrate:reset --workspace=db",
     "prisma:seed": "npm run seed --workspace=db",
+    "prisma:db:push": "npm run db:push --workspace=db",
     "docker:dev": "docker compose -f ops/compose/docker-compose.dev.yml up",
     "docker:dev:build": "docker compose -f ops/compose/docker-compose.dev.yml up --build",
     "docker:prod": "docker compose -f ops/compose/docker-compose.prod.yml up",
-    "docker:down": "docker compose -f ops/compose/docker-compose.dev.yml down"
+    "docker:prod:build": "docker compose -f ops/compose/docker-compose.prod.yml up --build",
+    "docker:down": "docker compose -f ops/compose/docker-compose.dev.yml down",
+    "docker:down:prod": "docker compose -f ops/compose/docker-compose.prod.yml down"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",

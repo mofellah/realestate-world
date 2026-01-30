@@ -1,0 +1,70 @@
+# Tegola Configuration for Real Estate Platform
+# Serves property data as Mapbox Vector Tiles (MVT)
+
+[webserver]
+port = ":8080"
+
+# CORS configuration for frontend access
+[webserver.headers]
+Access-Control-Allow-Origin = "*"
+Access-Control-Allow-Methods = "GET, OPTIONS"
+
+# PostGIS Database Connection
+[[providers]]
+name = "postgis"
+type = "postgis"
+host = "db"  # Docker service name
+port = 5432
+database = "realestate"
+user = "postgres"
+password = "postgres"
+srid = 4326  # WGS84 coordinate system
+max_connections = 50
+
+  # Properties layer - uses latitude/longitude fields
+  [[providers.layers]]
+  name = "properties"
+  # Tegola layer with longitude/latitude separation
+  sql = """
+    SELECT 
+      p.id::text,
+      p.title,
+      p."propertyType",
+      p.bedrooms,
+      p.bathrooms,
+      p."surfaceArea",
+      l.id::text as listing_id,
+      l.type as listing_type,
+      l.status as listing_status,
+      go.longitude,
+      go.latitude,
+      a."streetName",
+      a."city",
+      a."postalCode"
+    FROM "Property" p
+    INNER JOIN "Address" a ON p."addressId" = a.id
+    INNER JOIN "geo_objects" go ON a."geoObjectId" = go.id
+    LEFT JOIN "Listing" l ON p.id = l."propertyId" AND l.status = 'published'
+    WHERE go.latitude IS NOT NULL 
+      AND go.longitude IS NOT NULL
+      AND !BBOX!
+  """
+  geometry_fieldname = "longitude"
+  geometry_type = "point"
+  id_fieldname = "id"
+  srid = 4326
+  
+  [[providers.layers.fields]]
+  name = "latitude"
+  type = "float"
+
+# Map Configuration
+[[maps]]
+name = "properties"
+attribution = "Real Estate Platform"
+center = [4.3517, 50.8503, 12.0]  # Brussels, Belgium [lon, lat, zoom]
+
+  [[maps.layers]]
+  provider_layer = "postgis.properties"
+  min_zoom = 0
+  max_zoom = 20

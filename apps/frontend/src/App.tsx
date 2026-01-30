@@ -1,14 +1,17 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useAuthStore } from './stores/authStore';
 import { usePropertyStore } from './stores/propertyStore';
+
+// Theme Provider
+import { ThemeProvider } from './contexts/ThemeContext';
+
+// Components
+import ProtectedRoute from './components/protected-route';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Layouts
 import MainLayout from './components/layouts/MainLayout';
 import DashboardLayout from './components/layouts/DashboardLayout';
-
-// Components
-import ProtectedRoute from './components/protected-route';
 
 // Public Pages
 import HomePage from './pages/HomePage';
@@ -38,80 +41,78 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import './styles/layout.scss';
 
 export default function App() {
-  const { checkAuth } = useAuthStore();
   const { fetchListings, fetchProperties } = usePropertyStore();
 
   useEffect(() => {
-    // Check authentication on app load
-    checkAuth();
-    
     // Load initial data
     fetchListings();
     fetchProperties();
-  }, [checkAuth, fetchListings, fetchProperties]);
+  }, [fetchListings, fetchProperties]);
 
   return (
-    <Router>
-      <Routes>
-        {/* Public Routes with Main Layout */}
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/property/:id" element={<PropertyDetailPage />} />
-        </Route>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <Routes>
+          {/* Public Routes with Main Layout */}
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/property/:id" element={<PropertyDetailPage />} />
+          </Route>
 
-        {/* Auth Routes (no layout) */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+          {/* Auth Routes (no layout) */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
-        {/* Protected Dashboard Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<DashboardPage />} />
-          <Route path="properties" element={<MyPropertiesPage />} />
-          <Route path="properties/create" element={<CreatePropertyPage />} />
-          <Route path="properties/:id/edit" element={<EditPropertyPage />} />
-          <Route path="listings" element={<MyListingsPage />} />
-          <Route path="listings/create" element={<CreateListingPage />} />
-          <Route path="messages" element={<MessagesPage />} />
-          <Route path="profile" element={<ProfilePage />} />
-        </Route>
+          {/* Protected Dashboard Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<DashboardPage />} />
+            <Route path="properties" element={<MyPropertiesPage />} />
+            <Route path="properties/create" element={<CreatePropertyPage />} />
+            <Route path="properties/:id/edit" element={<EditPropertyPage />} />
+            <Route path="listings" element={<MyListingsPage />} />
+            <Route path="listings/create" element={<CreateListingPage />} />
+            <Route path="messages" element={<MessagesPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+          </Route>
 
-        {/* Protected Agency Routes */}
-        <Route
-          path="/agency"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<AgencyDashboardPage />} />
-          <Route path="team" element={<AgencyTeamPage />} />
-          <Route path="listings" element={<AgencyListingsPage />} />
-        </Route>
+          {/* Protected Agency Routes */}
+          <Route
+            path="/agency"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<AgencyDashboardPage />} />
+            <Route path="team" element={<AgencyTeamPage />} />
+            <Route path="listings" element={<AgencyListingsPage />} />
+          </Route>
 
-        {/* Protected Admin Routes */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<AdminDashboardPage />} />
-        </Route>
+          {/* Protected Admin Routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<AdminDashboardPage />} />
+          </Route>
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
+          {/* Catch all */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

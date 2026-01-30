@@ -25,7 +25,8 @@ COPY packages/*/package*.json ./packages/
 COPY db/package*.json ./db/
 
 # Install all dependencies (including devDependencies for development)
-RUN npm ci --workspace=apps/backend --include-workspace-root
+# First install root dependencies, then all workspaces
+RUN npm ci --include-workspace-root
 
 # Copy source code
 COPY apps/backend/ ./apps/backend/

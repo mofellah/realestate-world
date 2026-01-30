@@ -32,26 +32,39 @@ export default function AdminDashboardPage() {
   }, []);
 
   const fetchMetrics = async () => {
-    // TODO: API call to /api/admin/metrics
-    const mockMetrics = {
-      totalUsers: 1247,
-      totalProperties: 3582,
-      totalListings: 892,
-      activeListings: 657,
-      revenue: 45600,
-    };
-    setMetrics(mockMetrics);
-    setLoading(false);
+    try {
+      // API call to /api/admin/metrics
+      // const data = await adminService.getMetrics();
+      // setMetrics(data);
+      const mockMetrics = {
+        totalUsers: 1247,
+        totalProperties: 3582,
+        totalListings: 892,
+        activeListings: 657,
+        revenue: 45600,
+      };
+      setMetrics(mockMetrics);
+      setLoading(false);
+    } catch (error) {
+      console.error('[AdminDashboard] Failed to load metrics:', error);
+      setLoading(false);
+    }
   };
 
   const fetchActivity = async () => {
-    // TODO: API call to /api/admin/activity
-    const mockActivity: RecentActivity[] = [
-      { id: '1', type: 'user_registered', description: 'New user: john@example.com', timestamp: '2 min ago' },
-      { id: '2', type: 'listing_published', description: 'Listing published: Modern Family Home', timestamp: '15 min ago' },
-      { id: '3', type: 'property_created', description: 'Property created: Downtown Apartment', timestamp: '1 hour ago' },
-    ];
-    setActivity(mockActivity);
+    try {
+      // API call to /api/admin/activity
+      // const data = await adminService.getActivity();
+      // setActivity(data);
+      const mockActivity: RecentActivity[] = [
+        { id: '1', type: 'user_registered', description: 'New user: john@example.com', timestamp: '2 min ago' },
+        { id: '2', type: 'listing_published', description: 'Listing published: Modern Family Home', timestamp: '15 min ago' },
+        { id: '3', type: 'property_created', description: 'Property created: Downtown Apartment', timestamp: '1 hour ago' },
+      ];
+      setActivity(mockActivity);
+    } catch (error) {
+      console.error('[AdminDashboard] Failed to load activity:', error);
+    }
   };
 
   if (loading) {

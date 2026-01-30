@@ -1,9 +1,10 @@
 // Header component with navigation
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../stores/authStore';
+import { useAuth } from '../contexts/AuthContext';
+import ThemeToggle from './ThemeToggle';
 
 export default function Header() {
-  const { isAuthenticated, user, logout } = useAuthStore();
+  const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -38,6 +39,7 @@ export default function Header() {
 
           {/* User Actions */}
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
             {isAuthenticated && user ? (
               <>
                 <Link 

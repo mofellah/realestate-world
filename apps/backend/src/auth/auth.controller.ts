@@ -12,6 +12,7 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { JwtGuard } from './guards/jwt.guard';
@@ -29,7 +30,9 @@ export class AuthController {
    * POST /auth/login
    * Login with email and password
    * Returns: { accessToken, refreshToken, expiresIn, user }
+   * ✅ Rate limited: 5 attempts per 15 minutes (prevents brute force)
    */
+  @Throttle({ default: { limit: 5, ttl: 15 * 60 * 1000 } })
   @Post('login')
   @Public()
   @HttpCode(HttpStatus.OK)
@@ -40,6 +43,7 @@ export class AuthController {
     type: LoginResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @ApiResponse({ status: 429, description: 'Too many login attempts' })
   async login(@Body() loginRequest: LoginDto, @Req() req: RequestWithCorrelation) {
     const correlationId = req.correlationId;
     return this.authService.login(loginRequest, correlationId);
@@ -49,7 +53,9 @@ export class AuthController {
    * POST /auth/register
    * Register a new user with email, password, and optional name
    * Returns: { accessToken, refreshToken, expiresIn, user }
+   * ✅ Rate limited: 5 attempts per 15 minutes (prevents spam registration)
    */
+  @Throttle({ default: { limit: 5, ttl: 15 * 60 * 1000 } })
   @Post('register')
   @Public()
   @HttpCode(HttpStatus.CREATED)
@@ -60,6 +66,7 @@ export class AuthController {
     type: LoginResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Invalid input or email already exists' })
+  @ApiResponse({ status: 429, description: 'Too many registration attempts' })
   async register(@Body() registerRequest: RegisterDto, @Req() req: RequestWithCorrelation) {
     const correlationId = req.correlationId;
     return this.authService.register(registerRequest, correlationId);
@@ -69,7 +76,9 @@ export class AuthController {
    * POST /auth/refresh
    * Refresh access token using refresh token
    * Returns: { accessToken, refreshToken, expiresIn }
+   * ✅ Rate limited: 5 attempts per 15 minutes (prevents token refresh abuse)
    */
+  @Throttle({ default: { limit: 5, ttl: 15 * 60 * 1000 } })
   @Post('refresh')
   @Public()
   @HttpCode(HttpStatus.OK)
@@ -79,6 +88,7 @@ export class AuthController {
     description: 'Token refreshed successfully',
   })
   @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
+  @ApiResponse({ status: 429, description: 'Too many refresh attempts' })
   async refresh(@Body() refreshRequest: RefreshDto, @Req() req: RequestWithCorrelation) {
     const correlationId = req.correlationId;
     return this.authService.refreshToken(refreshRequest.refreshToken, correlationId);

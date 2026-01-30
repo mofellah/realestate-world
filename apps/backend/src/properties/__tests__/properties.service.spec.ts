@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
 import { PropertiesService } from '../properties.service';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -61,12 +62,21 @@ describe('PropertiesService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
 
+    const mockRequest = {
+      correlationId: 'test-correlation-id',
+      headers: {},
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PropertiesService,
         {
           provide: PrismaService,
           useValue: mockPrismaService,
+        },
+        {
+          provide: REQUEST,
+          useValue: mockRequest,
         },
       ],
     }).compile();
@@ -92,7 +102,7 @@ describe('PropertiesService', () => {
 
       const dto = {
         title: 'Test Property',
-        addressId: 'addr-001',
+        addressId: 'cltestaddr1234567890001',
         description: 'Test',
       };
 
@@ -103,18 +113,18 @@ describe('PropertiesService', () => {
       expect(mockPrismaService.property.create).toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if user not found', async () => {
-      mockPrismaService.user.findUnique.mockResolvedValue(null);
+    it('should throw BadRequestException for invalid addressId CUID', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
 
       await expect(
-        service.create('invalid-user', { title: 'Test', addressId: 'addr-001' })
-      ).rejects.toThrow(NotFoundException);
+        service.create('invalid-user', { title: 'Test', addressId: 'invalid-cuid' })
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException if title missing', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
 
-      await expect(service.create('user-001', { addressId: 'addr-001' })).rejects.toThrow(
+      await expect(service.create('user-001', { addressId: 'addr-001', title: 'Test' })).rejects.toThrow(
         BadRequestException
       );
     });
@@ -122,7 +132,7 @@ describe('PropertiesService', () => {
     it('should throw BadRequestException if addressId missing', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
 
-      await expect(service.create('user-001', { title: 'Test' })).rejects.toThrow(
+      await expect(service.create('user-001', { title: 'Test' } as any)).rejects.toThrow(
         BadRequestException
       );
     });
