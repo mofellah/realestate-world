@@ -52,12 +52,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    try {
-      const response = await authService.login(email, password);
-      setUser(response.user);
-      navigate('/dashboard');
-    } catch (error) {
-      throw error; // Let component handle error display
+    const response = await authService.login(email, password);
+    setUser(response.user);
+    navigate('/dashboard');
     }
   };
 

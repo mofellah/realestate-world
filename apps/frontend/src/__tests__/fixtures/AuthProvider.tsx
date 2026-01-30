@@ -30,7 +30,7 @@ interface MockAuthProviderProps {
  * Mock AuthProvider component for wrapping test components
  * Provides default mock auth context or custom values via authValue prop
  */
-export function MockAuthProvider({ children, authValue }: MockAuthProviderProps) {
+export function MockAuthProvider({ children }: MockAuthProviderProps) {
   return <>{children}</>;
 }
 

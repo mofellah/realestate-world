@@ -67,7 +67,7 @@ export default function CreateListingPage() {
       setSubmitting(true);
       setError(null);
 
-      const listing = await listingsService.createListing(formData);
+      await listingsService.createListing(formData);
       
       navigate('/dashboard/my-listings');
     } catch (err) {

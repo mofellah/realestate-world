@@ -124,7 +124,7 @@ export default function CreatePropertyPage() {
         address: addressData,
       };
 
-      const property = await propertiesService.createProperty(propertyData);
+      await propertiesService.createProperty(propertyData);
       
       navigate('/dashboard/properties');
     } catch (err) {

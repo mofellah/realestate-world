@@ -13,10 +13,6 @@ export default function MessagesPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Load messages on mount
-  useEffect(() => {
-    loadMessages();
-  }, []);
-
   const loadMessages = async () => {
     try {
       setLoading(true);
@@ -34,6 +30,10 @@ export default function MessagesPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadMessages();
+  }, []);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();

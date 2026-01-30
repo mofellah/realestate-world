@@ -420,7 +420,7 @@ export class PropertiesService {
         throw zodError;
       }
 
-      const { skip = 0, take = 20, latitude, longitude, radius, ...otherFilters } = validatedFilters;
+      const { skip = 0, take = 20, latitude, longitude, radius } = validatedFilters;
 
       // Build WHERE clause
       const where: any = {

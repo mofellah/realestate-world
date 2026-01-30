@@ -10,10 +10,6 @@ import {
   personsFixture,
   usersFixture,
   propertiesFixture,
-  paymentTermsFixture,
-  onetimePaymentFixture,
-  listingsFixture,
-  saleListingFixture,
 } from '../fixtures/test.fixtures';
 
 const prisma = new PrismaClient({

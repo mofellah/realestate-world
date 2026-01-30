@@ -189,7 +189,7 @@ export class AuthService {
       throw zodError;
     }
 
-    const { email, password, passwordConfirmation, name } = validatedRegister;
+    const { email, password, name } = validatedRegister;
 
     // Check if user already exists
     const existingUser = await this.prisma.user.findUnique({

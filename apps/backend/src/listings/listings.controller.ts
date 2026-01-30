@@ -16,7 +16,7 @@ import { ListingsService } from './listings.service';
 import { JwtGuard } from '../auth/guards/jwt.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtPayload } from '@boilerplate/types';
-import { CreateListingDto, UpdateListingDto, PublishListingDto } from './dto/listing.dto';
+import { CreateListingDto, UpdateListingDto } from './dto/listing.dto';
 
 @ApiTags('Listings')
 @Controller('listings')

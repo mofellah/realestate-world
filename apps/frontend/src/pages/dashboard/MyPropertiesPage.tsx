@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { propertiesService } from '../../services/properties-service';
-import { useAuth } from '../../contexts/AuthContext';
 
 interface Property {
   id: string;

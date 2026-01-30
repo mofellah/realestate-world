@@ -3,7 +3,7 @@
  * React Testing Library tests for listing creation form
  */
 
-import { render, screen, fireEvent, waitFor, renderWithRouter } from '../test-utils';
+import { screen, fireEvent, waitFor, renderWithRouter } from '../test-utils';
 import CreateListingPage from '../../pages/dashboard/CreateListingPage';
 import { propertiesService } from '../../services/properties-service';
 import { listingsService } from '../../services/listings-service';

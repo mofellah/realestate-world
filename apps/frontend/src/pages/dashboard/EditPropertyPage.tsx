@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { propertiesService } from '../../services/properties-service';
-import { useAuth } from '../../contexts/AuthContext';
 
 interface PropertyFormData {
   title: string;

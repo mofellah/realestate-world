@@ -101,7 +101,7 @@ describe('PropertiesService', () => {
       });
 
       const callArgs = (apiClient.get as jest.Mock).mock.calls[0][0];
-      expect(callArgs).toMatch(/city=New[\+%20]York/);
+      expect(callArgs).toMatch(/city=New[+%20]York/);
       expect(callArgs).toContain('type=apartment');
       expect(callArgs).toContain('bedrooms=2');
       expect(callArgs).toContain('priceMin=300000');

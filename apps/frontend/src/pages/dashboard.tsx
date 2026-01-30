@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import type { UserWithRoles } from '@boilerplate/types';
 import '../styles/dashboard.scss';
 
 export default function DashboardPage() {

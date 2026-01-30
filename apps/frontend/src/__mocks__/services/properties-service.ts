@@ -3,7 +3,7 @@
  * Provides mock implementations of property CRUD methods for testing
  */
 
-import type { Property, CreatePropertyDto, UpdatePropertyDto } from '@boilerplate/types';
+import type { Property } from '@boilerplate/types';
 
 const defaultProperty: Property = {
   id: 'prop-1',

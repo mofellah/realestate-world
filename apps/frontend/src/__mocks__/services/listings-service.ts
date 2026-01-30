@@ -3,7 +3,7 @@
  * Provides mock implementations of listing CRUD methods for testing
  */
 
-import type { Listing, CreateListingDto, UpdateListingDto } from '@boilerplate/types';
+import type { Listing } from '@boilerplate/types';
 
 const defaultListing: Listing = {
   id: 'listing-1',
