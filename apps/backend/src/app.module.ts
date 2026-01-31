@@ -3,19 +3,19 @@
  * Root module that imports all feature modules
  */
 
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { HealthModule } from './health/health.module';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { PropertiesModule } from './properties/properties.module';
-import { ListingsModule } from './listings/listings.module';
-import { MessagesModule } from './messages/messages.module';
-import { AgenciesModule } from './agencies/agencies.module';
-import { PrismaService } from './prisma/prisma.service';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
+import { Module, NestModule, MiddlewareConsumer } from "@nestjs/common";
+import { ThrottlerModule } from "@nestjs/throttler";
+import { HealthModule } from "./health/health.module";
+import { AuthModule } from "./auth/auth.module";
+import { UsersModule } from "./users/users.module";
+import { PropertiesModule } from "./properties/properties.module";
+import { ListingsModule } from "./listings/listings.module";
+import { MessagesModule } from "./messages/messages.module";
+import { AgenciesModule } from "./agencies/agencies.module";
+import { PrismaService } from "./prisma/prisma.service";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { CorrelationIdMiddleware } from "./common/middleware/correlation-id.middleware";
 
 @Module({
   imports: [
@@ -28,7 +28,7 @@ import { CorrelationIdMiddleware } from './common/middleware/correlation-id.midd
         limit: 100,
       },
     ]),
-    
+
     HealthModule,
     AuthModule,
     UsersModule,
@@ -43,6 +43,6 @@ import { CorrelationIdMiddleware } from './common/middleware/correlation-id.midd
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     // ✅ Apply correlation ID middleware to all routes for distributed tracing
-    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+    consumer.apply(CorrelationIdMiddleware).forRoutes("*");
   }
 }

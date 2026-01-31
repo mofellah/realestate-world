@@ -1,44 +1,44 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import { usePropertyStore } from './stores/propertyStore';
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { usePropertyStore } from "./stores/propertyStore";
 
 // Theme Provider
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 // Components
-import ProtectedRoute from './components/protected-route';
-import { ErrorBoundary } from './components/ErrorBoundary';
+import ProtectedRoute from "./components/protected-route";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // Layouts
-import MainLayout from './components/layouts/MainLayout';
-import DashboardLayout from './components/layouts/DashboardLayout';
+import MainLayout from "./components/layouts/MainLayout";
+import DashboardLayout from "./components/layouts/DashboardLayout";
 
 // Public Pages
-import HomePage from './pages/HomePage';
-import SearchPage from './pages/SearchPage';
-import PropertyDetailPage from './pages/PropertyDetailPage';
-import LoginPage from './pages/login';
-import RegisterPage from './pages/register';
+import HomePage from "./pages/HomePage";
+import SearchPage from "./pages/SearchPage";
+import PropertyDetailPage from "./pages/PropertyDetailPage";
+import LoginPage from "./pages/login";
+import RegisterPage from "./pages/register";
 
 // Dashboard Pages
-import DashboardPage from './pages/dashboard';
-import MyPropertiesPage from './pages/dashboard/MyPropertiesPage';
-import CreatePropertyPage from './pages/dashboard/CreatePropertyPage';
-import EditPropertyPage from './pages/dashboard/EditPropertyPage';
-import MyListingsPage from './pages/dashboard/MyListingsPage';
-import CreateListingPage from './pages/dashboard/CreateListingPage';
-import MessagesPage from './pages/dashboard/MessagesPage';
-import ProfilePage from './pages/dashboard/ProfilePage';
+import DashboardPage from "./pages/dashboard";
+import MyPropertiesPage from "./pages/dashboard/MyPropertiesPage";
+import CreatePropertyPage from "./pages/dashboard/CreatePropertyPage";
+import EditPropertyPage from "./pages/dashboard/EditPropertyPage";
+import MyListingsPage from "./pages/dashboard/MyListingsPage";
+import CreateListingPage from "./pages/dashboard/CreateListingPage";
+import MessagesPage from "./pages/dashboard/MessagesPage";
+import ProfilePage from "./pages/dashboard/ProfilePage";
 
 // Agency Pages
-import AgencyDashboardPage from './pages/agency/AgencyDashboardPage';
-import AgencyTeamPage from './pages/agency/AgencyTeamPage';
-import AgencyListingsPage from './pages/agency/AgencyListingsPage';
+import AgencyDashboardPage from "./pages/agency/AgencyDashboardPage";
+import AgencyTeamPage from "./pages/agency/AgencyTeamPage";
+import AgencyListingsPage from "./pages/agency/AgencyListingsPage";
 
 // Admin Pages
-import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 
-import './styles/layout.scss';
+import "./styles/layout.scss";
 
 export default function App() {
   const { fetchListings, fetchProperties } = usePropertyStore();

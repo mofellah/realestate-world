@@ -3,41 +3,41 @@
  * Tests for user info display and logout functionality
  */
 
-import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import DashboardPage from '@/pages/dashboard';
-import { renderWithRouter } from '../test-utils';
-import { useAuth } from '@/contexts/AuthContext';
+import React from "react";
+import { screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import DashboardPage from "@/pages/dashboard";
+import { renderWithRouter } from "../test-utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Mock dependencies
-jest.mock('@/contexts/AuthContext', () => ({
-  ...jest.requireActual('@/contexts/AuthContext'),
+jest.mock("@/contexts/AuthContext", () => ({
+  ...jest.requireActual("@/contexts/AuthContext"),
   useAuth: jest.fn(),
 }));
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
   useNavigate: jest.fn(),
 }));
 
 // Import mocks after they're declared
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const mockUseNavigate = useNavigate as jest.MockedFunction<typeof useNavigate>;
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 
-describe('DashboardPage Component', () => {
+describe("DashboardPage Component", () => {
   let mockNavigate: jest.Mock;
 
   const mockUser = {
-    id: 'user-123',
-    email: 'admin@example.com',
-    name: 'Admin User',
+    id: "user-123",
+    email: "admin@example.com",
+    name: "Admin User",
     isActive: true,
     createdAt: new Date(),
     updatedAt: new Date(),
-    roles: [{ id: 'role-1', name: 'admin' }],
+    roles: [{ id: "role-1", name: "admin" }],
     permissions: [],
   };
 
@@ -47,7 +47,7 @@ describe('DashboardPage Component', () => {
     jest.clearAllMocks();
     mockNavigate = jest.fn();
     mockUseNavigate.mockReturnValue(mockNavigate);
-    
+
     // Mock useAuth to return user data by default
     mockUseAuth.mockReturnValue({
       user: mockUser,
@@ -60,34 +60,34 @@ describe('DashboardPage Component', () => {
   });
 
   // Basic rendering and display tests
-  it('should render dashboard with user info', async () => {
+  it("should render dashboard with user info", async () => {
     renderWithRouter(<DashboardPage />);
     expect(screen.getAllByText(/admin@example.com/).length).toBeGreaterThan(0);
   });
 
-  it('should display user email', async () => {
+  it("should display user email", async () => {
     renderWithRouter(<DashboardPage />);
     expect(screen.getAllByText(/admin@example.com/).length).toBeGreaterThan(0);
   });
 
-  it('should display user ID', async () => {
+  it("should display user ID", async () => {
     renderWithRouter(<DashboardPage />);
-    expect(screen.getByText('user-123')).toBeInTheDocument();
+    expect(screen.getByText("user-123")).toBeInTheDocument();
   });
 
-  it('should display user roles', async () => {
+  it("should display user roles", async () => {
     renderWithRouter(<DashboardPage />);
-    expect(screen.getByText('admin')).toBeInTheDocument();
+    expect(screen.getByText("admin")).toBeInTheDocument();
   });
 
-  it('should display multiple roles', async () => {
+  it("should display multiple roles", async () => {
     mockUseAuth.mockReturnValue({
-      user: { 
-        ...mockUser, 
+      user: {
+        ...mockUser,
         roles: [
-          { id: 'role-1', name: 'admin' },
-          { id: 'role-2', name: 'moderator' },
-        ]
+          { id: "role-1", name: "admin" },
+          { id: "role-2", name: "moderator" },
+        ],
       },
       isAuthenticated: true,
       loading: false,
@@ -97,24 +97,24 @@ describe('DashboardPage Component', () => {
     });
 
     renderWithRouter(<DashboardPage />);
-    expect(screen.getByText('admin')).toBeInTheDocument();
-    expect(screen.getByText('moderator')).toBeInTheDocument();
+    expect(screen.getByText("admin")).toBeInTheDocument();
+    expect(screen.getByText("moderator")).toBeInTheDocument();
   });
 
-  it('should display welcome heading', async () => {
+  it("should display welcome heading", async () => {
     renderWithRouter(<DashboardPage />);
-    const heading = screen.getByRole('heading', { level: 2 });
+    const heading = screen.getByRole("heading", { level: 2 });
     expect(heading).toHaveTextContent(/welcome/i);
   });
 
-  it('should display logout button', async () => {
+  it("should display logout button", async () => {
     renderWithRouter(<DashboardPage />);
-    const logoutButton = screen.getByRole('button', { name: /logout/i });
+    const logoutButton = screen.getByRole("button", { name: /logout/i });
     expect(logoutButton).toBeInTheDocument();
   });
 
   // Loading state tests
-  it('should show loading state when loading is true', async () => {
+  it("should show loading state when loading is true", async () => {
     mockUseAuth.mockReturnValue({
       user: null,
       isAuthenticated: false,
@@ -128,7 +128,7 @@ describe('DashboardPage Component', () => {
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
 
-  it('should not show user info when user is null', async () => {
+  it("should not show user info when user is null", async () => {
     mockUseAuth.mockReturnValue({
       user: null,
       isAuthenticated: false,
@@ -144,31 +144,31 @@ describe('DashboardPage Component', () => {
   });
 
   // Logout functionality tests
-  it('should call logout when logout button is clicked', async () => {
+  it("should call logout when logout button is clicked", async () => {
     const user = userEvent.setup();
     renderWithRouter(<DashboardPage />);
-    
-    const logoutButton = screen.getByRole('button', { name: /logout/i });
+
+    const logoutButton = screen.getByRole("button", { name: /logout/i });
     await user.click(logoutButton);
-    
+
     expect(mockLogout).toHaveBeenCalled();
   });
 
-  it('should navigate to login after logout', async () => {
+  it("should navigate to login after logout", async () => {
     const user = userEvent.setup();
     renderWithRouter(<DashboardPage />);
-    
-    const logoutButton = screen.getByRole('button', { name: /logout/i });
+
+    const logoutButton = screen.getByRole("button", { name: /logout/i });
     await user.click(logoutButton);
-    
+
     // After logout, component should navigate to login
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/login');
+      expect(mockNavigate).toHaveBeenCalledWith("/login");
     });
   });
 
   // Edge cases
-  it('should handle empty roles array', async () => {
+  it("should handle empty roles array", async () => {
     mockUseAuth.mockReturnValue({
       user: { ...mockUser, roles: [] },
       isAuthenticated: true,
@@ -182,9 +182,9 @@ describe('DashboardPage Component', () => {
     expect(screen.getAllByText(/admin@example.com/)[0]).toBeInTheDocument();
   });
 
-  it('should render with user having various email formats', async () => {
+  it("should render with user having various email formats", async () => {
     mockUseAuth.mockReturnValue({
-      user: { ...mockUser, email: 'test.user+tag@example.co.uk' },
+      user: { ...mockUser, email: "test.user+tag@example.co.uk" },
       isAuthenticated: true,
       loading: false,
       login: jest.fn(),
@@ -193,6 +193,6 @@ describe('DashboardPage Component', () => {
     });
 
     renderWithRouter(<DashboardPage />);
-    expect(screen.getAllByText('test.user+tag@example.co.uk').length).toBeGreaterThan(0);
+    expect(screen.getAllByText("test.user+tag@example.co.uk").length).toBeGreaterThan(0);
   });
 });

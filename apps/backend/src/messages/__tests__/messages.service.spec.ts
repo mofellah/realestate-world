@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { MessagesService } from '../messages.service';
-import { PrismaService } from '../../prisma/prisma.service';
-import { NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Test, TestingModule } from "@nestjs/testing";
+import { MessagesService } from "../messages.service";
+import { PrismaService } from "../../prisma/prisma.service";
+import { NotFoundException, ForbiddenException } from "@nestjs/common";
 
-describe('MessagesService', () => {
+describe("MessagesService", () => {
   let service: MessagesService;
   let prisma: PrismaService;
 
@@ -35,7 +35,7 @@ describe('MessagesService', () => {
           useValue: mockPrismaService,
         },
         {
-          provide: 'LOGGER',
+          provide: "LOGGER",
           useValue: {
             info: jest.fn(),
             error: jest.fn(),
@@ -54,19 +54,19 @@ describe('MessagesService', () => {
     jest.clearAllMocks();
   });
 
-  describe('create', () => {
-    it('should create a message successfully', async () => {
-      const senderId = 'user-001';
+  describe("create", () => {
+    it("should create a message successfully", async () => {
+      const senderId = "user-001";
       const dto = {
-        recipientId: 'user-002',
-        subjectId: 'prop-001',
-        subjectType: 'property' as const,
-        body: 'Test message',
+        recipientId: "user-002",
+        subjectId: "prop-001",
+        subjectType: "property" as const,
+        body: "Test message",
       };
 
-      const mockRecipient = { id: 'user-002', email: 'recipient@test.com' };
+      const mockRecipient = { id: "user-002", email: "recipient@test.com" };
       const mockMessage = {
-        id: 'msg-001',
+        id: "msg-001",
         senderId,
         recipientId: dto.recipientId,
         subjectId: dto.subjectId,
@@ -77,7 +77,10 @@ describe('MessagesService', () => {
       };
 
       mockPrismaService.user.findUnique.mockResolvedValue(mockRecipient);
-      mockPrismaService.subject.findUnique.mockResolvedValue({ id: 'subject-001', subjectType: 'PROPERTY' });
+      mockPrismaService.subject.findUnique.mockResolvedValue({
+        id: "subject-001",
+        subjectType: "PROPERTY",
+      });
       mockPrismaService.message.create.mockResolvedValue(mockMessage);
 
       const result = await service.create(senderId, dto);
@@ -89,43 +92,43 @@ describe('MessagesService', () => {
       expect(prisma.message.create).toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if recipient not found', async () => {
+    it("should throw NotFoundException if recipient not found", async () => {
       const dto = {
-        recipientId: 'user-002',
-        subjectId: 'prop-001',
-        subjectType: 'property' as const,
-        body: 'Test message',
+        recipientId: "user-002",
+        subjectId: "prop-001",
+        subjectType: "property" as const,
+        body: "Test message",
       };
 
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.create('user-001', dto)).rejects.toThrow(NotFoundException);
+      await expect(service.create("user-001", dto)).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw NotFoundException if subject not found', async () => {
+    it("should throw NotFoundException if subject not found", async () => {
       const dto = {
-        recipientId: 'user-002',
-        subjectId: 'prop-001',
-        subjectType: 'property' as const,
-        body: 'Test message',
+        recipientId: "user-002",
+        subjectId: "prop-001",
+        subjectType: "property" as const,
+        body: "Test message",
       };
 
-      mockPrismaService.user.findUnique.mockResolvedValue({ id: 'user-002' });
+      mockPrismaService.user.findUnique.mockResolvedValue({ id: "user-002" });
       mockPrismaService.subject.findUnique.mockResolvedValue(null);
 
-      await expect(service.create('user-001', dto)).rejects.toThrow(NotFoundException);
+      await expect(service.create("user-001", dto)).rejects.toThrow(NotFoundException);
     });
   });
 
-  describe('findAll', () => {
-    it('should return all messages for user', async () => {
-      const userId = 'user-001';
+  describe("findAll", () => {
+    it("should return all messages for user", async () => {
+      const userId = "user-001";
       const mockMessages = [
         {
-          id: 'msg-001',
-          senderId: 'user-002',
+          id: "msg-001",
+          senderId: "user-002",
           recipientId: userId,
-          body: 'Test message',
+          body: "Test message",
           read: false,
         },
       ];
@@ -139,11 +142,11 @@ describe('MessagesService', () => {
       expect(prisma.message.findMany).toHaveBeenCalled();
     });
 
-    it('should filter by unread messages', async () => {
-      const userId = 'user-001';
+    it("should filter by unread messages", async () => {
+      const userId = "user-001";
       const mockMessages = [
         {
-          id: 'msg-001',
+          id: "msg-001",
           recipientId: userId,
           read: false,
         },
@@ -159,13 +162,13 @@ describe('MessagesService', () => {
           where: expect.objectContaining({
             isRead: false,
           }),
-        })
+        }),
       );
     });
 
-    it('should filter by subjectId', async () => {
-      const userId = 'user-001';
-      const subjectId = 'prop-001';
+    it("should filter by subjectId", async () => {
+      const userId = "user-001";
+      const subjectId = "prop-001";
 
       mockPrismaService.message.findMany.mockResolvedValue([]);
       mockPrismaService.message.count.mockResolvedValue(0);
@@ -177,13 +180,13 @@ describe('MessagesService', () => {
           where: expect.objectContaining({
             subjectId,
           }),
-        })
+        }),
       );
     });
 
-    it('should filter by threadId', async () => {
-      const userId = 'user-001';
-      const threadId = 'thread-001';
+    it("should filter by threadId", async () => {
+      const userId = "user-001";
+      const threadId = "thread-001";
 
       mockPrismaService.message.findMany.mockResolvedValue([]);
       mockPrismaService.message.count.mockResolvedValue(0);
@@ -195,74 +198,70 @@ describe('MessagesService', () => {
           where: expect.objectContaining({
             threadId,
           }),
-        })
+        }),
       );
     });
   });
 
-  describe('findOne', () => {
-    it('should return a message by id', async () => {
-      const userId = 'user-001';
+  describe("findOne", () => {
+    it("should return a message by id", async () => {
+      const userId = "user-001";
       const mockMessage = {
-        id: 'msg-001',
+        id: "msg-001",
         recipientId: userId,
-        senderId: 'user-002',
-        body: 'Test message',
+        senderId: "user-002",
+        body: "Test message",
       };
 
       mockPrismaService.message.findUnique.mockResolvedValue(mockMessage);
 
-      const result = await service.findOne('msg-001', userId);
+      const result = await service.findOne("msg-001", userId);
 
       expect(result).toEqual(mockMessage);
     });
 
-    it('should throw NotFoundException if message not found', async () => {
+    it("should throw NotFoundException if message not found", async () => {
       mockPrismaService.message.findUnique.mockResolvedValue(null);
 
-      await expect(service.findOne('nonexistent', 'user-001')).rejects.toThrow(
-        NotFoundException
-      );
+      await expect(service.findOne("nonexistent", "user-001")).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw ForbiddenException if not sender or recipient', async () => {
+    it("should throw ForbiddenException if not sender or recipient", async () => {
       const mockMessage = {
-        id: 'msg-001',
-        recipientId: 'user-002',
-        senderId: 'user-003',
+        id: "msg-001",
+        recipientId: "user-002",
+        senderId: "user-003",
       };
 
       mockPrismaService.message.findUnique.mockResolvedValue(mockMessage);
 
-      await expect(service.findOne('msg-001', 'user-001')).rejects.toThrow(
-        ForbiddenException
-      );
+      await expect(service.findOne("msg-001", "user-001")).rejects.toThrow(ForbiddenException);
     });
 
-    it('should auto-mark as read for recipient', async () => {
-      const userId = 'user-001';
+    it("should auto-mark as read for recipient", async () => {
+      const userId = "user-001";
       const mockMessage = {
-        id: 'msg-001',
+        id: "msg-001",
         recipientId: userId,
-        senderId: 'user-002',
+        senderId: "user-002",
         isRead: false,
       };
 
       mockPrismaService.message.findUnique.mockResolvedValue(mockMessage);
-      jest.spyOn(service, 'markAsRead').mockResolvedValue(undefined as any);
+      jest.spyOn(service, "markAsRead").mockResolvedValue(undefined as any);
 
-      const result = await service.findOne('msg-001', userId);
+      const result = await service.findOne("msg-001", userId);
 
-      expect(service.markAsRead).toHaveBeenCalledWith('msg-001', userId);
+      expect(service.markAsRead).toHaveBeenCalledWith("msg-001", userId);
       expect(result.isRead).toBe(true);
     });
   });
 
-  describe('markAsRead', () => {
-    it('should mark message as read', async () => {
-      const userId = 'user-001';
+  describe("markAsRead", () => {
+    it("should mark message as read", async () => {
+      const userId = "user-001";
       const mockMessage = {
-        id: 'msg-001',
+        id: "msg-001",
         recipientId: userId,
         read: false,
       };
@@ -272,36 +271,34 @@ describe('MessagesService', () => {
       mockPrismaService.message.findUnique.mockResolvedValue(mockMessage);
       mockPrismaService.message.update.mockResolvedValue(mockUpdated);
 
-      await service.markAsRead('msg-001', userId);
+      await service.markAsRead("msg-001", userId);
 
       expect(prisma.message.update).toHaveBeenCalledWith({
-        where: { id: 'msg-001' },
+        where: { id: "msg-001" },
         data: { isRead: true },
       });
     });
 
-    it('should throw ForbiddenException if not recipient', async () => {
+    it("should throw ForbiddenException if not recipient", async () => {
       const mockMessage = {
-        id: 'msg-001',
-        recipientId: 'user-002',
-        senderId: 'user-003',
+        id: "msg-001",
+        recipientId: "user-002",
+        senderId: "user-003",
       };
 
       mockPrismaService.message.findUnique.mockResolvedValue(mockMessage);
 
-      await expect(service.markAsRead('msg-001', 'user-001')).rejects.toThrow(
-        ForbiddenException
-      );
+      await expect(service.markAsRead("msg-001", "user-001")).rejects.toThrow(ForbiddenException);
     });
   });
 
-  describe('findThread', () => {
-    it('should return messages in a thread', async () => {
-      const userId = 'user-001';
-      const threadId = 'thread-001';
+  describe("findThread", () => {
+    it("should return messages in a thread", async () => {
+      const userId = "user-001";
+      const threadId = "thread-001";
       const mockMessages = [
-        { id: 'msg-001', threadId, recipientId: userId },
-        { id: 'msg-002', threadId, senderId: userId },
+        { id: "msg-001", threadId, recipientId: userId },
+        { id: "msg-002", threadId, senderId: userId },
       ];
 
       mockPrismaService.message.findMany.mockResolvedValue(mockMessages);
@@ -314,13 +311,13 @@ describe('MessagesService', () => {
           where: expect.objectContaining({
             threadId,
           }),
-        })
+        }),
       );
     });
 
-    it('should throw NotFoundException when thread is empty', async () => {
-      const userId = 'user-001';
-      const threadId = 'thread-001';
+    it("should throw NotFoundException when thread is empty", async () => {
+      const userId = "user-001";
+      const threadId = "thread-001";
 
       mockPrismaService.message.findMany.mockResolvedValue([]);
 

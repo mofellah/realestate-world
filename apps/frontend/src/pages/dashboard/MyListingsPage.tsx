@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { listingsService, Listing } from '../../services/listings-service';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { listingsService, Listing } from "../../services/listings-service";
 
 export default function MyListingsPage() {
-
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
     fetchListings();
@@ -19,39 +18,41 @@ export default function MyListingsPage() {
       const data = await listingsService.getMyListings();
       setListings(data);
     } catch (err) {
-      console.error('[MyListings] Failed to load:', err);
-      setError('Failed to load listings');
+      console.error("[MyListings] Failed to load:", err);
+      setError("Failed to load listings");
     } finally {
       setLoading(false);
     }
   };
 
   const filteredListings = listings.filter(
-    (listing) => filter === 'all' || listing.status === filter
+    (listing) => filter === "all" || listing.status === filter,
   );
 
   const getStatusBadge = (status: string) => {
     const styles = {
-      draft: 'bg-gray-100 text-gray-800',
-      published: 'bg-green-100 text-green-800',
-      archived: 'bg-red-100 text-red-800',
+      draft: "bg-gray-100 text-gray-800",
+      published: "bg-green-100 text-green-800",
+      archived: "bg-red-100 text-red-800",
     };
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status as keyof typeof styles] || 'bg-gray-100 text-gray-800'}`}>
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status as keyof typeof styles] || "bg-gray-100 text-gray-800"}`}
+      >
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
   };
 
   const handleDeleteListing = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this listing?')) return;
-    
+    if (!confirm("Are you sure you want to delete this listing?")) return;
+
     try {
       await listingsService.deleteListing(id);
-      setListings(prev => prev.filter(l => l.id !== id));
+      setListings((prev) => prev.filter((l) => l.id !== id));
     } catch (err) {
-      console.error('[MyListings] Failed to delete:', err);
-      alert('Failed to delete listing');
+      console.error("[MyListings] Failed to delete:", err);
+      alert("Failed to delete listing");
     }
   };
 
@@ -125,15 +126,17 @@ export default function MyListingsPage() {
             {filteredListings.map((listing) => (
               <tr key={listing.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="font-medium text-gray-900">Listing {listing.id.substring(0, 8)}</div>
-                  <div className="text-sm text-gray-500">Property: {listing.propertyId.substring(0, 8)}</div>
+                  <div className="font-medium text-gray-900">
+                    Listing {listing.id.substring(0, 8)}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Property: {listing.propertyId.substring(0, 8)}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="capitalize">{listing.type}</span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {getStatusBadge(listing.status)}
-                </td>
+                <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(listing.status)}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {new Date(listing.createdAt).toLocaleDateString()}
                 </td>
@@ -157,7 +160,10 @@ export default function MyListingsPage() {
         </table>
         {filteredListings.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            No listings found. <Link to="/dashboard/create-listing" className="text-blue-600 hover:underline">Create your first listing</Link>
+            No listings found.{" "}
+            <Link to="/dashboard/create-listing" className="text-blue-600 hover:underline">
+              Create your first listing
+            </Link>
           </div>
         )}
       </div>

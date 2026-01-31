@@ -13,5 +13,5 @@ export const apiClient = {
 
 export const mockApiError = {
   status: 401,
-  message: 'Unauthorized',
+  message: "Unauthorized",
 };

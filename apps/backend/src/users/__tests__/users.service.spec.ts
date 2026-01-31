@@ -3,13 +3,13 @@
  * Tests for user operations (getCurrentUser, getUserById)
  */
 
-import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
-import { UsersService } from '../users.service';
-import { PrismaService } from '../../prisma/prisma.service';
-import * as fixtures from '../../auth/__tests__/fixtures/auth.fixtures';
+import { Test, TestingModule } from "@nestjs/testing";
+import { NotFoundException } from "@nestjs/common";
+import { UsersService } from "../users.service";
+import { PrismaService } from "../../prisma/prisma.service";
+import * as fixtures from "../../auth/__tests__/fixtures/auth.fixtures";
 
-describe('UsersService', () => {
+describe("UsersService", () => {
   let service: UsersService;
   let prismaService: PrismaService;
 
@@ -36,30 +36,32 @@ describe('UsersService', () => {
     jest.clearAllMocks();
   });
 
-  describe('getUserById', () => {
-    it('should return user with a single role and no permissions', async () => {
+  describe("getUserById", () => {
+    it("should return user with a single role and no permissions", async () => {
       // Arrange
-      const userId = 'user-123';
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(fixtures.mockUserWithAdminRole as any);
+      const userId = "user-123";
+      jest
+        .spyOn(prismaService.user, "findUnique")
+        .mockResolvedValue(fixtures.mockUserWithAdminRole as any);
 
       // Act
       const result = await service.getUserById(userId);
 
       // Assert
-      expect(result.id).toBe('user-123');
-      expect(result.email).toBe('admin@example.com');
+      expect(result.id).toBe("user-123");
+      expect(result.email).toBe("admin@example.com");
       expect(result.roles).toEqual([fixtures.mockUserWithAdminRole.role]);
       expect(result.permissions).toEqual([]);
-      expect(result).not.toHaveProperty('passwordHash');
+      expect(result).not.toHaveProperty("passwordHash");
       expect(prismaService.user.findUnique).toHaveBeenCalledWith({
         where: { id: userId },
       });
     });
 
-    it('should throw NotFoundException when user not found', async () => {
+    it("should throw NotFoundException when user not found", async () => {
       // Arrange
-      const userId = 'nonexistent-user';
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null);
+      const userId = "nonexistent-user";
+      jest.spyOn(prismaService.user, "findUnique").mockResolvedValue(null);
 
       // Act & Assert
       await expect(service.getUserById(userId)).rejects.toThrow(NotFoundException);
@@ -68,15 +70,15 @@ describe('UsersService', () => {
       });
     });
 
-    it('should return empty roles array when user.role is missing', async () => {
+    it("should return empty roles array when user.role is missing", async () => {
       // Arrange
-      const userId = 'user-789';
+      const userId = "user-789";
       const mockUserWithoutRole = {
         ...fixtures.mockUserWithAdminRole,
-        id: 'user-789',
+        id: "user-789",
         role: null,
       };
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(mockUserWithoutRole as any);
+      jest.spyOn(prismaService.user, "findUnique").mockResolvedValue(mockUserWithoutRole as any);
 
       // Act
       const result = await service.getUserById(userId);
@@ -86,14 +88,14 @@ describe('UsersService', () => {
       expect(result.permissions).toEqual([]);
     });
 
-    it('should allow null user name in response', async () => {
+    it("should allow null user name in response", async () => {
       // Arrange
-      const userId = 'user-123';
+      const userId = "user-123";
       const mockUserNullName = {
         ...fixtures.mockUserWithAdminRole,
         name: null,
       };
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(mockUserNullName as any);
+      jest.spyOn(prismaService.user, "findUnique").mockResolvedValue(mockUserNullName as any);
 
       // Act
       const result = await service.getUserById(userId);

@@ -3,12 +3,12 @@
  * Handles all listing-related API calls
  */
 
-import { apiClient } from './api-client';
+import { apiClient } from "./api-client";
 
 export interface CreateListingDto {
   propertyId: string;
-  type: 'sale' | 'rent' | 'airbnb' | 'lease';
-  status?: 'draft' | 'published' | 'archived';
+  type: "sale" | "rent" | "airbnb" | "lease";
+  status?: "draft" | "published" | "archived";
   publishedAt?: Date;
   expiresAt?: Date;
 }
@@ -29,14 +29,14 @@ class ListingsService {
    * Create listing
    */
   async createListing(data: CreateListingDto): Promise<Listing> {
-    return apiClient.post<Listing>('/listings', data);
+    return apiClient.post<Listing>("/listings", data);
   }
 
   /**
    * Get user's listings
    */
   async getMyListings(): Promise<Listing[]> {
-    return apiClient.get<Listing[]>('/listings');
+    return apiClient.get<Listing[]>("/listings");
   }
 
   /**

@@ -3,20 +3,20 @@
  * NOTE: Requires test database connection - SKIPPED
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 import {
   geoObjectsFixture,
   addressesFixture,
   personsFixture,
   usersFixture,
   propertiesFixture,
-} from '../fixtures/test.fixtures';
+} from "../fixtures/test.fixtures";
 
 const prisma = new PrismaClient({
   datasourceUrl: process.env.DATABASE_TEST_URL,
 });
 
-describe.skip('Property Query Integration Tests - Requires Database', () => {
+describe.skip("Property Query Integration Tests - Requires Database", () => {
   beforeAll(async () => {
     await prisma.$connect();
   });
@@ -34,11 +34,13 @@ describe.skip('Property Query Integration Tests - Requires Database', () => {
     await prisma.geoObject.deleteMany();
   });
 
-  describe('Basic Property Queries', () => {
-    it('should filter properties by type', async () => {
+  describe("Basic Property Queries", () => {
+    it("should filter properties by type", async () => {
       // Create test data
       const geo = await prisma.geoObject.create({ data: geoObjectsFixture.brussels_center });
-      const addr = await prisma.address.create({ data: { ...addressesFixture.brussels_apartment, geoObjectId: geo.id } });
+      const addr = await prisma.address.create({
+        data: { ...addressesFixture.brussels_apartment, geoObjectId: geo.id },
+      });
       const person = await prisma.person.create({ data: personsFixture.property_owner });
       const user = await prisma.user.create({ data: usersFixture.property_lister });
 
@@ -46,7 +48,7 @@ describe.skip('Property Query Integration Tests - Requires Database', () => {
       await prisma.property.create({
         data: {
           ...propertiesFixture.apartment_brussels,
-          propertyType: 'apartment',
+          propertyType: "apartment",
           addressId: addr.id,
           ownerPersonId: person.id,
           userId: user.id,
@@ -55,11 +57,13 @@ describe.skip('Property Query Integration Tests - Requires Database', () => {
 
       // Create house
       const geo2 = await prisma.geoObject.create({ data: geoObjectsFixture.ghent_center });
-      const addr2 = await prisma.address.create({ data: { ...addressesFixture.ghent_house, geoObjectId: geo2.id } });
+      const addr2 = await prisma.address.create({
+        data: { ...addressesFixture.ghent_house, geoObjectId: geo2.id },
+      });
       await prisma.property.create({
         data: {
           ...propertiesFixture.house_ghent,
-          propertyType: 'house',
+          propertyType: "house",
           addressId: addr2.id,
           ownerPersonId: person.id,
           userId: user.id,
@@ -68,16 +72,18 @@ describe.skip('Property Query Integration Tests - Requires Database', () => {
 
       // Query apartments only
       const apartments = await prisma.property.findMany({
-        where: { propertyType: 'apartment' },
+        where: { propertyType: "apartment" },
       });
 
       expect(apartments).toHaveLength(1);
-      expect(apartments[0].propertyType).toBe('apartment');
+      expect(apartments[0].propertyType).toBe("apartment");
     });
 
-    it('should filter by bedrooms count', async () => {
+    it("should filter by bedrooms count", async () => {
       const geo = await prisma.geoObject.create({ data: geoObjectsFixture.brussels_center });
-      const addr = await prisma.address.create({ data: { ...addressesFixture.brussels_apartment, geoObjectId: geo.id } });
+      const addr = await prisma.address.create({
+        data: { ...addressesFixture.brussels_apartment, geoObjectId: geo.id },
+      });
       const person = await prisma.person.create({ data: personsFixture.property_owner });
       const user = await prisma.user.create({ data: usersFixture.property_lister });
 
@@ -94,7 +100,9 @@ describe.skip('Property Query Integration Tests - Requires Database', () => {
 
       // Studio (0 bedrooms)
       const geo2 = await prisma.geoObject.create({ data: geoObjectsFixture.antwerp_center });
-      const addr2 = await prisma.address.create({ data: { ...addressesFixture.antwerp_studio, geoObjectId: geo2.id } });
+      const addr2 = await prisma.address.create({
+        data: { ...addressesFixture.antwerp_studio, geoObjectId: geo2.id },
+      });
       await prisma.property.create({
         data: {
           ...propertiesFixture.studio_antwerp,
@@ -115,10 +123,12 @@ describe.skip('Property Query Integration Tests - Requires Database', () => {
     });
   });
 
-  describe('Geographic Queries', () => {
-    it('should query properties by city', async () => {
+  describe("Geographic Queries", () => {
+    it("should query properties by city", async () => {
       const geo = await prisma.geoObject.create({ data: geoObjectsFixture.brussels_center });
-      const addr = await prisma.address.create({ data: { ...addressesFixture.brussels_apartment, geoObjectId: geo.id } });
+      const addr = await prisma.address.create({
+        data: { ...addressesFixture.brussels_apartment, geoObjectId: geo.id },
+      });
       const person = await prisma.person.create({ data: personsFixture.property_owner });
       const user = await prisma.user.create({ data: usersFixture.property_lister });
 
@@ -134,18 +144,20 @@ describe.skip('Property Query Integration Tests - Requires Database', () => {
       // Query via address relation
       const brusselsProperties = await prisma.property.findMany({
         where: {
-          address: { city: 'Brussels' },
+          address: { city: "Brussels" },
         },
         include: { address: true },
       });
 
       expect(brusselsProperties).toHaveLength(1);
-      expect(brusselsProperties[0].address.city).toBe('Brussels');
+      expect(brusselsProperties[0].address.city).toBe("Brussels");
     });
 
-    it('should query properties with coordinates', async () => {
+    it("should query properties with coordinates", async () => {
       const geo = await prisma.geoObject.create({ data: geoObjectsFixture.brussels_center });
-      const addr = await prisma.address.create({ data: { ...addressesFixture.brussels_apartment, geoObjectId: geo.id } });
+      const addr = await prisma.address.create({
+        data: { ...addressesFixture.brussels_apartment, geoObjectId: geo.id },
+      });
       const person = await prisma.person.create({ data: personsFixture.property_owner });
       const user = await prisma.user.create({ data: usersFixture.property_lister });
 
@@ -180,10 +192,12 @@ describe.skip('Property Query Integration Tests - Requires Database', () => {
     });
   });
 
-  describe('Complex Filtering', () => {
-    it('should combine multiple filters', async () => {
+  describe("Complex Filtering", () => {
+    it("should combine multiple filters", async () => {
       const geo = await prisma.geoObject.create({ data: geoObjectsFixture.brussels_center });
-      const addr = await prisma.address.create({ data: { ...addressesFixture.brussels_apartment, geoObjectId: geo.id } });
+      const addr = await prisma.address.create({
+        data: { ...addressesFixture.brussels_apartment, geoObjectId: geo.id },
+      });
       const person = await prisma.person.create({ data: personsFixture.property_owner });
       const user = await prisma.user.create({ data: usersFixture.property_lister });
 
@@ -191,7 +205,7 @@ describe.skip('Property Query Integration Tests - Requires Database', () => {
       await prisma.property.create({
         data: {
           ...propertiesFixture.apartment_brussels,
-          propertyType: 'apartment',
+          propertyType: "apartment",
           bedrooms: 2,
           surfaceArea: 65,
           addressId: addr.id,
@@ -204,7 +218,7 @@ describe.skip('Property Query Integration Tests - Requires Database', () => {
       const results = await prisma.property.findMany({
         where: {
           AND: [
-            { propertyType: 'apartment' },
+            { propertyType: "apartment" },
             { bedrooms: { gte: 2 } },
             { surfaceArea: { gt: 60 } },
           ],
@@ -216,10 +230,12 @@ describe.skip('Property Query Integration Tests - Requires Database', () => {
     });
   });
 
-  describe('Pagination', () => {
-    it('should paginate results', async () => {
+  describe("Pagination", () => {
+    it("should paginate results", async () => {
       const geo = await prisma.geoObject.create({ data: geoObjectsFixture.brussels_center });
-      const addr = await prisma.address.create({ data: { ...addressesFixture.brussels_apartment, geoObjectId: geo.id } });
+      const addr = await prisma.address.create({
+        data: { ...addressesFixture.brussels_apartment, geoObjectId: geo.id },
+      });
       const person = await prisma.person.create({ data: personsFixture.property_owner });
       const user = await prisma.user.create({ data: usersFixture.property_lister });
 
@@ -240,14 +256,14 @@ describe.skip('Property Query Integration Tests - Requires Database', () => {
       const page1 = await prisma.property.findMany({
         take: 2,
         skip: 0,
-        orderBy: { createdAt: 'asc' },
+        orderBy: { createdAt: "asc" },
       });
 
       // Page 2 (next 2)
       const page2 = await prisma.property.findMany({
         take: 2,
         skip: 2,
-        orderBy: { createdAt: 'asc' },
+        orderBy: { createdAt: "asc" },
       });
 
       expect(page1).toHaveLength(2);

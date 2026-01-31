@@ -1,6 +1,6 @@
 /**
  * Test Utilities
- * 
+ *
  * Helper functions commonly used across tests.
  * Includes error handling, context creation, and async utilities.
  */
@@ -11,7 +11,7 @@ import {
   ForbiddenException,
   NotFoundException,
   UnauthorizedException,
-} from '@nestjs/common';
+} from "@nestjs/common";
 
 /**
  * Test context object for correlating test requests
@@ -38,7 +38,7 @@ export async function expectThrowError(
     if (error instanceof errorType) {
       return error;
     }
-    if (error instanceof Error && error.message.includes('Expected')) {
+    if (error instanceof Error && error.message.includes("Expected")) {
       throw error;
     }
     throw new Error(
@@ -67,7 +67,9 @@ export async function expectForbiddenException(promise: Promise<any>): Promise<F
  * Expect a promise to throw a BadRequestException
  * @param promise - The promise to test
  */
-export async function expectBadRequestException(promise: Promise<any>): Promise<BadRequestException> {
+export async function expectBadRequestException(
+  promise: Promise<any>,
+): Promise<BadRequestException> {
   return expectThrowError(promise, BadRequestException) as Promise<BadRequestException>;
 }
 
@@ -83,7 +85,9 @@ export async function expectConflictException(promise: Promise<any>): Promise<Co
  * Expect a promise to throw an UnauthorizedException
  * @param promise - The promise to test
  */
-export async function expectUnauthorizedException(promise: Promise<any>): Promise<UnauthorizedException> {
+export async function expectUnauthorizedException(
+  promise: Promise<any>,
+): Promise<UnauthorizedException> {
   return expectThrowError(promise, UnauthorizedException) as Promise<UnauthorizedException>;
 }
 
@@ -91,7 +95,9 @@ export async function expectUnauthorizedException(promise: Promise<any>): Promis
  * Expect a promise to throw a validation error (any BadRequestException with validation)
  * @param promise - The promise to test
  */
-export async function expectValidationException(promise: Promise<any>): Promise<BadRequestException> {
+export async function expectValidationException(
+  promise: Promise<any>,
+): Promise<BadRequestException> {
   const error = await expectBadRequestException(promise);
   return error;
 }
@@ -124,7 +130,7 @@ export async function sleep(ms: number): Promise<void> {
  * @param prefix - Optional prefix for the ID
  * @returns Unique ID string
  */
-export function generateTestId(prefix: string = 'test'): string {
+export function generateTestId(prefix: string = "test"): string {
   const timestamp = Date.now().toString(36);
   const random = Math.random().toString(36).substring(7);
   return `${prefix}-${timestamp}-${random}`;
@@ -135,7 +141,7 @@ export function generateTestId(prefix: string = 'test'): string {
  * @returns User ID string
  */
 export function createTestUserId(): string {
-  return generateTestId('user');
+  return generateTestId("user");
 }
 
 /**
@@ -143,7 +149,7 @@ export function createTestUserId(): string {
  * @returns Property ID string
  */
 export function createTestPropertyId(): string {
-  return generateTestId('prop');
+  return generateTestId("prop");
 }
 
 /**
@@ -151,7 +157,7 @@ export function createTestPropertyId(): string {
  * @returns Listing ID string
  */
 export function createTestListingId(): string {
-  return generateTestId('list');
+  return generateTestId("list");
 }
 
 /**

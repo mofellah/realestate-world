@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import MapView from '@/components/Map/MapView';
-import FilterPanel, { PropertyFilters } from '@/components/Map/FilterPanel';
-import { useMapSearch } from '@/hooks/useMapSearch';
-import { PropertyCardSkeleton } from '@/components/Skeleton';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import MapView from "@/components/Map/MapView";
+import FilterPanel, { PropertyFilters } from "@/components/Map/FilterPanel";
+import { useMapSearch } from "@/hooks/useMapSearch";
+import { PropertyCardSkeleton } from "@/components/Skeleton";
 
 export default function SearchPage() {
   const { properties, total, loading, search, error } = useMapSearch();
   const [filters, setFilters] = useState<PropertyFilters>({});
-  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
+  const [viewMode, setViewMode] = useState<"map" | "list">("map");
   const [center] = useState<[number, number]>([4.3517, 50.8503]); // Brussels
 
   useEffect(() => {
@@ -32,27 +32,25 @@ export default function SearchPage() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold">Search Properties</h1>
-            <p className="text-gray-600 mt-2">
-              {total} properties found
-            </p>
+            <p className="text-gray-600 mt-2">{total} properties found</p>
           </div>
           <div className="flex space-x-2">
             <button
-              onClick={() => setViewMode('list')}
+              onClick={() => setViewMode("list")}
               className={`px-4 py-2 rounded-lg font-medium ${
-                viewMode === 'list' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                viewMode === "list"
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >
               📋 List
             </button>
             <button
-              onClick={() => setViewMode('map')}
+              onClick={() => setViewMode("map")}
               className={`px-4 py-2 rounded-lg font-medium ${
-                viewMode === 'map' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                viewMode === "map"
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >
               🗺️ Map
@@ -63,11 +61,7 @@ export default function SearchPage() {
         <div className="flex gap-6">
           {/* Filter Panel */}
           <aside className="w-80">
-            <FilterPanel
-              filters={filters}
-              onChange={setFilters}
-              onApply={handleApplyFilters}
-            />
+            <FilterPanel filters={filters} onChange={setFilters} onApply={handleApplyFilters} />
           </aside>
 
           {/* Main Content */}
@@ -78,7 +72,7 @@ export default function SearchPage() {
                 <p className="text-red-600 text-sm">{error}</p>
               </div>
             )}
-            
+
             {loading && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -87,17 +81,16 @@ export default function SearchPage() {
               </div>
             )}
 
-            {!loading && viewMode === 'map' && (
-              <div className="bg-white rounded-lg shadow-md overflow-hidden" style={{ height: '600px' }}>
-                <MapView 
-                  center={center} 
-                  zoom={12}
-                  properties={properties}
-                />
+            {!loading && viewMode === "map" && (
+              <div
+                className="bg-white rounded-lg shadow-md overflow-hidden"
+                style={{ height: "600px" }}
+              >
+                <MapView center={center} zoom={12} properties={properties} />
               </div>
             )}
 
-            {!loading && viewMode === 'list' && (
+            {!loading && viewMode === "list" && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {properties.length === 0 ? (
                   <div className="col-span-full text-center py-8 text-gray-500">
@@ -105,7 +98,7 @@ export default function SearchPage() {
                   </div>
                 ) : (
                   properties.map((property) => (
-                    <Link 
+                    <Link
                       key={property.id}
                       to={`/property/${property.id}`}
                       className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
@@ -118,17 +111,19 @@ export default function SearchPage() {
                       <div className="p-4">
                         <h3 className="font-semibold text-lg mb-2">{property.title}</h3>
                         <p className="text-gray-600 text-sm mb-2">
-                          {typeof property.address === 'string' 
-                            ? property.address 
-                            : property.address?.city || 'No location'}
+                          {typeof property.address === "string"
+                            ? property.address
+                            : property.address?.city || "No location"}
                         </p>
                         <p className="text-xl font-bold text-blue-600">
-                          ${property.price?.toLocaleString() ?? 'N/A'}
+                          ${property.price?.toLocaleString() ?? "N/A"}
                         </p>
                         <div className="flex space-x-4 mt-2 text-sm text-gray-500">
                           {property.bedrooms && <span>🛏️ {property.bedrooms}</span>}
                           {property.bathrooms && <span>🚿 {property.bathrooms}</span>}
-                          {property.areaSquareMeters && <span>📏 {property.areaSquareMeters}m²</span>}
+                          {property.areaSquareMeters && (
+                            <span>📏 {property.areaSquareMeters}m²</span>
+                          )}
                         </div>
                       </div>
                     </Link>

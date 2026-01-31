@@ -8,7 +8,7 @@
  * @returns Formatted date string
  */
 export function formatDate(date: Date): string {
-  return date.toISOString().replace('T', ' ').substring(0, 19);
+  return date.toISOString().replace("T", " ").substring(0, 19);
 }
 
 /**
@@ -24,10 +24,10 @@ export function formatRelativeTime(date: Date): string {
   const diffHour = Math.floor(diffMin / 60);
   const diffDay = Math.floor(diffHour / 24);
 
-  if (diffSec < 60) return `${diffSec} second${diffSec !== 1 ? 's' : ''} ago`;
-  if (diffMin < 60) return `${diffMin} minute${diffMin !== 1 ? 's' : ''} ago`;
-  if (diffHour < 24) return `${diffHour} hour${diffHour !== 1 ? 's' : ''} ago`;
-  if (diffDay < 30) return `${diffDay} day${diffDay !== 1 ? 's' : ''} ago`;
+  if (diffSec < 60) return `${diffSec} second${diffSec !== 1 ? "s" : ""} ago`;
+  if (diffMin < 60) return `${diffMin} minute${diffMin !== 1 ? "s" : ""} ago`;
+  if (diffHour < 24) return `${diffHour} hour${diffHour !== 1 ? "s" : ""} ago`;
+  if (diffDay < 30) return `${diffDay} day${diffDay !== 1 ? "s" : ""} ago`;
 
   return formatDate(date);
 }
@@ -40,9 +40,9 @@ export function formatRelativeTime(date: Date): string {
 export function sanitizeInput(input: string): string {
   return input
     .trim()
-    .replace(/[<>]/g, '') // Remove angle brackets
-    .replace(/javascript:/gi, '') // Remove javascript: protocol
-    .replace(/on\w+=/gi, ''); // Remove event handlers
+    .replace(/[<>]/g, "") // Remove angle brackets
+    .replace(/javascript:/gi, "") // Remove javascript: protocol
+    .replace(/on\w+=/gi, ""); // Remove event handlers
 }
 
 /**
@@ -53,7 +53,7 @@ export function sanitizeInput(input: string): string {
  */
 export function truncate(str: string, maxLength: number): string {
   if (str.length <= maxLength) return str;
-  return str.substring(0, maxLength - 3) + '...';
+  return str.substring(0, maxLength - 3) + "...";
 }
 
 /**
@@ -73,8 +73,8 @@ export function capitalize(str: string): string {
  */
 export function toKebabCase(str: string): string {
   return str
-    .replace(/([a-z])([A-Z])/g, '$1-$2')
-    .replace(/[\s_]+/g, '-')
+    .replace(/([a-z])([A-Z])/g, "$1-$2")
+    .replace(/[\s_]+/g, "-")
     .toLowerCase();
 }
 
@@ -84,9 +84,7 @@ export function toKebabCase(str: string): string {
  * @returns camelCase string
  */
 export function toCamelCase(str: string): string {
-  return str
-    .toLowerCase()
-    .replace(/[^a-zA-Z0-9]+(.)/g, (_, char) => char.toUpperCase());
+  return str.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (_, char) => char.toUpperCase());
 }
 
 /**
@@ -99,6 +97,6 @@ export function maskSensitiveData(value: string, visibleChars = 3): string {
   if (value.length <= visibleChars * 2) return value;
   const start = value.substring(0, visibleChars);
   const end = value.substring(value.length - visibleChars);
-  const masked = '*'.repeat(value.length - visibleChars * 2);
+  const masked = "*".repeat(value.length - visibleChars * 2);
   return `${start}${masked}${end}`;
 }

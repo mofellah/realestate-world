@@ -1,7 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from '../prisma.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { PrismaService } from "../prisma.service";
 
-describe('PrismaService', () => {
+describe("PrismaService", () => {
   let service: PrismaService;
 
   beforeEach(async () => {
@@ -18,9 +18,9 @@ describe('PrismaService', () => {
     }
   });
 
-  describe('onModuleInit', () => {
-    it('should connect to database on module init', async () => {
-      const connectSpy = jest.spyOn(service, '$connect').mockResolvedValue(undefined);
+  describe("onModuleInit", () => {
+    it("should connect to database on module init", async () => {
+      const connectSpy = jest.spyOn(service, "$connect").mockResolvedValue(undefined);
 
       await service.onModuleInit();
 
@@ -28,9 +28,9 @@ describe('PrismaService', () => {
     });
   });
 
-  describe('onModuleDestroy', () => {
-    it('should disconnect from database on module destroy', async () => {
-      const disconnectSpy = jest.spyOn(service, '$disconnect').mockResolvedValue(undefined);
+  describe("onModuleDestroy", () => {
+    it("should disconnect from database on module destroy", async () => {
+      const disconnectSpy = jest.spyOn(service, "$disconnect").mockResolvedValue(undefined);
 
       await service.onModuleDestroy();
 
@@ -38,14 +38,14 @@ describe('PrismaService', () => {
     });
   });
 
-  describe('database connection', () => {
-    it('should be an instance of PrismaClient', () => {
+  describe("database connection", () => {
+    it("should be an instance of PrismaClient", () => {
       expect(service).toBeDefined();
-      expect(typeof service.$connect).toBe('function');
-      expect(typeof service.$disconnect).toBe('function');
+      expect(typeof service.$connect).toBe("function");
+      expect(typeof service.$disconnect).toBe("function");
     });
 
-    it('should have database models available', () => {
+    it("should have database models available", () => {
       expect(service.user).toBeDefined();
       expect(service.property).toBeDefined();
       expect(service.listing).toBeDefined();

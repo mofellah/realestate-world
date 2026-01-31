@@ -4,8 +4,8 @@
  * NOTE: Full test suite temporarily skipped due to database availability
  */
 
-describe.skip('ListingsController (Integration) - Requires Database', () => {
-  it('placeholder', () => {
+describe.skip("ListingsController (Integration) - Requires Database", () => {
+  it("placeholder", () => {
     expect(true).toBe(true);
   });
 });

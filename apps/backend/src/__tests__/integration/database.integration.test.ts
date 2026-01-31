@@ -3,20 +3,20 @@
  * NOTE: Requires test database connection - SKIPPED
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 import {
   geoObjectsFixture,
   addressesFixture,
   personsFixture,
   usersFixture,
   propertiesFixture,
-} from '../fixtures/test.fixtures';
+} from "../fixtures/test.fixtures";
 
 const prisma = new PrismaClient({
   datasourceUrl: process.env.DATABASE_TEST_URL,
 });
 
-describe.skip('Database Integration Tests - Requires Database', () => {
+describe.skip("Database Integration Tests - Requires Database", () => {
   beforeAll(async () => {
     await prisma.$connect();
   });
@@ -39,8 +39,8 @@ describe.skip('Database Integration Tests - Requires Database', () => {
     await prisma.geoObject.deleteMany();
   });
 
-  describe('Full Property Chain Creation', () => {
-    it('should create property with address and geoobject', async () => {
+  describe("Full Property Chain Creation", () => {
+    it("should create property with address and geoobject", async () => {
       // Create GeoObject
       const geoObject = await prisma.geoObject.create({
         data: geoObjectsFixture.brussels_center,
@@ -81,11 +81,11 @@ describe.skip('Database Integration Tests - Requires Database', () => {
       expect(property.ownerPersonId).toBe(person.id);
     });
 
-    it('should query property with all relationships', async () => {
+    it("should query property with all relationships", async () => {
       // Create chain
       const geoObject = await prisma.geoObject.create({ data: geoObjectsFixture.brussels_center });
-      const address = await prisma.address.create({ 
-        data: { ...addressesFixture.brussels_apartment, geoObjectId: geoObject.id } 
+      const address = await prisma.address.create({
+        data: { ...addressesFixture.brussels_apartment, geoObjectId: geoObject.id },
       });
       const person = await prisma.person.create({ data: personsFixture.property_owner });
       const user = await prisma.user.create({ data: usersFixture.property_lister });
@@ -113,25 +113,25 @@ describe.skip('Database Integration Tests - Requires Database', () => {
       });
 
       expect(propertyWithRelations).toBeDefined();
-      expect(propertyWithRelations?.address.streetName).toBe('Rue de la Paix');
+      expect(propertyWithRelations?.address.streetName).toBe("Rue de la Paix");
       expect(propertyWithRelations?.address.geoObject?.latitude).toBe(50.8503);
-      expect(propertyWithRelations?.user?.email).toBe('lister@test.com');
-      expect(propertyWithRelations?.ownerPerson?.email).toBe('owner@realestate.com');
+      expect(propertyWithRelations?.user?.email).toBe("lister@test.com");
+      expect(propertyWithRelations?.ownerPerson?.email).toBe("owner@realestate.com");
     });
   });
 
-  describe('Transaction Safety', () => {
-    it('should rollback on error', async () => {
+  describe("Transaction Safety", () => {
+    it("should rollback on error", async () => {
       try {
         await prisma.$transaction(async (tx) => {
           // Create valid geoObject
           await tx.geoObject.create({ data: geoObjectsFixture.brussels_center });
-          
+
           // This should fail (duplicate email)
           await tx.person.create({ data: personsFixture.john_doe });
           await tx.person.create({ data: personsFixture.john_doe }); // Duplicate!
         });
-        fail('Transaction should have thrown an error');
+        fail("Transaction should have thrown an error");
       } catch (error) {
         // Expected to throw
       }
@@ -142,29 +142,25 @@ describe.skip('Database Integration Tests - Requires Database', () => {
     });
   });
 
-  describe('Unique Constraints', () => {
-    it('should enforce unique email on users', async () => {
+  describe("Unique Constraints", () => {
+    it("should enforce unique email on users", async () => {
       await prisma.user.create({ data: usersFixture.regular_user });
 
-      await expect(
-        prisma.user.create({ data: usersFixture.regular_user })
-      ).rejects.toThrow();
+      await expect(prisma.user.create({ data: usersFixture.regular_user })).rejects.toThrow();
     });
 
-    it('should enforce unique email on persons', async () => {
+    it("should enforce unique email on persons", async () => {
       await prisma.person.create({ data: personsFixture.john_doe });
 
-      await expect(
-        prisma.person.create({ data: personsFixture.john_doe })
-      ).rejects.toThrow();
+      await expect(prisma.person.create({ data: personsFixture.john_doe })).rejects.toThrow();
     });
   });
 
-  describe('Cascade Deletes', () => {
-    it('should cascade delete property when address is deleted', async () => {
+  describe("Cascade Deletes", () => {
+    it("should cascade delete property when address is deleted", async () => {
       const geoObject = await prisma.geoObject.create({ data: geoObjectsFixture.brussels_center });
-      const address = await prisma.address.create({ 
-        data: { ...addressesFixture.brussels_apartment, geoObjectId: geoObject.id } 
+      const address = await prisma.address.create({
+        data: { ...addressesFixture.brussels_apartment, geoObjectId: geoObject.id },
       });
       const person = await prisma.person.create({ data: personsFixture.property_owner });
       const user = await prisma.user.create({ data: usersFixture.property_lister });
@@ -186,19 +182,19 @@ describe.skip('Database Integration Tests - Requires Database', () => {
     });
   });
 
-  describe('Connection Pooling', () => {
-    it('should handle concurrent queries', async () => {
+  describe("Connection Pooling", () => {
+    it("should handle concurrent queries", async () => {
       const geoObject = await prisma.geoObject.create({ data: geoObjectsFixture.brussels_center });
-      
+
       // Run multiple queries concurrently
-      const queries = Array(10).fill(null).map(() => 
-        prisma.geoObject.findUnique({ where: { id: geoObject.id } })
-      );
+      const queries = Array(10)
+        .fill(null)
+        .map(() => prisma.geoObject.findUnique({ where: { id: geoObject.id } }));
 
       const results = await Promise.all(queries);
-      
+
       // All queries should succeed
-      results.forEach(result => {
+      results.forEach((result) => {
         expect(result?.id).toBe(geoObject.id);
       });
     });

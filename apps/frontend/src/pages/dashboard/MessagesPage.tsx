@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { messagesService, Message } from '../../services/messages-service';
-import { useAuth } from '../../contexts/AuthContext';
+import React, { useEffect, useState } from "react";
+import { messagesService, Message } from "../../services/messages-service";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function MessagesPage() {
   const { user } = useAuth();
-  
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,8 +23,8 @@ export default function MessagesPage() {
         setSelectedThreadId(data[0].threadId || data[0].id);
       }
     } catch (err) {
-      console.error('[Messages] Failed to load messages:', err);
-      const errorMsg = err instanceof Error ? err.message : 'Failed to load messages';
+      console.error("[Messages] Failed to load messages:", err);
+      const errorMsg = err instanceof Error ? err.message : "Failed to load messages";
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -37,30 +37,30 @@ export default function MessagesPage() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!newMessage.trim() || !selectedThreadId) return;
 
     try {
       setSending(true);
       const messageData = await messagesService.sendMessage({
-        recipientId: selectedThreadId.split('-')[1] || '',
+        recipientId: selectedThreadId.split("-")[1] || "",
         body: newMessage,
-        messageType: 'response',
+        messageType: "response",
         threadId: selectedThreadId,
       });
-      
+
       setMessages([...messages, messageData]);
-      setNewMessage('');
+      setNewMessage("");
     } catch (err) {
-      console.error('Failed to send message:', err);
-      setError('Failed to send message');
+      console.error("Failed to send message:", err);
+      setError("Failed to send message");
     } finally {
       setSending(false);
     }
   };
 
   const threadMessages = messages.filter(
-    (msg) => !selectedThreadId || msg.threadId === selectedThreadId || msg.id === selectedThreadId
+    (msg) => !selectedThreadId || msg.threadId === selectedThreadId || msg.id === selectedThreadId,
   );
 
   // Group messages by thread
@@ -73,7 +73,7 @@ export default function MessagesPage() {
       acc[threadId].push(msg);
       return acc;
     },
-    {} as Record<string, Message[]>
+    {} as Record<string, Message[]>,
   );
 
   const threads = Object.entries(threadGroups).map(([threadId, msgs]) => ({
@@ -107,17 +107,17 @@ export default function MessagesPage() {
                 key={thread.threadId}
                 onClick={() => setSelectedThreadId(thread.threadId)}
                 className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${
-                  selectedThreadId === thread.threadId ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                  selectedThreadId === thread.threadId
+                    ? "bg-blue-50 border-l-4 border-blue-500"
+                    : ""
                 }`}
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <p className="font-semibold text-sm">
-                      {thread.lastMessage.sender?.email || 'Unknown'}
+                      {thread.lastMessage.sender?.email || "Unknown"}
                     </p>
-                    <p className="text-xs text-gray-600 truncate">
-                      {thread.lastMessage.body}
-                    </p>
+                    <p className="text-xs text-gray-600 truncate">{thread.lastMessage.body}</p>
                   </div>
                   {thread.unreadCount > 0 && (
                     <span className="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded-full">
@@ -140,15 +140,13 @@ export default function MessagesPage() {
               {threadMessages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex ${
-                    msg.senderId === user?.id ? 'justify-end' : 'justify-start'
-                  }`}
+                  className={`flex ${msg.senderId === user?.id ? "justify-end" : "justify-start"}`}
                 >
                   <div
                     className={`px-4 py-2 rounded-lg max-w-xs ${
                       msg.senderId === user?.id
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 text-gray-900'
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-900"
                     }`}
                   >
                     <p className="text-sm">{msg.body}</p>
@@ -176,7 +174,7 @@ export default function MessagesPage() {
                   disabled={sending || !newMessage.trim()}
                   className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
                 >
-                  {sending ? 'Sending...' : 'Send'}
+                  {sending ? "Sending..." : "Send"}
                 </button>
               </form>
               {error && <p className="text-red-600 text-sm mt-2">{error}</p>}

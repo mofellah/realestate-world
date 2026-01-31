@@ -26,7 +26,7 @@ export interface CreatePropertyDto {
   title: string;
   description?: string;
   addressId: string;
-  propertyType: 'residential' | 'commercial' | 'industrial' | 'other';
+  propertyType: "residential" | "commercial" | "industrial" | "other";
   bedrooms?: number;
   bathrooms?: number;
   surfaceArea?: number;
@@ -39,7 +39,7 @@ export interface CreatePropertyDto {
 export interface UpdatePropertyDto {
   title?: string;
   description?: string;
-  propertyType?: 'residential' | 'commercial' | 'industrial' | 'other';
+  propertyType?: "residential" | "commercial" | "industrial" | "other";
   bedrooms?: number;
   bathrooms?: number;
   surfaceArea?: number;
@@ -62,7 +62,7 @@ export interface PropertyResponse extends CreatePropertyDto {
 /**
  * Listing types and DTOs
  */
-export type ListingStatus = 'draft' | 'published' | 'sold' | 'expired' | 'archived';
+export type ListingStatus = "draft" | "published" | "sold" | "expired" | "archived";
 
 export interface CreateListingDto {
   propertyId: string;

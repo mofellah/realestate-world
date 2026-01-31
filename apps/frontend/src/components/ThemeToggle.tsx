@@ -3,8 +3,8 @@
  * Allows users to switch between light and dark themes
  */
 
-import { useTheme } from '../contexts/ThemeContext';
-import './ThemeToggle.scss';
+import { useTheme } from "../contexts/ThemeContext";
+import "./ThemeToggle.scss";
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
@@ -13,10 +13,10 @@ export default function ThemeToggle() {
     <button
       className="theme-toggle"
       onClick={toggleTheme}
-      title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-      aria-label={`Toggle ${theme === 'light' ? 'dark' : 'light'} mode`}
+      title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+      aria-label={`Toggle ${theme === "light" ? "dark" : "light"} mode`}
     >
-      {theme === 'light' ? (
+      {theme === "light" ? (
         <svg
           className="theme-icon"
           xmlns="http://www.w3.org/2000/svg"

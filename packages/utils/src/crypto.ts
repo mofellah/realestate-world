@@ -2,7 +2,7 @@
  * Cryptographic utilities using bcrypt
  */
 
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
 
@@ -21,9 +21,6 @@ export async function hashPassword(password: string): Promise<string> {
  * @param hash - bcrypt hash to compare against
  * @returns Promise resolving to true if password matches, false otherwise
  */
-export async function comparePassword(
-  password: string,
-  hash: string,
-): Promise<boolean> {
+export async function comparePassword(password: string, hash: string): Promise<boolean> {
   return bcrypt.compare(password, hash);
 }

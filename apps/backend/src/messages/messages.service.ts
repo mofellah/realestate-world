@@ -1,14 +1,14 @@
-import { Injectable, NotFoundException, ForbiddenException, Inject } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateMessageDto } from './dto/create-message.dto';
-import { QueryMessagesDto } from './dto/query-messages.dto';
-import type { Logger } from 'winston';
+import { Injectable, NotFoundException, ForbiddenException, Inject } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { CreateMessageDto } from "./dto/create-message.dto";
+import { QueryMessagesDto } from "./dto/query-messages.dto";
+import type { Logger } from "winston";
 
 @Injectable()
 export class MessagesService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject('LOGGER') private readonly logger: Logger,
+    @Inject("LOGGER") private readonly logger: Logger,
   ) {}
 
   /**
@@ -22,7 +22,7 @@ export class MessagesService {
       });
 
       if (!recipient) {
-        throw new NotFoundException('Recipient not found');
+        throw new NotFoundException("Recipient not found");
       }
 
       // If subjectId provided, verify it exists
@@ -32,7 +32,7 @@ export class MessagesService {
         });
 
         if (!subject) {
-          throw new NotFoundException('Subject not found');
+          throw new NotFoundException("Subject not found");
         }
       }
 
@@ -45,7 +45,7 @@ export class MessagesService {
           threadId: dto.threadId,
           subject_line: dto.subject_line,
           body: dto.body,
-          messageType: (dto.messageType as any) || 'inquiry',
+          messageType: (dto.messageType as any) || "inquiry",
         },
         include: {
           sender: {
@@ -82,7 +82,7 @@ export class MessagesService {
 
       return message;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg = error instanceof Error ? error.message : "Unknown error";
       this.logger.error(`Failed to create message: ${msg}`);
       throw error;
     }
@@ -97,10 +97,7 @@ export class MessagesService {
     try {
       // Build where clause for received messages
       const where: any = {
-        OR: [
-          { recipientId: userId },
-          { senderId: userId },
-        ],
+        OR: [{ recipientId: userId }, { senderId: userId }],
       };
 
       if (threadId) {
@@ -123,7 +120,7 @@ export class MessagesService {
           where,
           skip,
           take,
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           include: {
             sender: {
               select: {
@@ -160,7 +157,7 @@ export class MessagesService {
 
       return { messages, total };
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg = error instanceof Error ? error.message : "Unknown error";
       this.logger.error(`Failed to fetch messages: ${msg}`);
       throw error;
     }
@@ -215,12 +212,12 @@ export class MessagesService {
       });
 
       if (!message) {
-        throw new NotFoundException('Message not found');
+        throw new NotFoundException("Message not found");
       }
 
       // Verify user is sender or recipient
       if (message.senderId !== userId && message.recipientId !== userId) {
-        throw new ForbiddenException('Not authorized to view this message');
+        throw new ForbiddenException("Not authorized to view this message");
       }
 
       // Auto-mark as read if user is recipient
@@ -231,7 +228,7 @@ export class MessagesService {
 
       return message;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg = error instanceof Error ? error.message : "Unknown error";
       this.logger.error(`Failed to fetch message ${id}: ${msg}`);
       throw error;
     }
@@ -247,11 +244,11 @@ export class MessagesService {
       });
 
       if (!message) {
-        throw new NotFoundException('Message not found');
+        throw new NotFoundException("Message not found");
       }
 
       if (message.recipientId !== userId) {
-        throw new ForbiddenException('Only recipient can mark message as read');
+        throw new ForbiddenException("Only recipient can mark message as read");
       }
 
       await this.prisma.message.update({
@@ -261,7 +258,7 @@ export class MessagesService {
 
       this.logger.info(`Message ${id} marked as read by ${userId}`);
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg = error instanceof Error ? error.message : "Unknown error";
       this.logger.error(`Failed to mark message as read: ${msg}`);
       throw error;
     }
@@ -275,12 +272,9 @@ export class MessagesService {
       const messages = await this.prisma.message.findMany({
         where: {
           threadId,
-          OR: [
-            { senderId: userId },
-            { recipientId: userId },
-          ],
+          OR: [{ senderId: userId }, { recipientId: userId }],
         },
-        orderBy: { createdAt: 'asc' },
+        orderBy: { createdAt: "asc" },
         include: {
           sender: {
             select: {
@@ -308,12 +302,12 @@ export class MessagesService {
       });
 
       if (messages.length === 0) {
-        throw new NotFoundException('Thread not found or access denied');
+        throw new NotFoundException("Thread not found or access denied");
       }
 
       return messages;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg = error instanceof Error ? error.message : "Unknown error";
       this.logger.error(`Failed to fetch thread ${threadId}: ${msg}`);
       throw error;
     }

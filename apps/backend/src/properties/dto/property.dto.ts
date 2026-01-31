@@ -2,53 +2,62 @@
  * Property DTOs with Swagger decorations
  */
 
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsArray, IsBoolean, IsEnum, Min } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsNumber,
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  Min,
+} from "class-validator";
 
 enum PropertyType {
-  House = 'house',
-  Apartment = 'apartment',
-  Condo = 'condo',
-  Land = 'land',
-  Commercial = 'commercial',
+  House = "house",
+  Apartment = "apartment",
+  Condo = "condo",
+  Land = "land",
+  Commercial = "commercial",
 }
 
 export class CreatePropertyDto {
   @ApiProperty({
-    description: 'Property title',
-    example: 'Modern Family Home with Garden',
+    description: "Property title",
+    example: "Modern Family Home with Garden",
   })
   @IsString()
   @IsNotEmpty()
   title!: string;
 
   @ApiPropertyOptional({
-    description: 'Property description',
-    example: 'Beautiful 4-bedroom house with large backyard',
+    description: "Property description",
+    example: "Beautiful 4-bedroom house with large backyard",
   })
   @IsString()
   @IsOptional()
   description?: string;
 
   @ApiProperty({
-    description: 'Address ID (reference to Address table)',
-    example: 'cm123abc456',
+    description: "Address ID (reference to Address table)",
+    example: "cm123abc456",
   })
   @IsString()
   @IsNotEmpty()
   addressId!: string;
 
   @ApiPropertyOptional({
-    description: 'Property type',
+    description: "Property type",
     enum: PropertyType,
-    example: 'house',
+    example: "house",
   })
   @IsEnum(PropertyType)
   @IsOptional()
   propertyType?: string;
 
   @ApiPropertyOptional({
-    description: 'Number of bedrooms',
+    description: "Number of bedrooms",
     example: 4,
   })
   @IsNumber()
@@ -57,7 +66,7 @@ export class CreatePropertyDto {
   bedrooms?: number;
 
   @ApiPropertyOptional({
-    description: 'Number of bathrooms',
+    description: "Number of bathrooms",
     example: 2.5,
   })
   @IsNumber()
@@ -66,7 +75,7 @@ export class CreatePropertyDto {
   bathrooms?: number;
 
   @ApiPropertyOptional({
-    description: 'Surface area in square meters',
+    description: "Surface area in square meters",
     example: 250.5,
   })
   @IsNumber()
@@ -75,7 +84,7 @@ export class CreatePropertyDto {
   surfaceArea?: number;
 
   @ApiPropertyOptional({
-    description: 'Garden size in square meters',
+    description: "Garden size in square meters",
     example: 100,
   })
   @IsNumber()
@@ -84,7 +93,7 @@ export class CreatePropertyDto {
   gardenSize?: number;
 
   @ApiPropertyOptional({
-    description: 'Year the property was built',
+    description: "Year the property was built",
     example: 2015,
   })
   @IsNumber()
@@ -93,8 +102,8 @@ export class CreatePropertyDto {
   yearBuilt?: number;
 
   @ApiPropertyOptional({
-    description: 'List of amenities',
-    example: ['Pool', 'Garage', 'Garden', 'Fireplace'],
+    description: "List of amenities",
+    example: ["Pool", "Garage", "Garden", "Fireplace"],
     type: [String],
   })
   @IsArray()
@@ -102,8 +111,8 @@ export class CreatePropertyDto {
   amenitiesList?: string[];
 
   @ApiPropertyOptional({
-    description: 'Additional metadata (JSON)',
-    example: { heating: 'gas', parking: 'garage' },
+    description: "Additional metadata (JSON)",
+    example: { heating: "gas", parking: "garage" },
   })
   @IsOptional()
   metadata?: any;
@@ -111,23 +120,23 @@ export class CreatePropertyDto {
 
 export class UpdatePropertyDto {
   @ApiPropertyOptional({
-    description: 'Property title',
-    example: 'Updated Modern Family Home',
+    description: "Property title",
+    example: "Updated Modern Family Home",
   })
   @IsString()
   @IsOptional()
   title?: string;
 
   @ApiPropertyOptional({
-    description: 'Property description',
-    example: 'Updated description',
+    description: "Property description",
+    example: "Updated description",
   })
   @IsString()
   @IsOptional()
   description?: string;
 
   @ApiPropertyOptional({
-    description: 'Property type',
+    description: "Property type",
     enum: PropertyType,
   })
   @IsEnum(PropertyType)
@@ -135,7 +144,7 @@ export class UpdatePropertyDto {
   propertyType?: string;
 
   @ApiPropertyOptional({
-    description: 'Number of bedrooms',
+    description: "Number of bedrooms",
   })
   @IsNumber()
   @IsOptional()
@@ -143,7 +152,7 @@ export class UpdatePropertyDto {
   bedrooms?: number;
 
   @ApiPropertyOptional({
-    description: 'Number of bathrooms',
+    description: "Number of bathrooms",
   })
   @IsNumber()
   @IsOptional()
@@ -151,7 +160,7 @@ export class UpdatePropertyDto {
   bathrooms?: number;
 
   @ApiPropertyOptional({
-    description: 'Surface area in square meters',
+    description: "Surface area in square meters",
   })
   @IsNumber()
   @IsOptional()
@@ -159,7 +168,7 @@ export class UpdatePropertyDto {
   surfaceArea?: number;
 
   @ApiPropertyOptional({
-    description: 'Garden size in square meters',
+    description: "Garden size in square meters",
   })
   @IsNumber()
   @IsOptional()
@@ -167,7 +176,7 @@ export class UpdatePropertyDto {
   gardenSize?: number;
 
   @ApiPropertyOptional({
-    description: 'Year the property was built',
+    description: "Year the property was built",
   })
   @IsNumber()
   @IsOptional()
@@ -175,7 +184,7 @@ export class UpdatePropertyDto {
   yearBuilt?: number;
 
   @ApiPropertyOptional({
-    description: 'List of amenities',
+    description: "List of amenities",
     type: [String],
   })
   @IsArray()
@@ -183,13 +192,13 @@ export class UpdatePropertyDto {
   amenitiesList?: string[];
 
   @ApiPropertyOptional({
-    description: 'Additional metadata (JSON)',
+    description: "Additional metadata (JSON)",
   })
   @IsOptional()
   metadata?: any;
 
   @ApiPropertyOptional({
-    description: 'Availability status',
+    description: "Availability status",
   })
   @IsBoolean()
   @IsOptional()

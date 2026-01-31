@@ -1,7 +1,7 @@
 /**
  * Test Fixtures - Aligned with Prisma Schema
  * Last Updated: 2026-01-29
- * 
+ *
  * Schema-compliant test data for Property, Address, GeoObject, User, Listing
  */
 
@@ -10,28 +10,28 @@
  */
 export const geoObjectsFixture = {
   brussels_center: {
-    type: 'point' as const,
+    type: "point" as const,
     latitude: 50.8503,
     longitude: 4.3517,
-    geoJson: { type: 'Point', coordinates: [4.3517, 50.8503] },
+    geoJson: { type: "Point", coordinates: [4.3517, 50.8503] },
   },
   antwerp_center: {
-    type: 'point' as const,
+    type: "point" as const,
     latitude: 51.2211,
     longitude: 4.4014,
-    geoJson: { type: 'Point', coordinates: [4.4014, 51.2211] },
+    geoJson: { type: "Point", coordinates: [4.4014, 51.2211] },
   },
   ghent_center: {
-    type: 'point' as const,
+    type: "point" as const,
     latitude: 51.0537,
     longitude: 3.7181,
-    geoJson: { type: 'Point', coordinates: [3.7181, 51.0537] },
+    geoJson: { type: "Point", coordinates: [3.7181, 51.0537] },
   },
   bruges_center: {
-    type: 'point' as const,
+    type: "point" as const,
     latitude: 51.2093,
     longitude: 3.2244,
-    geoJson: { type: 'Point', coordinates: [3.2244, 51.2093] },
+    geoJson: { type: "Point", coordinates: [3.2244, 51.2093] },
   },
 };
 
@@ -40,36 +40,36 @@ export const geoObjectsFixture = {
  */
 export const addressesFixture = {
   brussels_apartment: {
-    streetName: 'Rue de la Paix',
-    streetNumber: '42',
-    postalCode: '1000',
-    city: 'Brussels',
-    region: 'Brussels-Capital',
-    country_code: 'BE',
+    streetName: "Rue de la Paix",
+    streetNumber: "42",
+    postalCode: "1000",
+    city: "Brussels",
+    region: "Brussels-Capital",
+    country_code: "BE",
   },
   antwerp_studio: {
-    streetName: 'Grotestraat',
-    streetNumber: '100',
-    postalCode: '2000',
-    city: 'Antwerp',
-    region: 'Flanders',
-    country_code: 'BE',
+    streetName: "Grotestraat",
+    streetNumber: "100",
+    postalCode: "2000",
+    city: "Antwerp",
+    region: "Flanders",
+    country_code: "BE",
   },
   ghent_house: {
-    streetName: 'Sint-Jacobsstraat',
-    streetNumber: '55',
-    postalCode: '9000',
-    city: 'Ghent',
-    region: 'East Flanders',
-    country_code: 'BE',
+    streetName: "Sint-Jacobsstraat",
+    streetNumber: "55",
+    postalCode: "9000",
+    city: "Ghent",
+    region: "East Flanders",
+    country_code: "BE",
   },
   bruges_studio: {
-    streetName: 'Markt',
-    streetNumber: '7',
-    postalCode: '8000',
-    city: 'Bruges',
-    region: 'West Flanders',
-    country_code: 'BE',
+    streetName: "Markt",
+    streetNumber: "7",
+    postalCode: "8000",
+    city: "Bruges",
+    region: "West Flanders",
+    country_code: "BE",
   },
 };
 
@@ -78,16 +78,16 @@ export const addressesFixture = {
  */
 export const personsFixture = {
   john_doe: {
-    email: 'john.doe@example.com',
-    phone: '+32123456789',
+    email: "john.doe@example.com",
+    phone: "+32123456789",
   },
   jane_smith: {
-    email: 'jane.smith@example.com',
-    phone: '+32987654321',
+    email: "jane.smith@example.com",
+    phone: "+32987654321",
   },
   property_owner: {
-    email: 'owner@realestate.com',
-    phone: '+32555666777',
+    email: "owner@realestate.com",
+    phone: "+32555666777",
   },
 };
 
@@ -96,19 +96,19 @@ export const personsFixture = {
  */
 export const physicalPersonsFixture = {
   john_doe: {
-    firstName: 'John',
-    lastName: 'Doe',
-    nationality: 'BE',
+    firstName: "John",
+    lastName: "Doe",
+    nationality: "BE",
   },
   jane_smith: {
-    firstName: 'Jane',
-    lastName: 'Smith',
-    nationality: 'BE',
+    firstName: "Jane",
+    lastName: "Smith",
+    nationality: "BE",
   },
   property_owner: {
-    firstName: 'Property',
-    lastName: 'Owner',
-    nationality: 'BE',
+    firstName: "Property",
+    lastName: "Owner",
+    nationality: "BE",
   },
 };
 
@@ -117,28 +117,28 @@ export const physicalPersonsFixture = {
  */
 export const usersFixture = {
   admin_user: {
-    email: 'admin@test.com',
-    passwordHash: '$2b$10$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJK', // bcrypt hash
-    name: 'Admin User',
-    role: 'admin' as const,
+    email: "admin@test.com",
+    passwordHash: "$2b$10$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJK", // bcrypt hash
+    name: "Admin User",
+    role: "admin" as const,
     isActive: true,
-    country_code: 'BE',
+    country_code: "BE",
   },
   regular_user: {
-    email: 'user@test.com',
-    passwordHash: '$2b$10$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJK',
-    name: 'Regular User',
-    role: 'user' as const,
+    email: "user@test.com",
+    passwordHash: "$2b$10$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJK",
+    name: "Regular User",
+    role: "user" as const,
     isActive: true,
-    country_code: 'BE',
+    country_code: "BE",
   },
   property_lister: {
-    email: 'lister@test.com',
-    passwordHash: '$2b$10$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJK',
-    name: 'Property Lister',
-    role: 'user' as const,
+    email: "lister@test.com",
+    passwordHash: "$2b$10$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJK",
+    name: "Property Lister",
+    role: "user" as const,
     isActive: true,
-    country_code: 'BE',
+    country_code: "BE",
   },
 };
 
@@ -148,48 +148,48 @@ export const usersFixture = {
  */
 export const propertiesFixture = {
   apartment_brussels: {
-    title: 'Modern Apartment in Brussels Center',
-    description: 'Beautiful 2-bedroom apartment with city views',
-    propertyType: 'apartment' as const,
+    title: "Modern Apartment in Brussels Center",
+    description: "Beautiful 2-bedroom apartment with city views",
+    propertyType: "apartment" as const,
     bedrooms: 2,
     bathrooms: 1,
     surfaceArea: 65.0,
     yearBuilt: 2010,
-    amenitiesList: ['balcony', 'elevator', 'parking'],
+    amenitiesList: ["balcony", "elevator", "parking"],
     isAvailable: true,
   },
   studio_antwerp: {
-    title: 'Cozy Studio in Antwerp',
-    description: 'Studio apartment near city center',
-    propertyType: 'apartment' as const,
+    title: "Cozy Studio in Antwerp",
+    description: "Studio apartment near city center",
+    propertyType: "apartment" as const,
     bedrooms: 0,
     bathrooms: 1,
     surfaceArea: 35.0,
     yearBuilt: 2005,
-    amenitiesList: ['heating'],
+    amenitiesList: ["heating"],
     isAvailable: true,
   },
   house_ghent: {
-    title: 'Family House in Ghent',
-    description: '4-bedroom family home with garden',
-    propertyType: 'house' as const,
+    title: "Family House in Ghent",
+    description: "4-bedroom family home with garden",
+    propertyType: "house" as const,
     bedrooms: 4,
     bathrooms: 2,
     surfaceArea: 150.0,
     gardenSize: 200.0,
     yearBuilt: 1998,
-    amenitiesList: ['garden', 'garage', 'fireplace'],
+    amenitiesList: ["garden", "garage", "fireplace"],
     isAvailable: true,
   },
   studio_bruges: {
-    title: 'Charming Studio in Bruges',
-    description: 'Perfect for tourists, heart of medieval city',
-    propertyType: 'apartment' as const,
+    title: "Charming Studio in Bruges",
+    description: "Perfect for tourists, heart of medieval city",
+    propertyType: "apartment" as const,
     bedrooms: 1,
     bathrooms: 1,
     surfaceArea: 45.0,
     yearBuilt: 1850,
-    amenitiesList: ['historic', 'central'],
+    amenitiesList: ["historic", "central"],
     isAvailable: true,
   },
 };
@@ -199,24 +199,24 @@ export const propertiesFixture = {
  */
 export const paymentTermsFixture = {
   sale_250k: {
-    termType: 'onetime' as const,
-    description: 'Purchase price',
-    currency: 'EUR',
+    termType: "onetime" as const,
+    description: "Purchase price",
+    currency: "EUR",
   },
   rent_800_monthly: {
-    termType: 'periodic' as const,
-    description: 'Monthly rent',
-    currency: 'EUR',
+    termType: "periodic" as const,
+    description: "Monthly rent",
+    currency: "EUR",
   },
   rent_1500_monthly: {
-    termType: 'periodic' as const,
-    description: 'Monthly rent',
-    currency: 'EUR',
+    termType: "periodic" as const,
+    description: "Monthly rent",
+    currency: "EUR",
   },
   short_term_120_night: {
-    termType: 'periodic' as const,
-    description: 'Per night rate',
-    currency: 'EUR',
+    termType: "periodic" as const,
+    description: "Per night rate",
+    currency: "EUR",
   },
 };
 
@@ -235,15 +235,15 @@ export const onetimePaymentFixture = {
 export const periodicPaymentFixture = {
   rent_800: {
     amountPerPeriod: 800,
-    periodType: 'monthly',
+    periodType: "monthly",
   },
   rent_1500: {
     amountPerPeriod: 1500,
-    periodType: 'monthly',
+    periodType: "monthly",
   },
   short_term_120: {
     amountPerPeriod: 120,
-    periodType: 'per_night',
+    periodType: "per_night",
   },
 };
 
@@ -252,24 +252,24 @@ export const periodicPaymentFixture = {
  */
 export const listingsFixture = {
   sale_apartment: {
-    type: 'sale' as const,
-    status: 'published' as const,
-    publishedAt: new Date('2026-01-15'),
+    type: "sale" as const,
+    status: "published" as const,
+    publishedAt: new Date("2026-01-15"),
   },
   rental_studio: {
-    type: 'rental' as const,
-    status: 'published' as const,
-    publishedAt: new Date('2026-01-20'),
+    type: "rental" as const,
+    status: "published" as const,
+    publishedAt: new Date("2026-01-20"),
   },
   rental_house: {
-    type: 'rental' as const,
-    status: 'published' as const,
-    publishedAt: new Date('2026-01-22'),
+    type: "rental" as const,
+    status: "published" as const,
+    publishedAt: new Date("2026-01-22"),
   },
   short_term_studio: {
-    type: 'short_term' as const,
-    status: 'published' as const,
-    publishedAt: new Date('2026-01-25'),
+    type: "short_term" as const,
+    status: "published" as const,
+    publishedAt: new Date("2026-01-25"),
   },
 };
 
@@ -278,7 +278,7 @@ export const listingsFixture = {
  */
 export const saleListingFixture = {
   apartment_excellent: {
-    condition: 'excellent',
+    condition: "excellent",
   },
 };
 
@@ -290,7 +290,7 @@ export const rentalListingFixture = {
     leaseTermMonths: 12,
     utilitiesIncluded: false,
     petFriendly: false,
-    furnishingStatus: 'unfurnished',
+    furnishingStatus: "unfurnished",
     depositRequired: 800,
     autoRenew: false,
   },
@@ -298,8 +298,8 @@ export const rentalListingFixture = {
     leaseTermMonths: 12,
     utilitiesIncluded: false,
     petFriendly: true,
-    petDetails: 'Small pets allowed',
-    furnishingStatus: 'semi_furnished',
+    petDetails: "Small pets allowed",
+    furnishingStatus: "semi_furnished",
     depositRequired: 3000,
     autoRenew: false,
   },
@@ -312,9 +312,9 @@ export const shortTermListingFixture = {
   studio_vacation: {
     minStayNights: 2,
     maxGuestsAllowed: 2,
-    cancellationPolicy: 'moderate',
-    checkInTime: '15:00',
-    checkOutTime: '11:00',
+    cancellationPolicy: "moderate",
+    checkInTime: "15:00",
+    checkOutTime: "11:00",
   },
 };
 
@@ -323,17 +323,17 @@ export const shortTermListingFixture = {
  */
 export const authFixture = {
   validCredentials: {
-    email: 'user@test.com',
-    password: 'password123',
+    email: "user@test.com",
+    password: "password123",
   },
   invalidCredentials: {
-    email: 'user@test.com',
-    password: 'wrongpassword',
+    email: "user@test.com",
+    password: "wrongpassword",
   },
   newUser: {
-    email: 'newuser@test.com',
-    password: 'newpassword123',
-    name: 'New User',
+    email: "newuser@test.com",
+    password: "newpassword123",
+    name: "New User",
   },
 };
 

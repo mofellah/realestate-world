@@ -3,28 +3,28 @@
  * Tests navigation, authentication UI, and user interactions
  */
 
-import { screen, fireEvent } from '@testing-library/react';
-import Header from '../../components/Header';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { render } from '../test-utils';
+import { screen, fireEvent } from "@testing-library/react";
+import Header from "../../components/Header";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { render } from "../test-utils";
 
 // Mock react-router-dom
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
   useNavigate: jest.fn(),
 }));
 
 // Mock AuthContext
-jest.mock('../../contexts/AuthContext', () => ({
-  ...jest.requireActual('../../contexts/AuthContext'),
+jest.mock("../../contexts/AuthContext", () => ({
+  ...jest.requireActual("../../contexts/AuthContext"),
   useAuth: jest.fn(),
 }));
 
 const mockNavigate = jest.fn();
 const mockLogout = jest.fn();
 
-describe('Header Component', () => {
+describe("Header Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
@@ -34,7 +34,7 @@ describe('Header Component', () => {
     return render(<Header />);
   };
 
-  describe('Unauthenticated State', () => {
+  describe("Unauthenticated State", () => {
     beforeEach(() => {
       (useAuth as jest.Mock).mockReturnValue({
         isAuthenticated: false,
@@ -46,73 +46,73 @@ describe('Header Component', () => {
       });
     });
 
-    it('should render logo and brand name', () => {
+    it("should render logo and brand name", () => {
       renderHeader();
-      
-      expect(screen.getByText('RE')).toBeInTheDocument();
-      expect(screen.getByText('RealEstate World')).toBeInTheDocument();
+
+      expect(screen.getByText("RE")).toBeInTheDocument();
+      expect(screen.getByText("RealEstate World")).toBeInTheDocument();
     });
 
-    it('should render navigation links', () => {
+    it("should render navigation links", () => {
       renderHeader();
-      
-      expect(screen.getByText('Search Properties')).toBeInTheDocument();
-      expect(screen.getByText('How It Works')).toBeInTheDocument();
-      expect(screen.getByText('Pricing')).toBeInTheDocument();
+
+      expect(screen.getByText("Search Properties")).toBeInTheDocument();
+      expect(screen.getByText("How It Works")).toBeInTheDocument();
+      expect(screen.getByText("Pricing")).toBeInTheDocument();
     });
 
-    it('should render Sign In button when not authenticated', () => {
+    it("should render Sign In button when not authenticated", () => {
       renderHeader();
-      
-      const signInButton = screen.getByText('Sign In');
+
+      const signInButton = screen.getByText("Sign In");
       expect(signInButton).toBeInTheDocument();
-      expect(signInButton.closest('a')).toHaveAttribute('href', '/login');
+      expect(signInButton.closest("a")).toHaveAttribute("href", "/login");
     });
 
-    it('should render Get Started button when not authenticated', () => {
+    it("should render Get Started button when not authenticated", () => {
       renderHeader();
-      
-      const getStartedButton = screen.getByText('Get Started');
+
+      const getStartedButton = screen.getByText("Get Started");
       expect(getStartedButton).toBeInTheDocument();
-      expect(getStartedButton.closest('a')).toHaveAttribute('href', '/register');
+      expect(getStartedButton.closest("a")).toHaveAttribute("href", "/register");
     });
 
-    it('should not render Dashboard link when not authenticated', () => {
+    it("should not render Dashboard link when not authenticated", () => {
       renderHeader();
-      
-      expect(screen.queryByText('Dashboard')).not.toBeInTheDocument();
+
+      expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
     });
 
-    it('should not render Logout button when not authenticated', () => {
+    it("should not render Logout button when not authenticated", () => {
       renderHeader();
-      
-      expect(screen.queryByText('Logout')).not.toBeInTheDocument();
+
+      expect(screen.queryByText("Logout")).not.toBeInTheDocument();
     });
 
-    it('should have correct link to home page', () => {
+    it("should have correct link to home page", () => {
       renderHeader();
-      
-      const homeLink = screen.getByText('RealEstate World').closest('a');
-      expect(homeLink).toHaveAttribute('href', '/');
+
+      const homeLink = screen.getByText("RealEstate World").closest("a");
+      expect(homeLink).toHaveAttribute("href", "/");
     });
 
-    it('should have correct link to search page', () => {
+    it("should have correct link to search page", () => {
       renderHeader();
-      
-      const searchLink = screen.getByText('Search Properties').closest('a');
-      expect(searchLink).toHaveAttribute('href', '/search');
+
+      const searchLink = screen.getByText("Search Properties").closest("a");
+      expect(searchLink).toHaveAttribute("href", "/search");
     });
   });
 
-  describe('Authenticated State', () => {
+  describe("Authenticated State", () => {
     const mockUser = {
-      id: '1',
-      email: 'test@example.com',
-      role: 'user' as const,
-      avatarUrl: 'https://example.com/avatar.jpg',
+      id: "1",
+      email: "test@example.com",
+      role: "user" as const,
+      avatarUrl: "https://example.com/avatar.jpg",
       createdAt: new Date(),
       updatedAt: new Date(),
-      personId: 'person-1',
+      personId: "person-1",
     };
 
     beforeEach(() => {
@@ -126,23 +126,23 @@ describe('Header Component', () => {
       });
     });
 
-    it('should render Dashboard link when authenticated', () => {
+    it("should render Dashboard link when authenticated", () => {
       renderHeader();
-      
-      const dashboardLink = screen.getByText('Dashboard');
+
+      const dashboardLink = screen.getByText("Dashboard");
       expect(dashboardLink).toBeInTheDocument();
-      expect(dashboardLink.closest('a')).toHaveAttribute('href', '/dashboard');
+      expect(dashboardLink.closest("a")).toHaveAttribute("href", "/dashboard");
     });
 
-    it('should render user avatar when authenticated', () => {
+    it("should render user avatar when authenticated", () => {
       renderHeader();
-      
+
       const avatar = screen.getByAltText(mockUser.email);
       expect(avatar).toBeInTheDocument();
-      expect(avatar).toHaveAttribute('src', mockUser.avatarUrl);
+      expect(avatar).toHaveAttribute("src", mockUser.avatarUrl);
     });
 
-    it('should render default avatar when avatarUrl is null', () => {
+    it("should render default avatar when avatarUrl is null", () => {
       (useAuth as jest.Mock).mockReturnValue({
         isAuthenticated: true,
         user: { ...mockUser, avatarUrl: null },
@@ -153,41 +153,41 @@ describe('Header Component', () => {
       });
 
       renderHeader();
-      
+
       const avatar = screen.getByAltText(mockUser.email);
-      expect(avatar).toHaveAttribute('src', 'https://via.placeholder.com/40');
+      expect(avatar).toHaveAttribute("src", "https://via.placeholder.com/40");
     });
 
-    it('should render Logout button when authenticated', () => {
+    it("should render Logout button when authenticated", () => {
       renderHeader();
-      
-      expect(screen.getByText('Logout')).toBeInTheDocument();
+
+      expect(screen.getByText("Logout")).toBeInTheDocument();
     });
 
-    it('should not render Sign In button when authenticated', () => {
+    it("should not render Sign In button when authenticated", () => {
       renderHeader();
-      
-      expect(screen.queryByText('Sign In')).not.toBeInTheDocument();
+
+      expect(screen.queryByText("Sign In")).not.toBeInTheDocument();
     });
 
-    it('should not render Get Started button when authenticated', () => {
+    it("should not render Get Started button when authenticated", () => {
       renderHeader();
-      
-      expect(screen.queryByText('Get Started')).not.toBeInTheDocument();
+
+      expect(screen.queryByText("Get Started")).not.toBeInTheDocument();
     });
 
-    it('should call logout and navigate to home when Logout is clicked', () => {
+    it("should call logout and navigate to home when Logout is clicked", () => {
       renderHeader();
-      
-      const logoutButton = screen.getByText('Logout');
+
+      const logoutButton = screen.getByText("Logout");
       fireEvent.click(logoutButton);
 
       expect(mockLogout).toHaveBeenCalledTimes(1);
-      expect(mockNavigate).toHaveBeenCalledWith('/');
+      expect(mockNavigate).toHaveBeenCalledWith("/");
     });
   });
 
-  describe('Styling and Layout', () => {
+  describe("Styling and Layout", () => {
     beforeEach(() => {
       (useAuth as jest.Mock).mockReturnValue({
         isAuthenticated: false,
@@ -199,32 +199,32 @@ describe('Header Component', () => {
       });
     });
 
-    it('should apply correct CSS classes to header', () => {
+    it("should apply correct CSS classes to header", () => {
       const { container } = renderHeader();
-      
-      const header = container.querySelector('header');
-      expect(header).toHaveClass('bg-white', 'shadow-sm', 'border-b');
+
+      const header = container.querySelector("header");
+      expect(header).toHaveClass("bg-white", "shadow-sm", "border-b");
     });
 
-    it('should apply logo styles', () => {
+    it("should apply logo styles", () => {
       renderHeader();
-      
-      const logo = screen.getByText('RE');
-      expect(logo).toHaveClass('text-white', 'font-bold', 'text-xl');
-      
+
+      const logo = screen.getByText("RE");
+      expect(logo).toHaveClass("text-white", "font-bold", "text-xl");
+
       const logoContainer = logo.parentElement;
-      expect(logoContainer).toHaveClass('w-10', 'h-10', 'bg-blue-600', 'rounded-lg');
+      expect(logoContainer).toHaveClass("w-10", "h-10", "bg-blue-600", "rounded-lg");
     });
 
-    it('should apply Get Started button styles', () => {
+    it("should apply Get Started button styles", () => {
       renderHeader();
-      
-      const getStartedButton = screen.getByText('Get Started');
-      expect(getStartedButton).toHaveClass('text-white', 'bg-blue-600', 'rounded-lg');
+
+      const getStartedButton = screen.getByText("Get Started");
+      expect(getStartedButton).toHaveClass("text-white", "bg-blue-600", "rounded-lg");
     });
   });
 
-  describe('Accessibility', () => {
+  describe("Accessibility", () => {
     beforeEach(() => {
       (useAuth as jest.Mock).mockReturnValue({
         isAuthenticated: false,
@@ -236,29 +236,29 @@ describe('Header Component', () => {
       });
     });
 
-    it('should have navigation landmark', () => {
+    it("should have navigation landmark", () => {
       const { container } = renderHeader();
-      
-      const nav = container.querySelector('nav');
+
+      const nav = container.querySelector("nav");
       expect(nav).toBeInTheDocument();
     });
 
-    it('should have clickable logo link', () => {
+    it("should have clickable logo link", () => {
       renderHeader();
-      
-      const logoLink = screen.getByText('RealEstate World').closest('a');
-      expect(logoLink).toHaveAttribute('href', '/');
+
+      const logoLink = screen.getByText("RealEstate World").closest("a");
+      expect(logoLink).toHaveAttribute("href", "/");
     });
 
-    it('should have alt text for user avatar', () => {
+    it("should have alt text for user avatar", () => {
       const mockUser = {
-        id: '1',
-        email: 'test@example.com',
-        role: 'user' as const,
-        avatarUrl: 'https://example.com/avatar.jpg',
+        id: "1",
+        email: "test@example.com",
+        role: "user" as const,
+        avatarUrl: "https://example.com/avatar.jpg",
         createdAt: new Date(),
         updatedAt: new Date(),
-        personId: 'person-1',
+        personId: "person-1",
       };
 
       (useAuth as jest.Mock).mockReturnValue({
@@ -271,9 +271,9 @@ describe('Header Component', () => {
       });
 
       renderHeader();
-      
+
       const avatar = screen.getByAltText(mockUser.email);
-      expect(avatar).toHaveAttribute('alt', mockUser.email);
+      expect(avatar).toHaveAttribute("alt", mockUser.email);
     });
   });
 });

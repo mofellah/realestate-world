@@ -9,7 +9,7 @@ interface HealthResponse {
 }
 
 // Support both Vite (import.meta.env) and Jest (process.env)
-let API_URL = 'http://localhost:3000';
+let API_URL = "http://localhost:3000";
 try {
   API_URL = import.meta.env.VITE_API_URL || API_URL;
 } catch (e) {
@@ -23,7 +23,7 @@ class HealthService {
   async getHealth(): Promise<HealthResponse> {
     const response = await fetch(`${API_URL}/health`);
     if (!response.ok) {
-      throw new Error('Health check failed');
+      throw new Error("Health check failed");
     }
     return response.json();
   }

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 /**
  * Tegola Service Unit Tests
@@ -7,9 +7,9 @@ import axios from 'axios';
  * Target: 10-12 tests, ≥80% coverage
  * NOTE: Requires Tegola server running on http://localhost:8080
  */
-describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
+describe.skip("TegolaService (Unit Tests - Requires Tegola Server)", () => {
   // Configuration
-  const TEGOLA_URL = process.env.TEGOLA_URL || 'http://localhost:8080';
+  const TEGOLA_URL = process.env.TEGOLA_URL || "http://localhost:8080";
   const axiosInstance = axios.create({
     baseURL: TEGOLA_URL,
     timeout: 5000,
@@ -30,7 +30,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
     }
 
     async getCapabilities() {
-      const cacheKey = 'capabilities';
+      const cacheKey = "capabilities";
 
       // Check cache
       if (this.isCached(cacheKey)) {
@@ -38,7 +38,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       }
 
       try {
-        const response = await axiosInstance.get('/capabilities');
+        const response = await axiosInstance.get("/capabilities");
         const data = response.data;
 
         // Cache result
@@ -50,10 +50,15 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       }
     }
 
-    async getTile(z: number, x: number, y: number, layerName: string = 'properties'): Promise<Buffer> {
+    async getTile(
+      z: number,
+      x: number,
+      y: number,
+      layerName: string = "properties",
+    ): Promise<Buffer> {
       try {
         const response = await axiosInstance.get(`/data/${layerName}/${z}/${x}/${y}.pbf`, {
-          responseType: 'arraybuffer',
+          responseType: "arraybuffer",
         });
 
         return Buffer.from(response.data);
@@ -120,8 +125,8 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
   // CAPABILITIES TESTS
   // ============================================================================
 
-  describe('Tegola Capabilities', () => {
-    test('should fetch Tegola capabilities', async () => {
+  describe("Tegola Capabilities", () => {
+    test("should fetch Tegola capabilities", async () => {
       // Act
       const capabilities = await tegolaService.getCapabilities();
 
@@ -131,7 +136,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       expect(Array.isArray(capabilities.layers)).toBe(true);
     });
 
-    test('should return capabilities with layer information', async () => {
+    test("should return capabilities with layer information", async () => {
       // Act
       const capabilities = await tegolaService.getCapabilities();
 
@@ -140,13 +145,13 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
         jasmine.objectContaining({
           name: jasmine.any(String),
           zoom: jasmine.any(Object),
-        })
+        }),
       );
     });
 
-    test('should cache capabilities after first fetch', async () => {
+    test("should cache capabilities after first fetch", async () => {
       // Arrange
-      const spy1 = jest.spyOn(axiosInstance, 'get');
+      const spy1 = jest.spyOn(axiosInstance, "get");
 
       // Act
       await tegolaService.getCapabilities(); // First call - from network
@@ -158,7 +163,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       spy1.mockRestore();
     });
 
-    test('should refresh cached capabilities after expiry', async () => {
+    test("should refresh cached capabilities after expiry", async () => {
       // This test verifies cache expiry logic
       // Create a service with shorter TTL for testing
       const shortCacheService = new TegolaService(TEGOLA_URL);
@@ -173,9 +178,9 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       expect(result1).toBeDefined();
     });
 
-    test('should handle Tegola connection errors', async () => {
+    test("should handle Tegola connection errors", async () => {
       // Arrange
-      const badService = new TegolaService('http://localhost:99999'); // Invalid port
+      const badService = new TegolaService("http://localhost:99999"); // Invalid port
 
       // Act & Assert
       expect(async () => {
@@ -188,15 +193,15 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
   // TILE REQUEST TESTS
   // ============================================================================
 
-  describe('Tile Requests', () => {
-    test('should fetch tile for valid coordinates', async () => {
+  describe("Tile Requests", () => {
+    test("should fetch tile for valid coordinates", async () => {
       // Arrange - valid Web Mercator coordinates for Brussels
       const z = 12; // zoom level
       const x = 2048; // x tile
       const y = 1365; // y tile
 
       // Act
-      const tile = await tegolaService.getTile(z, x, y, 'properties');
+      const tile = await tegolaService.getTile(z, x, y, "properties");
 
       // Assert
       expect(tile).toBeDefined();
@@ -204,7 +209,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       expect(tile.length).toBeGreaterThan(0);
     });
 
-    test('should handle tile requests at different zoom levels', async () => {
+    test("should handle tile requests at different zoom levels", async () => {
       // Test tiles at various zoom levels (0-14 typical)
       const zoomLevels = [0, 5, 10, 14];
 
@@ -215,7 +220,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       });
     });
 
-    test('should return buffer data for tile', async () => {
+    test("should return buffer data for tile", async () => {
       // Arrange
       const z = 12;
       const x = 2048;
@@ -230,7 +235,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       expect(tile.length).toBeGreaterThan(0);
     });
 
-    test('should handle out-of-bounds tile requests', async () => {
+    test("should handle out-of-bounds tile requests", async () => {
       // Arrange - tile outside Belgium
       const z = 12;
       const x = 99999; // way out of bounds
@@ -244,7 +249,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       expect(Buffer.isBuffer(tile)).toBe(true);
     });
 
-    test('should handle concurrent tile requests', async () => {
+    test("should handle concurrent tile requests", async () => {
       // Arrange
       const tileRequests = [
         tegolaService.getTile(12, 2048, 1365),
@@ -267,8 +272,8 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
   // COORDINATE VALIDATION TESTS
   // ============================================================================
 
-  describe('Coordinate Validation', () => {
-    test('should validate coordinates within Belgium', async () => {
+  describe("Coordinate Validation", () => {
+    test("should validate coordinates within Belgium", async () => {
       // Arrange - Brussels coordinates
       const coordinates = [
         { lon: 4.356, lat: 50.8503 }, // Brussels
@@ -283,7 +288,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       }
     });
 
-    test('should reject coordinates outside Belgium', async () => {
+    test("should reject coordinates outside Belgium", async () => {
       // Arrange - coordinates outside Belgium
       const coordinates = [
         { lon: 8.68, lat: 50.1109 }, // Germany
@@ -298,7 +303,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       }
     });
 
-    test('should validate latitude bounds', async () => {
+    test("should validate latitude bounds", async () => {
       // Arrange - test latitude extremes
       const validLat = 50.5;
       const tooNorthLat = 51.6;
@@ -310,7 +315,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       expect(await tegolaService.validateCoordinates(4.35, toSouthLat)).toBe(false);
     });
 
-    test('should validate longitude bounds', async () => {
+    test("should validate longitude bounds", async () => {
       // Arrange - test longitude extremes
       const validLon = 4.35;
       const tooEastLon = 6.5;
@@ -322,7 +327,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       expect(await tegolaService.validateCoordinates(tooWestLon, 50.5)).toBe(false);
     });
 
-    test('should handle null/undefined coordinates', async () => {
+    test("should handle null/undefined coordinates", async () => {
       // Act & Assert
       expect(await tegolaService.validateCoordinates(NaN, 50.5)).toBe(false);
       expect(await tegolaService.validateCoordinates(4.35, NaN)).toBe(false);
@@ -333,19 +338,19 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
   // LAYER INFORMATION TESTS
   // ============================================================================
 
-  describe('Layer Information', () => {
-    test('should include properties layer in capabilities', async () => {
+  describe("Layer Information", () => {
+    test("should include properties layer in capabilities", async () => {
       // Act
       const capabilities = await tegolaService.getCapabilities();
 
       // Assert
       const hasPropertiesLayer = capabilities.layers.some(
-        (layer: any) => layer.name === 'properties'
+        (layer: any) => layer.name === "properties",
       );
       expect(hasPropertiesLayer).toBe(true);
     });
 
-    test('should include layer zoom levels', async () => {
+    test("should include layer zoom levels", async () => {
       // Act
       const capabilities = await tegolaService.getCapabilities();
 
@@ -358,25 +363,32 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       });
     });
 
-    test('should include layer geometry types', async () => {
+    test("should include layer geometry types", async () => {
       // Act
       const capabilities = await tegolaService.getCapabilities();
 
       // Assert
       capabilities.layers.forEach((layer: any) => {
         expect(layer.geometryType).toBeDefined();
-        const validGeometryTypes = ['Point', 'LineString', 'Polygon', 'MultiPoint', 'MultiLineString', 'MultiPolygon'];
+        const validGeometryTypes = [
+          "Point",
+          "LineString",
+          "Polygon",
+          "MultiPoint",
+          "MultiLineString",
+          "MultiPolygon",
+        ];
         expect(validGeometryTypes).toContain(layer.geometryType);
       });
     });
 
-    test('should include layer properties/attributes', async () => {
+    test("should include layer properties/attributes", async () => {
       // Act
       const capabilities = await tegolaService.getCapabilities();
 
       // Assert
       capabilities.layers.forEach((layer: any) => {
-        if (layer.name === 'properties') {
+        if (layer.name === "properties") {
           // Properties layer should have attributes
           expect(Array.isArray(layer.properties)).toBe(true);
           expect(layer.properties.length).toBeGreaterThan(0);
@@ -389,10 +401,10 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
   // ERROR HANDLING & RESILIENCE TESTS
   // ============================================================================
 
-  describe('Error Handling', () => {
-    test('should handle Tegola service unavailable', async () => {
+  describe("Error Handling", () => {
+    test("should handle Tegola service unavailable", async () => {
       // Arrange
-      const deadService = new TegolaService('http://localhost:19999');
+      const deadService = new TegolaService("http://localhost:19999");
 
       // Act & Assert
       expect(async () => {
@@ -400,7 +412,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       }).rejects.toThrow();
     });
 
-    test('should handle malformed Tegola response', async () => {
+    test("should handle malformed Tegola response", async () => {
       // This would require mocking axios to return invalid data
       // For now, verify error handling structure exists
 
@@ -408,7 +420,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       expect(TegolaService).toBeDefined();
     });
 
-    test('should timeout on slow Tegola response', async () => {
+    test("should timeout on slow Tegola response", async () => {
       // Axios instance has 5000ms timeout set
       // This tests that timeout is enforced
 
@@ -416,7 +428,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       expect(axiosInstance.defaults.timeout).toBe(5000);
     });
 
-    test('should handle rate limiting (429 responses)', async () => {
+    test("should handle rate limiting (429 responses)", async () => {
       // Tegola might return 429 if rate limited
       // Service should handle gracefully
 
@@ -424,7 +436,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       expect(true).toBe(true); // Placeholder
     });
 
-    test('should handle invalid tile coordinates', async () => {
+    test("should handle invalid tile coordinates", async () => {
       // Act & Assert - negative zoom should fail or return empty
       expect(async () => {
         await tegolaService.getTile(-1, 0, 0);
@@ -436,8 +448,8 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
   // PERFORMANCE TESTS
   // ============================================================================
 
-  describe('Performance & Caching', () => {
-    test('should cache reduce repeated requests', async () => {
+  describe("Performance & Caching", () => {
+    test("should cache reduce repeated requests", async () => {
       // Arrange
       const startTime1 = Date.now();
       await tegolaService.getCapabilities(); // First call - from network
@@ -451,7 +463,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       expect(time2).toBeLessThan(time1);
     });
 
-    test('should handle cache clearing', async () => {
+    test("should handle cache clearing", async () => {
       // Act
       await tegolaService.getCapabilities();
       tegolaService.clearCache();
@@ -461,7 +473,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       expect(true).toBe(true);
     });
 
-    test('should generate tiles efficiently', async () => {
+    test("should generate tiles efficiently", async () => {
       // Arrange
       const startTime = Date.now();
 
@@ -475,7 +487,7 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       expect(duration).toBeLessThan(2000); // Should complete within 2 seconds
     });
 
-    test('should handle burst of tile requests', async () => {
+    test("should handle burst of tile requests", async () => {
       // Arrange - simulate 20 concurrent requests
       const requests = Array(20)
         .fill(null)
@@ -496,8 +508,8 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
   // INTEGRATION SCENARIOS
   // ============================================================================
 
-  describe('Integration Scenarios', () => {
-    test('should support full map tile request workflow', async () => {
+  describe("Integration Scenarios", () => {
+    test("should support full map tile request workflow", async () => {
       // Act
       // 1. Get capabilities
       const capabilities = await tegolaService.getCapabilities();
@@ -521,12 +533,10 @@ describe.skip('TegolaService (Unit Tests - Requires Tegola Server)', () => {
       });
     });
 
-    test('should gracefully degrade when Tegola unavailable', async () => {
+    test("should gracefully degrade when Tegola unavailable", async () => {
       // Demonstrate error handling strategy
       const fallbackData = {
-        layers: [
-          { name: 'properties', geometryType: 'Point' },
-        ],
+        layers: [{ name: "properties", geometryType: "Point" }],
       };
 
       // When Tegola unavailable, should use fallback

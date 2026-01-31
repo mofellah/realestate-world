@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { propertiesService } from '../../services/properties-service';
-import { listingsService } from '../../services/listings-service';
-import { useAuth } from '../../contexts/AuthContext';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { propertiesService } from "../../services/properties-service";
+import { listingsService } from "../../services/listings-service";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface Property {
   id: string;
@@ -16,8 +16,8 @@ interface Property {
 
 interface ListingFormData {
   propertyId: string;
-  type: 'sale' | 'rent' | 'airbnb' | 'lease';
-  status: 'draft' | 'published';
+  type: "sale" | "rent" | "airbnb" | "lease";
+  status: "draft" | "published";
 }
 
 export default function CreateListingPage() {
@@ -28,9 +28,9 @@ export default function CreateListingPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ListingFormData>({
-    propertyId: '',
-    type: 'sale',
-    status: 'draft',
+    propertyId: "",
+    type: "sale",
+    status: "draft",
   });
 
   useEffect(() => {
@@ -40,26 +40,26 @@ export default function CreateListingPage() {
         const data = await propertiesService.getAllProperties(0, 100);
         setProperties(data.properties || []);
       } catch (err) {
-        console.error('[CreateListing] Failed to load properties:', err);
-        setError('Failed to load your properties');
+        console.error("[CreateListing] Failed to load properties:", err);
+        setError("Failed to load your properties");
       } finally {
         setLoading(false);
       }
     };
-    
+
     loadProperties();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
-      setError('You must be logged in to create a listing');
+      setError("You must be logged in to create a listing");
       return;
     }
 
     if (!formData.propertyId) {
-      setError('Please select a property');
+      setError("Please select a property");
       return;
     }
 
@@ -68,11 +68,11 @@ export default function CreateListingPage() {
       setError(null);
 
       await listingsService.createListing(formData);
-      
-      navigate('/dashboard/my-listings');
+
+      navigate("/dashboard/my-listings");
     } catch (err) {
-      console.error('[CreateListing] Error:', err);
-      const errorMsg = err instanceof Error ? err.message : 'Failed to create listing';
+      console.error("[CreateListing] Error:", err);
+      const errorMsg = err instanceof Error ? err.message : "Failed to create listing";
       setError(errorMsg);
     } finally {
       setSubmitting(false);
@@ -80,10 +80,10 @@ export default function CreateListingPage() {
   };
 
   const updateFormData = (updates: Partial<ListingFormData>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
+    setFormData((prev) => ({ ...prev, ...updates }));
   };
 
-  const selectedProperty = properties.find(p => p.id === formData.propertyId);
+  const selectedProperty = properties.find((p) => p.id === formData.propertyId);
 
   if (loading) {
     return (
@@ -124,7 +124,10 @@ export default function CreateListingPage() {
           </select>
           {properties.length === 0 && (
             <p className="text-sm text-gray-600 mt-2">
-              No properties found. <a href="/dashboard/create-property" className="text-blue-600 hover:underline">Create a property first</a>
+              No properties found.{" "}
+              <a href="/dashboard/create-property" className="text-blue-600 hover:underline">
+                Create a property first
+              </a>
             </p>
           )}
         </div>
@@ -133,13 +136,13 @@ export default function CreateListingPage() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Listing Type *</label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {['sale', 'rent', 'airbnb', 'lease'].map((type) => (
+            {["sale", "rent", "airbnb", "lease"].map((type) => (
               <label
                 key={type}
                 className={`flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                   formData.type === type
-                    ? 'border-blue-600 bg-blue-50'
-                    : 'border-gray-300 hover:border-gray-400'
+                    ? "border-blue-600 bg-blue-50"
+                    : "border-gray-300 hover:border-gray-400"
                 }`}
               >
                 <input
@@ -163,7 +166,7 @@ export default function CreateListingPage() {
               <input
                 type="radio"
                 value="draft"
-                checked={formData.status === 'draft'}
+                checked={formData.status === "draft"}
                 onChange={(e) => updateFormData({ status: e.target.value as any })}
                 className="mr-3"
               />
@@ -176,7 +179,7 @@ export default function CreateListingPage() {
               <input
                 type="radio"
                 value="published"
-                checked={formData.status === 'published'}
+                checked={formData.status === "published"}
                 onChange={(e) => updateFormData({ status: e.target.value as any })}
                 className="mr-3"
               />
@@ -193,9 +196,16 @@ export default function CreateListingPage() {
           <div className="bg-blue-50 p-4 rounded-lg">
             <h3 className="font-semibold mb-2">Listing Summary</h3>
             <div className="space-y-1 text-sm">
-              <p><span className="font-medium">Property:</span> {selectedProperty.type} in {selectedProperty.address.city}</p>
-              <p><span className="font-medium">Type:</span> {formData.type}</p>
-              <p><span className="font-medium">Status:</span> {formData.status}</p>
+              <p>
+                <span className="font-medium">Property:</span> {selectedProperty.type} in{" "}
+                {selectedProperty.address.city}
+              </p>
+              <p>
+                <span className="font-medium">Type:</span> {formData.type}
+              </p>
+              <p>
+                <span className="font-medium">Status:</span> {formData.status}
+              </p>
             </div>
           </div>
         )}
@@ -204,7 +214,7 @@ export default function CreateListingPage() {
         <div className="flex gap-4">
           <button
             type="button"
-            onClick={() => navigate('/dashboard/my-listings')}
+            onClick={() => navigate("/dashboard/my-listings")}
             className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
           >
             Cancel
@@ -214,7 +224,7 @@ export default function CreateListingPage() {
             disabled={submitting || !formData.propertyId}
             className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? 'Creating...' : 'Create Listing'}
+            {submitting ? "Creating..." : "Create Listing"}
           </button>
         </div>
       </form>

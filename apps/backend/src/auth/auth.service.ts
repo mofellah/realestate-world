@@ -8,28 +8,28 @@ import {
   UnauthorizedException,
   BadRequestException,
   ConflictException,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../prisma/prisma.service';
-import { comparePassword, hashPassword } from '@boilerplate/utils';
-import { backendConfig } from '@boilerplate/config';
-import { Logger } from '@boilerplate/logger';
-import { UserResponseDto } from './dto/user-response.dto';
-import { ZodError } from 'zod';
-import { LoginSchema, RegisterSchema, RefreshTokenSchema } from './schemas/auth.schema';
+} from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { PrismaService } from "../prisma/prisma.service";
+import { comparePassword, hashPassword } from "@boilerplate/utils";
+import { backendConfig } from "@boilerplate/config";
+import { Logger } from "@boilerplate/logger";
+import { UserResponseDto } from "./dto/user-response.dto";
+import { ZodError } from "zod";
+import { LoginSchema, RegisterSchema, RefreshTokenSchema } from "./schemas/auth.schema";
 import type {
   LoginRequest,
   LoginResponse,
   RegisterRequest,
   TokenPair,
   JwtPayload,
-} from '@boilerplate/types';
-import ms from 'ms';
-import crypto from 'crypto';
+} from "@boilerplate/types";
+import ms from "ms";
+import crypto from "crypto";
 
 @Injectable()
 export class AuthService {
-  private logger = new Logger('info', { service: 'AuthService' });
+  private logger = new Logger("info", { service: "AuthService" });
 
   constructor(
     private prisma: PrismaService,
@@ -50,8 +50,8 @@ export class AuthService {
       validatedLogin = LoginSchema.parse(loginRequest);
     } catch (zodError) {
       if (zodError instanceof ZodError) {
-        const messages = zodError.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ');
-        this.logger.warn('Login validation failed', { errors: messages, correlationId });
+        const messages = zodError.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join("; ");
+        this.logger.warn("Login validation failed", { errors: messages, correlationId });
         throw new BadRequestException(`Validation error: ${messages}`);
       }
       throw zodError;
@@ -65,13 +65,13 @@ export class AuthService {
     });
 
     if (!user) {
-      this.logger.warn('Login attempt failed: user not found', {
+      this.logger.warn("Login attempt failed: user not found", {
         email,
         correlationId,
       });
       throw new UnauthorizedException({
-        message: 'Invalid credentials',
-        error: 'INVALID_CREDENTIALS',
+        message: "Invalid credentials",
+        error: "INVALID_CREDENTIALS",
         correlationId,
       });
     }
@@ -80,13 +80,13 @@ export class AuthService {
     const isPasswordValid = await comparePassword(password, user.passwordHash);
 
     if (!isPasswordValid) {
-      this.logger.warn('Login attempt failed: invalid password', {
+      this.logger.warn("Login attempt failed: invalid password", {
         email,
         correlationId,
       });
       throw new UnauthorizedException({
-        message: 'Invalid credentials',
-        error: 'INVALID_CREDENTIALS',
+        message: "Invalid credentials",
+        error: "INVALID_CREDENTIALS",
         correlationId,
       });
     }
@@ -94,7 +94,7 @@ export class AuthService {
     // Generate tokens
     const tokenPair = await this.generateTokens(user, correlationId);
 
-    this.logger.info('User login successful', {
+    this.logger.info("User login successful", {
       userId: user.id,
       email: user.email,
       correlationId,
@@ -120,15 +120,18 @@ export class AuthService {
       validatedRefresh = RefreshTokenSchema.parse({ refreshToken: refreshTokenString });
     } catch (zodError) {
       if (zodError instanceof ZodError) {
-        const messages = zodError.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ');
-        this.logger.warn('Refresh token validation failed', { errors: messages, correlationId });
+        const messages = zodError.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join("; ");
+        this.logger.warn("Refresh token validation failed", { errors: messages, correlationId });
         throw new BadRequestException(`Validation error: ${messages}`);
       }
       throw zodError;
     }
 
     // Hash the refresh token for lookup
-    const tokenHash = crypto.createHash('sha256').update(validatedRefresh.refreshToken).digest('hex');
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(validatedRefresh.refreshToken)
+      .digest("hex");
 
     // Find refresh token in database
     const refreshTokenRecord = await this.prisma.refreshToken.findUnique({
@@ -143,12 +146,12 @@ export class AuthService {
       refreshTokenRecord.revokedAt ||
       refreshTokenRecord.expiresAt < new Date()
     ) {
-      this.logger.warn('Refresh token invalid or expired', {
+      this.logger.warn("Refresh token invalid or expired", {
         correlationId,
       });
       throw new UnauthorizedException({
-        message: 'Invalid or expired refresh token',
-        error: 'INVALID_REFRESH_TOKEN',
+        message: "Invalid or expired refresh token",
+        error: "INVALID_REFRESH_TOKEN",
         correlationId,
       });
     }
@@ -156,7 +159,7 @@ export class AuthService {
     // Generate new token pair
     const tokenPair = await this.generateTokens(refreshTokenRecord.user, correlationId);
 
-    this.logger.info('Token refreshed successfully', {
+    this.logger.info("Token refreshed successfully", {
       userId: refreshTokenRecord.user.id,
       correlationId,
     });
@@ -181,8 +184,8 @@ export class AuthService {
       validatedRegister = RegisterSchema.parse(registerRequest);
     } catch (zodError) {
       if (zodError instanceof ZodError) {
-        const messages = zodError.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ');
-        this.logger.warn('Registration validation failed', { errors: messages, correlationId });
+        const messages = zodError.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join("; ");
+        this.logger.warn("Registration validation failed", { errors: messages, correlationId });
         throw new BadRequestException(`Validation error: ${messages}`);
       }
       throw zodError;
@@ -196,13 +199,13 @@ export class AuthService {
     });
 
     if (existingUser) {
-      this.logger.warn('Registration failed: email already in use', {
+      this.logger.warn("Registration failed: email already in use", {
         email,
         correlationId,
       });
       throw new ConflictException({
-        message: 'Email already in use',
-        error: 'EMAIL_CONFLICT',
+        message: "Email already in use",
+        error: "EMAIL_CONFLICT",
       });
     }
 
@@ -214,7 +217,7 @@ export class AuthService {
       data: {
         email,
         passwordHash: hashedPassword,
-        role: 'user',
+        role: "user",
         isActive: true,
         name: name ?? undefined,
       },
@@ -223,7 +226,7 @@ export class AuthService {
     // Generate tokens
     const tokenPair = await this.generateTokens(newUser, correlationId);
 
-    this.logger.info('User registration successful', {
+    this.logger.info("User registration successful", {
       userId: newUser.id,
       email: newUser.email,
       correlationId,
@@ -252,7 +255,7 @@ export class AuthService {
       },
     });
 
-    this.logger.info('User logged out', {
+    this.logger.info("User logged out", {
       userId,
       correlationId,
     });
@@ -272,8 +275,8 @@ export class AuthService {
       return payload as JwtPayload;
     } catch (error) {
       throw new UnauthorizedException({
-        message: 'Invalid JWT token',
-        error: 'INVALID_JWT',
+        message: "Invalid JWT token",
+        error: "INVALID_JWT",
       });
     }
   }
@@ -281,10 +284,7 @@ export class AuthService {
   /**
    * Generate access and refresh token pair
    */
-  private async generateTokens(
-    user: any,
-    correlationId: string,
-  ): Promise<TokenPair> {
+  private async generateTokens(user: any, correlationId: string): Promise<TokenPair> {
     // Extract roles - user.role is a single string (user | admin)
     // For now, represent as an array for JWT payload compatibility
     const roles = user.role ? [user.role] : [];
@@ -292,8 +292,8 @@ export class AuthService {
     const permissions: string[] = [];
 
     // Parse expiry times
-    const accessTokenExpiry = backendConfig.JWT_ACCESS_EXPIRY || '15m';
-    const refreshTokenExpiry = backendConfig.JWT_REFRESH_EXPIRY || '7d';
+    const accessTokenExpiry = backendConfig.JWT_ACCESS_EXPIRY || "15m";
+    const refreshTokenExpiry = backendConfig.JWT_REFRESH_EXPIRY || "7d";
 
     const accessTokenExpiryMs = (ms(accessTokenExpiry as any) || 900000) as number;
     const refreshTokenExpiryMs = (ms(refreshTokenExpiry as any) || 604800000) as number;
@@ -320,10 +320,7 @@ export class AuthService {
     });
 
     // Hash refresh token for storage
-    const refreshTokenHash = crypto
-      .createHash('sha256')
-      .update(refreshToken)
-      .digest('hex');
+    const refreshTokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
 
     // Store refresh token in database
     await this.prisma.refreshToken.create({

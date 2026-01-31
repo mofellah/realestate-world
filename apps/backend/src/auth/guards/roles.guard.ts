@@ -3,18 +3,18 @@
  * Validates user roles against required roles
  */
 
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { Logger } from '@boilerplate/logger';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { Logger } from "@boilerplate/logger";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  private logger = new Logger('info', { service: 'RolesGuard' });
+  private logger = new Logger("info", { service: "RolesGuard" });
 
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>('roles', [
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>("roles", [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -29,8 +29,8 @@ export class RolesGuard implements CanActivate {
 
     if (!user) {
       throw new ForbiddenException({
-        message: 'No user found',
-        error: 'FORBIDDEN',
+        message: "No user found",
+        error: "FORBIDDEN",
         correlationId,
       });
     }
@@ -46,8 +46,8 @@ export class RolesGuard implements CanActivate {
       });
 
       throw new ForbiddenException({
-        message: `Insufficient permissions. Required roles: ${requiredRoles.join(', ')}`,
-        error: 'FORBIDDEN',
+        message: `Insufficient permissions. Required roles: ${requiredRoles.join(", ")}`,
+        error: "FORBIDDEN",
         correlationId,
       });
     }

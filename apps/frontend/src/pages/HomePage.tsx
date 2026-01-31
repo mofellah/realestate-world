@@ -1,6 +1,6 @@
 // Home Page - Landing page with hero and featured properties
-import { Link } from 'react-router-dom';
-import { usePropertyStore } from '../stores/propertyStore';
+import { Link } from "react-router-dom";
+import { usePropertyStore } from "../stores/propertyStore";
 
 export default function HomePage() {
   const { filteredListings, isLoading } = usePropertyStore();
@@ -11,12 +11,10 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6">
-            Find Your Perfect Home in Europe
-          </h1>
+          <h1 className="text-5xl font-bold mb-6">Find Your Perfect Home in Europe</h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Search thousands of properties across Belgium, Netherlands, and Switzerland.
-            Connect directly with owners and agencies.
+            Search thousands of properties across Belgium, Netherlands, and Switzerland. Connect
+            directly with owners and agencies.
           </p>
           <div className="flex justify-center space-x-4">
             <Link
@@ -44,8 +42,8 @@ export default function HomePage() {
               <div className="text-5xl mb-4">🗺️</div>
               <h3 className="text-xl font-semibold mb-2">Interactive Map Search</h3>
               <p className="text-gray-600">
-                Explore properties visually on an interactive map with proximity filters for schools,
-                hospitals, and transport.
+                Explore properties visually on an interactive map with proximity filters for
+                schools, hospitals, and transport.
               </p>
             </div>
             <div className="text-center">
@@ -74,14 +72,14 @@ export default function HomePage() {
             <div className="text-center py-12">Loading properties...</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredListings.map(listing => (
+              {featuredListings.map((listing) => (
                 <Link
                   key={listing.id}
                   to={`/property/${listing.id}`}
                   className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden"
                 >
                   <img
-                    src={listing.property.images?.[0] || 'https://via.placeholder.com/400x300'}
+                    src={listing.property.images?.[0] || "https://via.placeholder.com/400x300"}
                     alt={listing.property.title}
                     className="w-full h-48 object-cover"
                   />
@@ -94,11 +92,11 @@ export default function HomePage() {
                     </p>
                     <div className="flex justify-between items-center">
                       <span className="text-2xl font-bold text-blue-600">
-                        €{listing.paymentTerms.termType === 'onetime' 
+                        €
+                        {listing.paymentTerms.termType === "onetime"
                           ? (listing.paymentTerms as any).amount.toLocaleString()
-                          : (listing.paymentTerms as any).amountPerPeriod.toLocaleString()
-                        }
-                        {listing.paymentTerms.termType !== 'onetime' && '/mo'}
+                          : (listing.paymentTerms as any).amountPerPeriod.toLocaleString()}
+                        {listing.paymentTerms.termType !== "onetime" && "/mo"}
                       </span>
                       <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
                         {listing.type}
@@ -106,7 +104,7 @@ export default function HomePage() {
                     </div>
                     <div className="mt-2 text-sm text-gray-500">
                       {listing.property.bedrooms && `${listing.property.bedrooms} bed`}
-                      {listing.property.bedrooms && listing.property.bathrooms && ' • '}
+                      {listing.property.bedrooms && listing.property.bathrooms && " • "}
                       {listing.property.bathrooms && `${listing.property.bathrooms} bath`}
                       {listing.property.surfaceArea && ` • ${listing.property.surfaceArea}m²`}
                     </div>

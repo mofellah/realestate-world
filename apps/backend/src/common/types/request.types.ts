@@ -3,7 +3,7 @@
  * Extended request types for type-safe access to custom properties
  */
 
-import { FastifyRequest } from 'fastify';
+import { FastifyRequest } from "fastify";
 
 /**
  * Request with correlation ID

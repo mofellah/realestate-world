@@ -1,22 +1,32 @@
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException, Inject } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
-import { PrismaService } from '../prisma/prisma.service';
-import { Logger } from '@boilerplate/logger';
-import { ZodError } from 'zod';
-import crypto from 'crypto';
-import type { Request } from 'express';
-import type { CreatePropertyDto } from './dto/property.dto';
-import { CreatePropertySchema, UpdatePropertySchema, SearchPropertiesSchema } from './schemas/property.schema';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+  Inject,
+} from "@nestjs/common";
+import { REQUEST } from "@nestjs/core";
+import { PrismaService } from "../prisma/prisma.service";
+import { Logger } from "@boilerplate/logger";
+import { ZodError } from "zod";
+import crypto from "crypto";
+import type { Request } from "express";
+import type { CreatePropertyDto } from "./dto/property.dto";
+import {
+  CreatePropertySchema,
+  UpdatePropertySchema,
+  SearchPropertiesSchema,
+} from "./schemas/property.schema";
 
 // PropertyType enum matching Prisma schema
 enum PropertyType {
-  house = 'house',
-  apartment = 'apartment',
-  villa = 'villa',
-  land = 'land',
-  room = 'room',
-  commercial = 'commercial',
-  other = 'other',
+  house = "house",
+  apartment = "apartment",
+  villa = "villa",
+  land = "land",
+  room = "room",
+  commercial = "commercial",
+  other = "other",
 }
 
 /**
@@ -26,7 +36,7 @@ enum PropertyType {
  */
 @Injectable()
 export class PropertiesService {
-  private logger = new Logger('info', { service: 'PropertiesService' });
+  private logger = new Logger("info", { service: "PropertiesService" });
 
   constructor(
     private prisma: PrismaService,
@@ -43,7 +53,7 @@ export class PropertiesService {
     if (id) {
       return id;
     }
-    
+
     // Fallback: generate new ID if not in middleware context
     return crypto.randomUUID();
   }
@@ -63,25 +73,27 @@ export class PropertiesService {
         validatedData = CreatePropertySchema.parse(data);
       } catch (zodError) {
         if (zodError instanceof ZodError) {
-          const messages = zodError.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ');
+          const messages = zodError.errors
+            .map((e) => `${e.path.join(".")}: ${e.message}`)
+            .join("; ");
           throw new BadRequestException(`Validation error: ${messages}`);
         }
         throw zodError;
       }
 
       // Validate user
-      const user = await this.prisma.user.findUnique({ 
+      const user = await this.prisma.user.findUnique({
         where: { id: userId },
         include: { person: true },
       });
       if (!user) throw new NotFoundException(`User not found`);
-      if (!user.person) throw new BadRequestException('User person record missing');
+      if (!user.person) throw new BadRequestException("User person record missing");
 
       // ✅ Validate property type against Prisma enum
-      const propertyType = (validatedData.propertyType || 'house') as PropertyType;
+      const propertyType = (validatedData.propertyType || "house") as PropertyType;
       if (!Object.values(PropertyType).includes(propertyType)) {
         throw new BadRequestException(
-          `Invalid propertyType. Must be one of: ${Object.values(PropertyType).join(', ')}`
+          `Invalid propertyType. Must be one of: ${Object.values(PropertyType).join(", ")}`,
         );
       }
 
@@ -108,14 +120,14 @@ export class PropertiesService {
       this.logger.info(`Property ${property.id} created by ${userId}`);
       return property;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown';
+      const msg = error instanceof Error ? error.message : "Unknown";
       this.logger.error(`Property create failed: ${msg}`);
-      
+
       // Handle Prisma foreign key constraint errors
-      if (error && typeof error === 'object' && 'code' in error && error.code === 'P2003') {
-        throw new BadRequestException('Invalid address ID');
+      if (error && typeof error === "object" && "code" in error && error.code === "P2003") {
+        throw new BadRequestException("Invalid address ID");
       }
-      
+
       throw error;
     }
   }
@@ -133,7 +145,7 @@ export class PropertiesService {
           where: { userId },
           skip,
           take,
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           include: { address: true, user: true },
         }),
         this.prisma.property.count({ where: { userId } }),
@@ -141,7 +153,7 @@ export class PropertiesService {
 
       return { properties, total };
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown';
+      const msg = error instanceof Error ? error.message : "Unknown";
       this.logger.error(`Property findByUser failed: ${msg}`);
       throw error;
     }
@@ -172,7 +184,7 @@ export class PropertiesService {
           },
           // All listings with payment terms
           listings: {
-            orderBy: { createdAt: 'desc' },
+            orderBy: { createdAt: "desc" },
             include: {
               paymentTerms: {
                 include: {
@@ -191,7 +203,7 @@ export class PropertiesService {
                   timestamp: true,
                 },
                 take: 5,
-                orderBy: { timestamp: 'desc' },
+                orderBy: { timestamp: "desc" },
               },
             },
           },
@@ -259,16 +271,16 @@ export class PropertiesService {
         },
       });
 
-      if (!property) throw new NotFoundException('Property not found');
+      if (!property) throw new NotFoundException("Property not found");
 
       // Increment view count (async, don't wait)
-      this.incrementPropertyView(id).catch(err =>
-        this.logger.warn(`Failed to increment view for property ${id}: ${err.message}`)
+      this.incrementPropertyView(id).catch((err) =>
+        this.logger.warn(`Failed to increment view for property ${id}: ${err.message}`),
       );
 
       return property;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown';
+      const msg = error instanceof Error ? error.message : "Unknown";
       this.logger.error(`Property findById failed: ${msg}`);
       throw error;
     }
@@ -284,13 +296,15 @@ export class PropertiesService {
       const listing = await this.prisma.listing.findFirst({
         where: {
           propertyId,
-          status: 'published',
+          status: "published",
         },
-        orderBy: { publishedAt: 'desc' },
+        orderBy: { publishedAt: "desc" },
       });
 
       if (!listing) {
-        this.logger.debug(`No published listing found for property ${propertyId}, skipping view tracking`);
+        this.logger.debug(
+          `No published listing found for property ${propertyId}, skipping view tracking`,
+        );
         return;
       }
 
@@ -299,14 +313,16 @@ export class PropertiesService {
         data: {
           listingId: listing.id,
           viewerId: viewerId || null,
-          viewType: 'detail', // detail view (vs preview in search results)
+          viewType: "detail", // detail view (vs preview in search results)
         },
       });
 
       this.logger.debug(`View recorded for listing ${listing.id}`);
     } catch (error) {
       // Don't throw - view tracking is non-critical
-      this.logger.warn(`View tracking failed: ${error instanceof Error ? error.message : 'Unknown'}`);
+      this.logger.warn(
+        `View tracking failed: ${error instanceof Error ? error.message : "Unknown"}`,
+      );
     }
   }
 
@@ -325,15 +341,17 @@ export class PropertiesService {
         validatedData = UpdatePropertySchema.parse(data);
       } catch (zodError) {
         if (zodError instanceof ZodError) {
-          const messages = zodError.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ');
+          const messages = zodError.errors
+            .map((e) => `${e.path.join(".")}: ${e.message}`)
+            .join("; ");
           throw new BadRequestException(`Validation error: ${messages}`);
         }
         throw zodError;
       }
 
       const property = await this.prisma.property.findUnique({ where: { id } });
-      if (!property) throw new NotFoundException('Property not found');
-      if (property.userId !== userId) throw new ForbiddenException('Not owner');
+      if (!property) throw new NotFoundException("Property not found");
+      if (property.userId !== userId) throw new ForbiddenException("Not owner");
 
       // Validate property type if provided
       let propertyType = undefined;
@@ -341,7 +359,7 @@ export class PropertiesService {
         propertyType = validatedData.propertyType as PropertyType;
         if (!Object.values(PropertyType).includes(propertyType)) {
           throw new BadRequestException(
-            `Invalid propertyType. Must be one of: ${Object.values(PropertyType).join(', ')}`
+            `Invalid propertyType. Must be one of: ${Object.values(PropertyType).join(", ")}`,
           );
         }
       }
@@ -350,16 +368,24 @@ export class PropertiesService {
         where: { id },
         data: {
           ...(validatedData.title && { title: validatedData.title }),
-          ...(validatedData.description !== undefined && { description: validatedData.description }),
+          ...(validatedData.description !== undefined && {
+            description: validatedData.description,
+          }),
           ...(validatedData.propertyType && { propertyType }),
           ...(validatedData.bedrooms !== undefined && { bedrooms: validatedData.bedrooms }),
           ...(validatedData.bathrooms !== undefined && { bathrooms: validatedData.bathrooms }),
-          ...(validatedData.surfaceArea !== undefined && { surfaceArea: validatedData.surfaceArea }),
+          ...(validatedData.surfaceArea !== undefined && {
+            surfaceArea: validatedData.surfaceArea,
+          }),
           ...(validatedData.gardenSize !== undefined && { gardenSize: validatedData.gardenSize }),
           ...(validatedData.yearBuilt !== undefined && { yearBuilt: validatedData.yearBuilt }),
           ...(validatedData.amenitiesList && { amenitiesList: validatedData.amenitiesList }),
-          ...(validatedData.metadata !== undefined && { metadata: (validatedData.metadata as any) || null }),
-          ...(validatedData.isAvailable !== undefined && { isAvailable: validatedData.isAvailable }),
+          ...(validatedData.metadata !== undefined && {
+            metadata: (validatedData.metadata as any) || null,
+          }),
+          ...(validatedData.isAvailable !== undefined && {
+            isAvailable: validatedData.isAvailable,
+          }),
         },
         include: { address: true },
       });
@@ -367,7 +393,7 @@ export class PropertiesService {
       this.logger.info(`Property ${id} updated by ${userId}`);
       return updated;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown';
+      const msg = error instanceof Error ? error.message : "Unknown";
       this.logger.error(`Property update failed: ${msg}`);
       throw error;
     }
@@ -382,14 +408,14 @@ export class PropertiesService {
 
     try {
       const property = await this.prisma.property.findUnique({ where: { id } });
-      if (!property) throw new NotFoundException('Property not found');
-      if (property.userId !== userId) throw new ForbiddenException('Not owner');
+      if (!property) throw new NotFoundException("Property not found");
+      if (property.userId !== userId) throw new ForbiddenException("Not owner");
 
       await this.prisma.property.delete({ where: { id } });
 
       this.logger.info(`Property ${id} deleted by ${userId}`);
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown';
+      const msg = error instanceof Error ? error.message : "Unknown";
       this.logger.error(`Property delete failed: ${msg}`);
       throw error;
     }
@@ -424,7 +450,9 @@ export class PropertiesService {
         validatedFilters = SearchPropertiesSchema.parse(filters);
       } catch (zodError) {
         if (zodError instanceof ZodError) {
-          const messages = zodError.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; ');
+          const messages = zodError.errors
+            .map((e) => `${e.path.join(".")}: ${e.message}`)
+            .join("; ");
           throw new BadRequestException(`Validation error: ${messages}`);
         }
         throw zodError;
@@ -470,7 +498,7 @@ export class PropertiesService {
         `;
 
         const spatialIds = spatialProperties.map((p: { id: string }) => p.id);
-        
+
         // If no properties in radius, return empty
         if (spatialIds.length === 0) {
           return { properties: [], total: 0 };
@@ -487,14 +515,14 @@ export class PropertiesService {
       // Price filtering via listings - note that price is in paymentTerms now
       // For MVP, we'll include all published listings and filter on frontend
       // A more complex implementation would need raw SQL to filter by payment terms
-      const listingWhere: any = { status: 'published' };
-      
+      const listingWhere: any = { status: "published" };
+
       // TODO: Price filtering requires complex query because price is in polymorphic paymentTerms
       // For now, returning all published listings - frontend can filter by price
       if (validatedFilters.minPrice !== undefined || validatedFilters.maxPrice !== undefined) {
         // This would require joining payment_terms and checking both onetime and periodic amounts
         // Keeping it simple for MVP - will enhance later
-        this.logger.warn('Price filtering not yet implemented - returning all published listings');
+        this.logger.warn("Price filtering not yet implemented - returning all published listings");
       }
 
       // Get properties with published listings
@@ -518,7 +546,7 @@ export class PropertiesService {
             },
             listings: {
               where: listingWhere,
-              orderBy: { createdAt: 'desc' },
+              orderBy: { createdAt: "desc" },
               take: 1, // Only get latest listing
               select: {
                 id: true,
@@ -559,7 +587,7 @@ export class PropertiesService {
               },
             },
           },
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
         }),
         this.prisma.property.count({ where }),
       ]);
@@ -567,7 +595,7 @@ export class PropertiesService {
       this.logger.info(`Property search returned ${properties.length} of ${total} properties`);
       return { properties, total };
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown';
+      const msg = error instanceof Error ? error.message : "Unknown";
       this.logger.error(`Property search failed: ${msg}`);
       throw error;
     }

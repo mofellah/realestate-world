@@ -3,8 +3,8 @@
  * Handle access and refresh token persistence
  */
 
-const TOKEN_KEY = 'accessToken';
-const REFRESH_TOKEN_KEY = 'refreshToken';
+const TOKEN_KEY = "accessToken";
+const REFRESH_TOKEN_KEY = "refreshToken";
 
 export const tokenStorage = {
   /**

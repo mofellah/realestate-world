@@ -4,7 +4,7 @@
  */
 
 // Export logger
-export * from './logger';
+export * from "./logger";
 
 // Export correlation utilities
-export * from './correlation';
+export * from "./correlation";

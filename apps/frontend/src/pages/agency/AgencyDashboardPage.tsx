@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import DashboardLayout from '../../components/layouts/DashboardLayout';
-import { agenciesService, AgencyInfo, PropertyListing } from '../../services/agencies-service';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import DashboardLayout from "../../components/layouts/DashboardLayout";
+import { agenciesService, AgencyInfo, PropertyListing } from "../../services/agencies-service";
 
 export default function AgencyDashboardPage() {
   const { id } = useParams<{ id: string }>();
@@ -13,7 +13,7 @@ export default function AgencyDashboardPage() {
   useEffect(() => {
     const loadAgency = async () => {
       if (!id) {
-        setError('Agency ID not provided');
+        setError("Agency ID not provided");
         setLoading(false);
         return;
       }
@@ -25,8 +25,8 @@ export default function AgencyDashboardPage() {
         const portfolioData = await agenciesService.getPortfolio(id);
         setPortfolio(portfolioData.listings || []);
       } catch (err) {
-        console.error('Failed to load agency:', err);
-        setError('Failed to load agency details');
+        console.error("Failed to load agency:", err);
+        setError("Failed to load agency details");
       } finally {
         setLoading(false);
       }
@@ -49,7 +49,7 @@ export default function AgencyDashboardPage() {
     return (
       <DashboardLayout>
         <div className="p-8 text-center">
-          <p className="text-red-600">{error || 'Agency not found'}</p>
+          <p className="text-red-600">{error || "Agency not found"}</p>
         </div>
       </DashboardLayout>
     );
@@ -62,7 +62,7 @@ export default function AgencyDashboardPage() {
         <div className="mb-8">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2">{agency.person?.businessName || 'Agency'}</h1>
+              <h1 className="text-3xl font-bold mb-2">{agency.person?.businessName || "Agency"}</h1>
               <p className="text-gray-600">
                 Tier: <span className="font-semibold capitalize">{agency.tier}</span>
               </p>
@@ -87,7 +87,7 @@ export default function AgencyDashboardPage() {
           <div className="bg-white p-6 rounded-lg shadow">
             <p className="text-gray-500 text-sm">Active Listings</p>
             <p className="text-3xl font-bold mt-2">
-              {portfolio.filter((p) => p.status === 'published').length}
+              {portfolio.filter((p) => p.status === "published").length}
             </p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
@@ -104,8 +104,12 @@ export default function AgencyDashboardPage() {
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Role</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                      Email
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                      Role
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -135,17 +139,22 @@ export default function AgencyDashboardPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {portfolio.map((listing) => (
-                <div key={listing.id} className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
+                <div
+                  key={listing.id}
+                  className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition"
+                >
                   <div className="h-48 bg-gray-200 flex items-center justify-center text-gray-500">
                     Property Image
                   </div>
                   <div className="p-4">
                     <div className="flex justify-between items-start mb-2">
                       <span className="font-semibold capitalize">{listing.type}</span>
-                      <span className="text-xs px-2 py-1 bg-gray-100 rounded">{listing.status}</span>
+                      <span className="text-xs px-2 py-1 bg-gray-100 rounded">
+                        {listing.status}
+                      </span>
                     </div>
                     <p className="text-sm text-gray-600 mb-3">
-                      {listing.property?.address?.city || 'Location TBD'}
+                      {listing.property?.address?.city || "Location TBD"}
                     </p>
                     {listing.paymentTerms && listing.paymentTerms.length > 0 && (
                       <p className="text-lg font-bold text-blue-600">

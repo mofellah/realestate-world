@@ -1,15 +1,21 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException, Inject } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateAgencyDto } from './dto/create-agency.dto';
-import { UpdateAgencyDto } from './dto/update-agency.dto';
-import { AddAgentDto } from './dto/add-agent.dto';
-import type { Logger } from 'winston';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+  Inject,
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { CreateAgencyDto } from "./dto/create-agency.dto";
+import { UpdateAgencyDto } from "./dto/update-agency.dto";
+import { AddAgentDto } from "./dto/add-agent.dto";
+import type { Logger } from "winston";
 
 @Injectable()
 export class AgenciesService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject('LOGGER') private readonly logger: Logger,
+    @Inject("LOGGER") private readonly logger: Logger,
   ) {}
 
   /**
@@ -24,11 +30,11 @@ export class AgenciesService {
       });
 
       if (!person) {
-        throw new NotFoundException('Person not found');
+        throw new NotFoundException("Person not found");
       }
 
       if (!person.organization) {
-        throw new BadRequestException('Person must be an organization to create agency');
+        throw new BadRequestException("Person must be an organization to create agency");
       }
 
       // Check if agency already exists for this person
@@ -37,14 +43,14 @@ export class AgenciesService {
       });
 
       if (existing) {
-        throw new BadRequestException('Agency already exists for this person');
+        throw new BadRequestException("Agency already exists for this person");
       }
 
       // Create agency
       const agency = await this.prisma.agency.create({
         data: {
           personId: dto.personId,
-          tier: (dto.tier as any) || 'basic',
+          tier: (dto.tier as any) || "basic",
           profileImageUrl: dto.profileImageUrl,
           description: dto.description,
           maxAgents: dto.maxAgents || 5,
@@ -82,7 +88,7 @@ export class AgenciesService {
       this.logger.info(`Agency created: ${agency.id} for person ${dto.personId}`);
       return agency;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg = error instanceof Error ? error.message : "Unknown error";
       this.logger.error(`Failed to create agency: ${msg}`);
       throw error;
     }
@@ -125,12 +131,12 @@ export class AgenciesService {
       });
 
       if (!agency) {
-        throw new NotFoundException('Agency not found');
+        throw new NotFoundException("Agency not found");
       }
 
       return agency;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg = error instanceof Error ? error.message : "Unknown error";
       this.logger.error(`Failed to fetch agency ${id}: ${msg}`);
       throw error;
     }
@@ -146,17 +152,17 @@ export class AgenciesService {
         where: { id },
         include: {
           employees: {
-            where: { userId, role: 'owner' },
+            where: { userId, role: "owner" },
           },
         },
       });
 
       if (!agency) {
-        throw new NotFoundException('Agency not found');
+        throw new NotFoundException("Agency not found");
       }
 
       if (agency.employees.length === 0) {
-        throw new ForbiddenException('Only agency owners can update agency');
+        throw new ForbiddenException("Only agency owners can update agency");
       }
 
       // Update agency
@@ -181,7 +187,7 @@ export class AgenciesService {
       this.logger.info(`Agency updated: ${id}`);
       return updated;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg = error instanceof Error ? error.message : "Unknown error";
       this.logger.error(`Failed to update agency ${id}: ${msg}`);
       throw error;
     }
@@ -201,17 +207,22 @@ export class AgenciesService {
       });
 
       if (!agency) {
-        throw new NotFoundException('Agency not found');
+        throw new NotFoundException("Agency not found");
       }
 
-      const adminRole = agency.employees.find((e: { userId: string; role: string }) => e.userId === adminUserId && (e.role === 'owner' || e.role === 'manager'));
+      const adminRole = agency.employees.find(
+        (e: { userId: string; role: string }) =>
+          e.userId === adminUserId && (e.role === "owner" || e.role === "manager"),
+      );
       if (!adminRole) {
-        throw new ForbiddenException('Only agency owners/managers can add agents');
+        throw new ForbiddenException("Only agency owners/managers can add agents");
       }
 
       // Check max agents limit
       if (agency.employees.length >= agency.maxAgents) {
-        throw new BadRequestException(`Agency has reached maximum agent limit (${agency.maxAgents})`);
+        throw new BadRequestException(
+          `Agency has reached maximum agent limit (${agency.maxAgents})`,
+        );
       }
 
       // Verify user exists
@@ -220,13 +231,13 @@ export class AgenciesService {
       });
 
       if (!user) {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException("User not found");
       }
 
       // Check if already an employee
       const existing = agency.employees.find((e: { userId: string }) => e.userId === dto.userId);
       if (existing) {
-        throw new BadRequestException('User is already an employee of this agency');
+        throw new BadRequestException("User is already an employee of this agency");
       }
 
       // Create agency role
@@ -259,7 +270,7 @@ export class AgenciesService {
       this.logger.info(`Agent ${dto.userId} added to agency ${id} with role ${dto.role}`);
       return agencyRole;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg = error instanceof Error ? error.message : "Unknown error";
       this.logger.error(`Failed to add agent to agency ${id}: ${msg}`);
       throw error;
     }
@@ -279,24 +290,29 @@ export class AgenciesService {
       });
 
       if (!agency) {
-        throw new NotFoundException('Agency not found');
+        throw new NotFoundException("Agency not found");
       }
 
-      const adminRole = agency.employees.find((e: { userId: string; role: string }) => e.userId === adminUserId && (e.role === 'owner' || e.role === 'manager'));
+      const adminRole = agency.employees.find(
+        (e: { userId: string; role: string }) =>
+          e.userId === adminUserId && (e.role === "owner" || e.role === "manager"),
+      );
       if (!adminRole) {
-        throw new ForbiddenException('Only agency owners/managers can remove agents');
+        throw new ForbiddenException("Only agency owners/managers can remove agents");
       }
 
       // Find agent role
-      const agentRole = agency.employees.find((e: { userId: string; role: string; id: string }) => e.userId === agentUserId);
+      const agentRole = agency.employees.find(
+        (e: { userId: string; role: string; id: string }) => e.userId === agentUserId,
+      );
       if (!agentRole) {
-        throw new NotFoundException('Agent not found in agency');
+        throw new NotFoundException("Agent not found in agency");
       }
 
       // Can't remove the last owner
-      const owners = agency.employees.filter((e: { role: string }) => e.role === 'owner');
-      if (owners.length === 1 && agentRole.role === 'owner') {
-        throw new BadRequestException('Cannot remove the last owner from agency');
+      const owners = agency.employees.filter((e: { role: string }) => e.role === "owner");
+      if (owners.length === 1 && agentRole.role === "owner") {
+        throw new BadRequestException("Cannot remove the last owner from agency");
       }
 
       // Remove role
@@ -305,9 +321,9 @@ export class AgenciesService {
       });
 
       this.logger.info(`Agent ${agentUserId} removed from agency ${id}`);
-      return { message: 'Agent removed successfully' };
+      return { message: "Agent removed successfully" };
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg = error instanceof Error ? error.message : "Unknown error";
       this.logger.error(`Failed to remove agent from agency ${id}: ${msg}`);
       throw error;
     }
@@ -328,7 +344,7 @@ export class AgenciesService {
       });
 
       if (!agency) {
-        throw new NotFoundException('Agency not found');
+        throw new NotFoundException("Agency not found");
       }
 
       // Get all employee user IDs
@@ -342,12 +358,12 @@ export class AgenciesService {
           },
           skip,
           take,
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           include: {
             address: true,
             listings: {
-              where: { status: 'published' },
-              orderBy: { publishedAt: 'desc' },
+              where: { status: "published" },
+              orderBy: { publishedAt: "desc" },
               take: 1,
               include: {
                 paymentTerms: {
@@ -369,7 +385,7 @@ export class AgenciesService {
 
       return { properties, total };
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
+      const msg = error instanceof Error ? error.message : "Unknown error";
       this.logger.error(`Failed to fetch agency portfolio ${id}: ${msg}`);
       throw error;
     }

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { propertiesService } from '../../services/properties-service';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { propertiesService } from "../../services/properties-service";
 
 interface Property {
   id: string;
@@ -19,7 +19,7 @@ export default function MyPropertiesPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const loadProperties = async () => {
@@ -28,8 +28,8 @@ export default function MyPropertiesPage() {
         const data = await propertiesService.getAllProperties(0, 100);
         setProperties(data.properties || []);
       } catch (err) {
-        console.error('[MyProperties] Failed to load:', err);
-        setError('Failed to load properties');
+        console.error("[MyProperties] Failed to load:", err);
+        setError("Failed to load properties");
       } finally {
         setLoading(false);
       }
@@ -38,7 +38,7 @@ export default function MyPropertiesPage() {
     loadProperties();
   }, []);
 
-  const filteredProperties = properties.filter(property => {
+  const filteredProperties = properties.filter((property) => {
     if (!searchTerm) return true;
     return (
       property.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -93,8 +93,18 @@ export default function MyPropertiesPage() {
       ) : filteredProperties.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-12 text-center">
           <div className="text-gray-400 mb-4">
-            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            <svg
+              className="mx-auto h-12 w-12"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              />
             </svg>
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No properties found</h3>
@@ -109,12 +119,20 @@ export default function MyPropertiesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProperties.map((property) => (
-            <div key={property.id} className="bg-white rounded-lg shadow hover:shadow-lg transition">
+            <div
+              key={property.id}
+              className="bg-white rounded-lg shadow hover:shadow-lg transition"
+            >
               {/* Property Image */}
               <div className="h-48 bg-gradient-to-br from-blue-100 to-blue-200 rounded-t-lg overflow-hidden flex items-center justify-center">
                 <div className="text-blue-400">
                   <svg className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                    />
                   </svg>
                 </div>
               </div>

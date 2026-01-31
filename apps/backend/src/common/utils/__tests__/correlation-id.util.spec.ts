@@ -1,25 +1,25 @@
-import { getCorrelationId, getOrGenerateCorrelationId } from '../correlation-id.util';
+import { getCorrelationId, getOrGenerateCorrelationId } from "../correlation-id.util";
 
-describe('CorrelationId Util', () => {
-  describe('getOrGenerateCorrelationId', () => {
-    it('should generate a UUID when no request provided', () => {
+describe("CorrelationId Util", () => {
+  describe("getOrGenerateCorrelationId", () => {
+    it("should generate a UUID when no request provided", () => {
       const id = getOrGenerateCorrelationId();
       expect(id).toBeDefined();
-      expect(typeof id).toBe('string');
+      expect(typeof id).toBe("string");
       expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
     });
 
-    it('should generate unique IDs', () => {
+    it("should generate unique IDs", () => {
       const id1 = getOrGenerateCorrelationId();
       const id2 = getOrGenerateCorrelationId();
       expect(id1).not.toEqual(id2);
     });
 
-    it('should use existing correlation ID from request header', () => {
-      const testId = 'test-correlation-id';
+    it("should use existing correlation ID from request header", () => {
+      const testId = "test-correlation-id";
       const req = {
         headers: {
-          'x-correlation-id': testId,
+          "x-correlation-id": testId,
         },
       } as any;
 
@@ -27,23 +27,23 @@ describe('CorrelationId Util', () => {
       expect(result).toBe(testId);
     });
 
-    it('should generate new ID if not in request header', () => {
+    it("should generate new ID if not in request header", () => {
       const req = {
         headers: {},
       } as any;
 
       const result = getOrGenerateCorrelationId(req);
       expect(result).toBeDefined();
-      expect(typeof result).toBe('string');
+      expect(typeof result).toBe("string");
     });
   });
 
-  describe('getCorrelationId', () => {
-    it('should retrieve correlation ID from request header', () => {
-      const testId = 'test-correlation-id';
+  describe("getCorrelationId", () => {
+    it("should retrieve correlation ID from request header", () => {
+      const testId = "test-correlation-id";
       const req = {
         headers: {
-          'x-correlation-id': testId,
+          "x-correlation-id": testId,
         },
       } as any;
 
@@ -51,7 +51,7 @@ describe('CorrelationId Util', () => {
       expect(result).toBe(testId);
     });
 
-    it('should return undefined if no correlation ID is set', () => {
+    it("should return undefined if no correlation ID is set", () => {
       const req = {
         headers: {},
       } as any;
@@ -59,7 +59,7 @@ describe('CorrelationId Util', () => {
       expect(getCorrelationId(req)).toBeUndefined();
     });
 
-    it('should return undefined if no request provided', () => {
+    it("should return undefined if no request provided", () => {
       expect(getCorrelationId()).toBeUndefined();
     });
   });

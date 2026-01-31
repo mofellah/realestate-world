@@ -3,7 +3,7 @@
  * Handles all property-related API calls (search, detail, etc.)
  */
 
-import { apiClient } from './api-client';
+import { apiClient } from "./api-client";
 
 // ============================================================================
 // TYPES
@@ -103,23 +103,25 @@ class PropertiesService {
    */
   async searchProperties(params: SearchPropertiesParams): Promise<PropertySearchResult[]> {
     const queryString = new URLSearchParams();
-    
-    if (params.priceMin !== undefined) queryString.append('priceMin', params.priceMin.toString());
-    if (params.priceMax !== undefined) queryString.append('priceMax', params.priceMax.toString());
-    if (params.type) queryString.append('type', params.type);
-    if (params.bedrooms !== undefined) queryString.append('bedrooms', params.bedrooms.toString());
-    if (params.bathrooms !== undefined) queryString.append('bathrooms', params.bathrooms.toString());
-    if (params.latitude !== undefined) queryString.append('latitude', params.latitude.toString());
-    if (params.longitude !== undefined) queryString.append('longitude', params.longitude.toString());
-    if (params.radius !== undefined) queryString.append('radius', params.radius.toString());
-    if (params.city) queryString.append('city', params.city);
-    if (params.country) queryString.append('country', params.country);
-    if (params.skip !== undefined) queryString.append('skip', params.skip.toString());
-    if (params.take !== undefined) queryString.append('take', params.take.toString());
+
+    if (params.priceMin !== undefined) queryString.append("priceMin", params.priceMin.toString());
+    if (params.priceMax !== undefined) queryString.append("priceMax", params.priceMax.toString());
+    if (params.type) queryString.append("type", params.type);
+    if (params.bedrooms !== undefined) queryString.append("bedrooms", params.bedrooms.toString());
+    if (params.bathrooms !== undefined)
+      queryString.append("bathrooms", params.bathrooms.toString());
+    if (params.latitude !== undefined) queryString.append("latitude", params.latitude.toString());
+    if (params.longitude !== undefined)
+      queryString.append("longitude", params.longitude.toString());
+    if (params.radius !== undefined) queryString.append("radius", params.radius.toString());
+    if (params.city) queryString.append("city", params.city);
+    if (params.country) queryString.append("country", params.country);
+    if (params.skip !== undefined) queryString.append("skip", params.skip.toString());
+    if (params.take !== undefined) queryString.append("take", params.take.toString());
 
     const query = queryString.toString();
-    const endpoint = query ? `/properties/search?${query}` : '/properties/search';
-    
+    const endpoint = query ? `/properties/search?${query}` : "/properties/search";
+
     return apiClient.get<PropertySearchResult[]>(endpoint);
   }
 
@@ -148,7 +150,7 @@ class PropertiesService {
    * Create property (owner only)
    */
   async createProperty(data: any) {
-    return apiClient.post('/properties', data);
+    return apiClient.post("/properties", data);
   }
 
   /**

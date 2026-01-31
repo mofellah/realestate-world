@@ -3,23 +3,19 @@
  * Validates JWT tokens from Authorization header
  */
 
-import {
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { Reflector } from '@nestjs/core';
+import { ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
+import { Reflector } from "@nestjs/core";
 
 @Injectable()
-export class JwtGuard extends AuthGuard('jwt') {
+export class JwtGuard extends AuthGuard("jwt") {
   constructor(private reflector: Reflector) {
     super();
   }
 
   canActivate(context: ExecutionContext) {
     // Check if route is marked as public
-    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
+    const isPublic = this.reflector.getAllAndOverride<boolean>("isPublic", [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -39,8 +35,8 @@ export class JwtGuard extends AuthGuard('jwt') {
       throw (
         err ||
         new UnauthorizedException({
-          message: 'Invalid or missing JWT token',
-          error: 'UNAUTHORIZED',
+          message: "Invalid or missing JWT token",
+          error: "UNAUTHORIZED",
           correlationId,
         })
       );

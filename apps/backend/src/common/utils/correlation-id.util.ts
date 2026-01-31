@@ -3,10 +3,10 @@
  * Provides request tracing across service layers
  */
 
-import { Request } from 'express';
-import crypto from 'crypto';
+import { Request } from "express";
+import crypto from "crypto";
 
-const CORRELATION_ID_HEADER = 'x-correlation-id';
+const CORRELATION_ID_HEADER = "x-correlation-id";
 
 /**
  * Get or generate correlation ID for a request

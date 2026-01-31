@@ -3,7 +3,7 @@
  * Filter panel for property search with spatial filters
  */
 
-import { useState } from 'react';
+import { useState } from "react";
 
 export interface PropertyFilters {
   priceMin?: number;
@@ -35,22 +35,24 @@ export default function FilterPanel({ filters, onChange, onApply }: PropertyFilt
 
       {/* Price Range */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Price Range
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Price Range</label>
         <div className="grid grid-cols-2 gap-2">
           <input
             type="number"
             placeholder="Min"
-            value={localFilters.priceMin || ''}
-            onChange={(e) => handleChange('priceMin', e.target.value ? Number(e.target.value) : undefined)}
+            value={localFilters.priceMin || ""}
+            onChange={(e) =>
+              handleChange("priceMin", e.target.value ? Number(e.target.value) : undefined)
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
           <input
             type="number"
             placeholder="Max"
-            value={localFilters.priceMax || ''}
-            onChange={(e) => handleChange('priceMax', e.target.value ? Number(e.target.value) : undefined)}
+            value={localFilters.priceMax || ""}
+            onChange={(e) =>
+              handleChange("priceMax", e.target.value ? Number(e.target.value) : undefined)
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -58,12 +60,10 @@ export default function FilterPanel({ filters, onChange, onApply }: PropertyFilt
 
       {/* Property Type */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Property Type
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
         <select
-          value={localFilters.propertyType || ''}
-          onChange={(e) => handleChange('propertyType', e.target.value || undefined)}
+          value={localFilters.propertyType || ""}
+          onChange={(e) => handleChange("propertyType", e.target.value || undefined)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">All Types</option>
@@ -77,12 +77,12 @@ export default function FilterPanel({ filters, onChange, onApply }: PropertyFilt
 
       {/* Bedrooms */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Bedrooms
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
         <select
-          value={localFilters.bedrooms || ''}
-          onChange={(e) => handleChange('bedrooms', e.target.value ? Number(e.target.value) : undefined)}
+          value={localFilters.bedrooms || ""}
+          onChange={(e) =>
+            handleChange("bedrooms", e.target.value ? Number(e.target.value) : undefined)
+          }
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">Any</option>
@@ -96,12 +96,12 @@ export default function FilterPanel({ filters, onChange, onApply }: PropertyFilt
 
       {/* Bathrooms */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Bathrooms
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
         <select
-          value={localFilters.bathrooms || ''}
-          onChange={(e) => handleChange('bathrooms', e.target.value ? Number(e.target.value) : undefined)}
+          value={localFilters.bathrooms || ""}
+          onChange={(e) =>
+            handleChange("bathrooms", e.target.value ? Number(e.target.value) : undefined)
+          }
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">Any</option>
@@ -113,12 +113,12 @@ export default function FilterPanel({ filters, onChange, onApply }: PropertyFilt
 
       {/* Proximity Radius (ST_DWithin) */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Proximity Radius
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Proximity Radius</label>
         <select
-          value={localFilters.radius || ''}
-          onChange={(e) => handleChange('radius', e.target.value ? Number(e.target.value) : undefined)}
+          value={localFilters.radius || ""}
+          onChange={(e) =>
+            handleChange("radius", e.target.value ? Number(e.target.value) : undefined)
+          }
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">Entire map</option>

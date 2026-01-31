@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { propertiesService } from '../../services/properties-service';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { propertiesService } from "../../services/properties-service";
 
 interface PropertyFormData {
   title: string;
   description: string;
   propertyType: string;
-  listingType: 'sale' | 'rent';
+  listingType: "sale" | "rent";
   price: string;
   street: string;
   city: string;
@@ -28,26 +28,26 @@ export default function EditPropertyPage() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(true);
-  
+
   const [formData, setFormData] = useState<PropertyFormData>({
-    title: '',
-    description: '',
-    propertyType: 'house',
-    listingType: 'sale',
-    price: '',
-    street: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: 'USA',
-    bedrooms: '',
-    bathrooms: '',
-    area: '',
-    yearBuilt: '',
-    parking: '',
+    title: "",
+    description: "",
+    propertyType: "house",
+    listingType: "sale",
+    price: "",
+    street: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "USA",
+    bedrooms: "",
+    bathrooms: "",
+    area: "",
+    yearBuilt: "",
+    parking: "",
     amenities: [],
     images: [],
-    videoUrl: '',
+    videoUrl: "",
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -60,31 +60,31 @@ export default function EditPropertyPage() {
         setLoading(true);
         setError(null);
         const property = await propertiesService.getProperty(id);
-        
+
         setFormData({
-          title: property.title || '',
-          description: property.description || '',
-          propertyType: property.type || 'house',
-          listingType: 'sale',
-          price: '',
-          street: property.address?.street || '',
-          city: property.address?.city || '',
-          state: property.address?.state || '',
-          zipCode: property.address?.postalCode || '',
-          country: property.address?.country || 'USA',
-          bedrooms: property.bedrooms?.toString() || '',
-          bathrooms: property.bathrooms?.toString() || '',
-          area: property.surfaceArea?.toString() || '',
-          yearBuilt: property.yearBuilt?.toString() || '',
-          parking: '',
+          title: property.title || "",
+          description: property.description || "",
+          propertyType: property.type || "house",
+          listingType: "sale",
+          price: "",
+          street: property.address?.street || "",
+          city: property.address?.city || "",
+          state: property.address?.state || "",
+          zipCode: property.address?.postalCode || "",
+          country: property.address?.country || "USA",
+          bedrooms: property.bedrooms?.toString() || "",
+          bathrooms: property.bathrooms?.toString() || "",
+          area: property.surfaceArea?.toString() || "",
+          yearBuilt: property.yearBuilt?.toString() || "",
+          parking: "",
           amenities: property.amenitiesList || [],
           images: [],
-          videoUrl: '',
+          videoUrl: "",
         });
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : 'Failed to load property';
+        const errorMsg = err instanceof Error ? err.message : "Failed to load property";
         setError(errorMsg);
-        console.error('[EditProperty] Failed to load:', err);
+        console.error("[EditProperty] Failed to load:", err);
       } finally {
         setLoading(false);
       }
@@ -93,12 +93,12 @@ export default function EditPropertyPage() {
   }, [id]);
 
   const updateFormData = (updates: Partial<PropertyFormData>) => {
-    setFormData(prev => ({ ...prev, ...updates }));
+    setFormData((prev) => ({ ...prev, ...updates }));
   };
 
   const handleSubmit = async () => {
     if (!id) {
-      setError('Property ID not found');
+      setError("Property ID not found");
       return;
     }
 
@@ -125,23 +125,23 @@ export default function EditPropertyPage() {
       };
 
       await propertiesService.updateProperty(id, propertyData);
-      navigate('/dashboard/my-properties');
+      navigate("/dashboard/my-properties");
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Failed to update property';
+      const errorMsg = err instanceof Error ? err.message : "Failed to update property";
       setError(errorMsg);
-      console.error('[EditProperty] Failed to submit:', err);
+      console.error("[EditProperty] Failed to submit:", err);
     } finally {
       setSubmitting(false);
     }
   };
 
   const amenitiesList = [
-    { id: 'pool', label: 'Swimming Pool' },
-    { id: 'gym', label: 'Gym' },
-    { id: 'garden', label: 'Garden' },
-    { id: 'garage', label: 'Garage' },
-    { id: 'balcony', label: 'Balcony' },
-    { id: 'ac', label: 'Air Conditioning' },
+    { id: "pool", label: "Swimming Pool" },
+    { id: "gym", label: "Gym" },
+    { id: "garden", label: "Garden" },
+    { id: "garage", label: "Garage" },
+    { id: "balcony", label: "Balcony" },
+    { id: "ac", label: "Air Conditioning" },
   ];
 
   const renderStepContent = () => {
@@ -188,8 +188,8 @@ export default function EditPropertyPage() {
                 <label className="flex items-center">
                   <input
                     type="radio"
-                    checked={formData.listingType === 'sale'}
-                    onChange={() => updateFormData({ listingType: 'sale' })}
+                    checked={formData.listingType === "sale"}
+                    onChange={() => updateFormData({ listingType: "sale" })}
                     className="mr-2"
                   />
                   For Sale
@@ -197,8 +197,8 @@ export default function EditPropertyPage() {
                 <label className="flex items-center">
                   <input
                     type="radio"
-                    checked={formData.listingType === 'rent'}
-                    onChange={() => updateFormData({ listingType: 'rent' })}
+                    checked={formData.listingType === "rent"}
+                    onChange={() => updateFormData({ listingType: "rent" })}
                     className="mr-2"
                   />
                   For Rent
@@ -335,7 +335,9 @@ export default function EditPropertyPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Parking Spaces</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Parking Spaces
+                </label>
                 <input
                   type="number"
                   value={formData.parking}
@@ -356,7 +358,9 @@ export default function EditPropertyPage() {
                         if (e.target.checked) {
                           updateFormData({ amenities: [...formData.amenities, amenity.id] });
                         } else {
-                          updateFormData({ amenities: formData.amenities.filter(a => a !== amenity.id) });
+                          updateFormData({
+                            amenities: formData.amenities.filter((a) => a !== amenity.id),
+                          });
                         }
                       }}
                       className="mr-2"
@@ -374,7 +378,9 @@ export default function EditPropertyPage() {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold mb-4">Media</h2>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Property Images</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Property Images
+              </label>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                 <p className="text-gray-600 mb-2">Drag and drop images here, or click to browse</p>
                 <input
@@ -389,16 +395,23 @@ export default function EditPropertyPage() {
                   className="hidden"
                   id="image-upload"
                 />
-                <label htmlFor="image-upload" className="cursor-pointer text-blue-600 hover:text-blue-700">
+                <label
+                  htmlFor="image-upload"
+                  className="cursor-pointer text-blue-600 hover:text-blue-700"
+                >
                   Browse Files
                 </label>
                 {formData.images.length > 0 && (
-                  <p className="mt-2 text-sm text-gray-600">{formData.images.length} file(s) selected</p>
+                  <p className="mt-2 text-sm text-gray-600">
+                    {formData.images.length} file(s) selected
+                  </p>
                 )}
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Video URL (optional)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Video URL (optional)
+              </label>
               <input
                 type="url"
                 value={formData.videoUrl}
@@ -415,13 +428,26 @@ export default function EditPropertyPage() {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold mb-4">Review & Save</h2>
             <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-              <p><strong>Title:</strong> {formData.title}</p>
-              <p><strong>Type:</strong> {formData.propertyType} for {formData.listingType}</p>
-              <p><strong>Price:</strong> ${formData.price}</p>
-              <p><strong>Location:</strong> {formData.street}, {formData.city}, {formData.state}</p>
-              <p><strong>Specs:</strong> {formData.bedrooms} bed, {formData.bathrooms} bath, {formData.area} sq ft</p>
+              <p>
+                <strong>Title:</strong> {formData.title}
+              </p>
+              <p>
+                <strong>Type:</strong> {formData.propertyType} for {formData.listingType}
+              </p>
+              <p>
+                <strong>Price:</strong> ${formData.price}
+              </p>
+              <p>
+                <strong>Location:</strong> {formData.street}, {formData.city}, {formData.state}
+              </p>
+              <p>
+                <strong>Specs:</strong> {formData.bedrooms} bed, {formData.bathrooms} bath,{" "}
+                {formData.area} sq ft
+              </p>
               {formData.amenities.length > 0 && (
-                <p><strong>Amenities:</strong> {formData.amenities.join(', ')}</p>
+                <p>
+                  <strong>Amenities:</strong> {formData.amenities.join(", ")}
+                </p>
               )}
             </div>
           </div>
@@ -453,63 +479,65 @@ export default function EditPropertyPage() {
         </div>
       )}
 
-        {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            {[1, 2, 3, 4, 5].map((step) => (
-              <div key={step} className="flex items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    currentStep >= step 
-                      ? 'bg-blue-600 dark:bg-blue-700 text-white' 
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-                  }`}
-                >
-                  {step}
-                </div>
-                {step < 5 && (
-                  <div
-                    className={`w-16 h-1 mx-2 ${
-                      currentStep > step ? 'bg-blue-600 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-700'
-                    }`}
-                  />
-                )}
+      {/* Progress Steps */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          {[1, 2, 3, 4, 5].map((step) => (
+            <div key={step} className="flex items-center">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  currentStep >= step
+                    ? "bg-blue-600 dark:bg-blue-700 text-white"
+                    : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                }`}
+              >
+                {step}
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Form Content */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          {renderStepContent()}
-
-          {/* Navigation */}
-          <div className="flex justify-between mt-6">
-            <button
-              onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
-              disabled={currentStep === 1}
-              className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Previous
-            </button>
-            {currentStep < 5 ? (
-              <button
-                onClick={() => setCurrentStep(prev => prev + 1)}
-                className="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600"
-              >
-                Next
-              </button>
-            ) : (
-              <button
-                onClick={handleSubmit}
-                disabled={submitting}
-                className="px-6 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {submitting ? 'Saving...' : 'Save Changes'}
-              </button>
-            )}
-          </div>
+              {step < 5 && (
+                <div
+                  className={`w-16 h-1 mx-2 ${
+                    currentStep > step
+                      ? "bg-blue-600 dark:bg-blue-700"
+                      : "bg-gray-200 dark:bg-gray-700"
+                  }`}
+                />
+              )}
+            </div>
+          ))}
         </div>
       </div>
+
+      {/* Form Content */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        {renderStepContent()}
+
+        {/* Navigation */}
+        <div className="flex justify-between mt-6">
+          <button
+            onClick={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
+            disabled={currentStep === 1}
+            className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          {currentStep < 5 ? (
+            <button
+              onClick={() => setCurrentStep((prev) => prev + 1)}
+              className="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600"
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              disabled={submitting}
+              className="px-6 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {submitting ? "Saving..." : "Save Changes"}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

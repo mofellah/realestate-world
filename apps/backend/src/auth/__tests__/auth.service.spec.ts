@@ -4,30 +4,30 @@
  */
 
 // Mock @boilerplate/config BEFORE other imports
-jest.mock('@boilerplate/config', () => ({
+jest.mock("@boilerplate/config", () => ({
   backendConfig: {
-    JWT_SECRET: 'test-secret',
-    DATABASE_URL: 'postgresql://test:test@localhost:5432/test_db',
-    BACKEND_URL: 'http://localhost:3000',
-    FRONTEND_URL: 'http://localhost:5173',
-    NODE_ENV: 'test',
+    JWT_SECRET: "test-secret",
+    DATABASE_URL: "postgresql://test:test@localhost:5432/test_db",
+    BACKEND_URL: "http://localhost:3000",
+    FRONTEND_URL: "http://localhost:5173",
+    NODE_ENV: "test",
   },
 }));
 
-import { UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { AuthService } from '../auth.service';
-import { PrismaService } from '../../prisma/prisma.service';
-import * as fixtures from './fixtures/auth.fixtures';
-import { comparePassword } from '@boilerplate/utils';
-import { backendConfig } from '@boilerplate/config';
+import { UnauthorizedException } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { AuthService } from "../auth.service";
+import { PrismaService } from "../../prisma/prisma.service";
+import * as fixtures from "./fixtures/auth.fixtures";
+import { comparePassword } from "@boilerplate/utils";
+import { backendConfig } from "@boilerplate/config";
 
 // Mock the utility functions
-jest.mock('@boilerplate/utils', () => ({
+jest.mock("@boilerplate/utils", () => ({
   comparePassword: jest.fn(),
 }));
 
-describe('AuthService', () => {
+describe("AuthService", () => {
   let service: AuthService;
   let prismaService: PrismaService;
   let jwtService: JwtService;
@@ -65,69 +65,91 @@ describe('AuthService', () => {
     jest.clearAllMocks();
   });
 
-  describe('login', () => {
-    it('should return LoginResponse with tokens on valid credentials', async () => {
+  describe("login", () => {
+    it("should return LoginResponse with tokens on valid credentials", async () => {
       // Arrange
       const loginRequest = fixtures.mockLoginRequest;
-      const correlationId = 'trace-123';
+      const correlationId = "trace-123";
 
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(fixtures.mockUserWithAdminRole as any);
+      jest
+        .spyOn(prismaService.user, "findUnique")
+        .mockResolvedValue(fixtures.mockUserWithAdminRole as any);
       (comparePassword as jest.Mock).mockResolvedValue(true);
-      jest.spyOn(jwtService, 'sign').mockReturnValueOnce('access-token').mockReturnValueOnce('refresh-token');
-      jest.spyOn(prismaService.refreshToken, 'create').mockResolvedValue({} as any);
+      jest
+        .spyOn(jwtService, "sign")
+        .mockReturnValueOnce("access-token")
+        .mockReturnValueOnce("refresh-token");
+      jest.spyOn(prismaService.refreshToken, "create").mockResolvedValue({} as any);
 
       // Act
       const result = await service.login(loginRequest, correlationId);
 
       // Assert
-      expect(result).toHaveProperty('accessToken');
-      expect(result).toHaveProperty('refreshToken');
-      expect(result).toHaveProperty('expiresIn');
-      expect(result).toHaveProperty('user');
-      expect(result.user.email).toBe('admin@example.com');
-      expect(result.user.id).toBe('user-123');
+      expect(result).toHaveProperty("accessToken");
+      expect(result).toHaveProperty("refreshToken");
+      expect(result).toHaveProperty("expiresIn");
+      expect(result).toHaveProperty("user");
+      expect(result.user.email).toBe("admin@example.com");
+      expect(result.user.id).toBe("user-123");
       expect(prismaService.user.findUnique).toHaveBeenCalledWith({
         where: { email: loginRequest.email },
       });
-      expect(comparePassword).toHaveBeenCalledWith(loginRequest.password, fixtures.mockUserWithAdminRole.passwordHash);
+      expect(comparePassword).toHaveBeenCalledWith(
+        loginRequest.password,
+        fixtures.mockUserWithAdminRole.passwordHash,
+      );
     });
 
-    it('should throw UnauthorizedException when user not found', async () => {
+    it("should throw UnauthorizedException when user not found", async () => {
       // Arrange
       const loginRequest = fixtures.mockLoginRequest;
-      const correlationId = 'trace-123';
+      const correlationId = "trace-123";
 
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null);
+      jest.spyOn(prismaService.user, "findUnique").mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.login(loginRequest, correlationId)).rejects.toThrow(UnauthorizedException);
+      await expect(service.login(loginRequest, correlationId)).rejects.toThrow(
+        UnauthorizedException,
+      );
       expect(prismaService.user.findUnique).toHaveBeenCalledWith({
         where: { email: loginRequest.email },
       });
     });
 
-    it('should throw UnauthorizedException when password is invalid', async () => {
+    it("should throw UnauthorizedException when password is invalid", async () => {
       // Arrange
       const loginRequest = fixtures.mockLoginRequest;
-      const correlationId = 'trace-123';
+      const correlationId = "trace-123";
 
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(fixtures.mockUserWithAdminRole as any);
+      jest
+        .spyOn(prismaService.user, "findUnique")
+        .mockResolvedValue(fixtures.mockUserWithAdminRole as any);
       (comparePassword as jest.Mock).mockResolvedValue(false);
 
       // Act & Assert
-      await expect(service.login(loginRequest, correlationId)).rejects.toThrow(UnauthorizedException);
-      expect(comparePassword).toHaveBeenCalledWith(loginRequest.password, fixtures.mockUserWithAdminRole.passwordHash);
+      await expect(service.login(loginRequest, correlationId)).rejects.toThrow(
+        UnauthorizedException,
+      );
+      expect(comparePassword).toHaveBeenCalledWith(
+        loginRequest.password,
+        fixtures.mockUserWithAdminRole.passwordHash,
+      );
     });
 
-    it('should include roles and permissions in JWT token', async () => {
+    it("should include roles and permissions in JWT token", async () => {
       // Arrange
       const loginRequest = fixtures.mockLoginRequest;
-      const correlationId = 'trace-123';
+      const correlationId = "trace-123";
 
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(fixtures.mockUserWithAdminRole as any);
+      jest
+        .spyOn(prismaService.user, "findUnique")
+        .mockResolvedValue(fixtures.mockUserWithAdminRole as any);
       (comparePassword as jest.Mock).mockResolvedValue(true);
-      jest.spyOn(jwtService, 'sign').mockReturnValueOnce('access-token').mockReturnValueOnce('refresh-token');
-      jest.spyOn(prismaService.refreshToken, 'create').mockResolvedValue({} as any);
+      jest
+        .spyOn(jwtService, "sign")
+        .mockReturnValueOnce("access-token")
+        .mockReturnValueOnce("refresh-token");
+      jest.spyOn(prismaService.refreshToken, "create").mockResolvedValue({} as any);
 
       // Act
       await service.login(loginRequest, correlationId);
@@ -135,9 +157,9 @@ describe('AuthService', () => {
       // Assert
       const signCalls = (jwtService.sign as jest.Mock).mock.calls;
       expect(signCalls[0][0]).toMatchObject({
-        sub: 'user-123',
-        email: 'admin@example.com',
-        roles: ['admin'],
+        sub: "user-123",
+        email: "admin@example.com",
+        roles: ["admin"],
         correlationId,
       });
       // Permissions are empty array for now (TODO: implement granular permissions)
@@ -145,79 +167,90 @@ describe('AuthService', () => {
     });
   });
 
-  describe('refreshToken', () => {
-    it('should return new TokenPair with valid refresh token', async () => {
+  describe("refreshToken", () => {
+    it("should return new TokenPair with valid refresh token", async () => {
       // Arrange
-      const refreshTokenString = 'refresh-token-string';
-      const correlationId = 'trace-123';
+      const refreshTokenString = "refresh-token-string";
+      const correlationId = "trace-123";
       const refreshTokenWithUser = {
         ...fixtures.mockRefreshToken,
         user: fixtures.mockUserWithAdminRole,
       };
 
-      jest.spyOn(prismaService.refreshToken, 'findUnique').mockResolvedValue(refreshTokenWithUser as any);
-      jest.spyOn(jwtService, 'sign').mockReturnValueOnce('new-access-token').mockReturnValueOnce('new-refresh-token');
-      jest.spyOn(prismaService.refreshToken, 'create').mockResolvedValue({} as any);
+      jest
+        .spyOn(prismaService.refreshToken, "findUnique")
+        .mockResolvedValue(refreshTokenWithUser as any);
+      jest
+        .spyOn(jwtService, "sign")
+        .mockReturnValueOnce("new-access-token")
+        .mockReturnValueOnce("new-refresh-token");
+      jest.spyOn(prismaService.refreshToken, "create").mockResolvedValue({} as any);
 
       // Act
       const result = await service.refreshToken(refreshTokenString, correlationId);
 
       // Assert
-      expect(result).toHaveProperty('accessToken');
-      expect(result).toHaveProperty('refreshToken');
-      expect(result).toHaveProperty('expiresIn');
-      expect(result.accessToken).toBe('new-access-token');
+      expect(result).toHaveProperty("accessToken");
+      expect(result).toHaveProperty("refreshToken");
+      expect(result).toHaveProperty("expiresIn");
+      expect(result.accessToken).toBe("new-access-token");
     });
 
-    it('should throw UnauthorizedException when refresh token not found', async () => {
+    it("should throw UnauthorizedException when refresh token not found", async () => {
       // Arrange
-      const refreshTokenString = 'invalid-token';
-      const correlationId = 'trace-123';
+      const refreshTokenString = "invalid-token";
+      const correlationId = "trace-123";
 
-      jest.spyOn(prismaService.refreshToken, 'findUnique').mockResolvedValue(null);
+      jest.spyOn(prismaService.refreshToken, "findUnique").mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.refreshToken(refreshTokenString, correlationId)).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshToken(refreshTokenString, correlationId)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
-    it('should throw UnauthorizedException when refresh token is revoked', async () => {
+    it("should throw UnauthorizedException when refresh token is revoked", async () => {
       // Arrange
-      const refreshTokenString = 'revoked-token';
-      const correlationId = 'trace-123';
+      const refreshTokenString = "revoked-token";
+      const correlationId = "trace-123";
       const revokedToken = {
         ...fixtures.mockRevokedRefreshToken,
         user: fixtures.mockUserWithAdminRole,
       };
 
-      jest.spyOn(prismaService.refreshToken, 'findUnique').mockResolvedValue(revokedToken as any);
+      jest.spyOn(prismaService.refreshToken, "findUnique").mockResolvedValue(revokedToken as any);
 
       // Act & Assert
-      await expect(service.refreshToken(refreshTokenString, correlationId)).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshToken(refreshTokenString, correlationId)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
-    it('should throw UnauthorizedException when refresh token is expired', async () => {
+    it("should throw UnauthorizedException when refresh token is expired", async () => {
       // Arrange
-      const refreshTokenString = 'expired-token';
-      const correlationId = 'trace-123';
+      const refreshTokenString = "expired-token";
+      const correlationId = "trace-123";
       const expiredToken = {
         ...fixtures.mockExpiredRefreshToken,
         user: fixtures.mockUserWithAdminRole,
       };
 
-      jest.spyOn(prismaService.refreshToken, 'findUnique').mockResolvedValue(expiredToken as any);
+      jest.spyOn(prismaService.refreshToken, "findUnique").mockResolvedValue(expiredToken as any);
 
       // Act & Assert
-      await expect(service.refreshToken(refreshTokenString, correlationId)).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshToken(refreshTokenString, correlationId)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 
-  describe('logout', () => {
-    it('should revoke all refresh tokens for user and return success', async () => {
+  describe("logout", () => {
+    it("should revoke all refresh tokens for user and return success", async () => {
       // Arrange
-      const userId = 'user-123';
-      const correlationId = 'trace-123';
+      const userId = "user-123";
+      const correlationId = "trace-123";
 
-      jest.spyOn(prismaService.refreshToken, 'updateMany').mockResolvedValue({ count: 2 });
+      jest.spyOn(prismaService.refreshToken, "updateMany").mockResolvedValue({ count: 2 });
 
       // Act
       const result = await service.logout(userId, correlationId);
@@ -235,12 +268,12 @@ describe('AuthService', () => {
       });
     });
 
-    it('should handle case with no refresh tokens to revoke', async () => {
+    it("should handle case with no refresh tokens to revoke", async () => {
       // Arrange
-      const userId = 'user-456';
-      const correlationId = 'trace-456';
+      const userId = "user-456";
+      const correlationId = "trace-456";
 
-      jest.spyOn(prismaService.refreshToken, 'updateMany').mockResolvedValue({ count: 0 });
+      jest.spyOn(prismaService.refreshToken, "updateMany").mockResolvedValue({ count: 0 });
 
       // Act
       const result = await service.logout(userId, correlationId);
@@ -251,13 +284,13 @@ describe('AuthService', () => {
     });
   });
 
-  describe('validateJwt', () => {
-    it('should decode and return JwtPayload on valid token', async () => {
+  describe("validateJwt", () => {
+    it("should decode and return JwtPayload on valid token", async () => {
       // Arrange
-      const token = 'valid-jwt-token';
+      const token = "valid-jwt-token";
       const payload = fixtures.mockJwtPayloadAdmin;
 
-      jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue(payload);
+      jest.spyOn(jwtService, "verifyAsync").mockResolvedValue(payload);
 
       // Act
       const result = await service.validateJwt(token);
@@ -269,21 +302,21 @@ describe('AuthService', () => {
       });
     });
 
-    it('should throw UnauthorizedException on invalid token', async () => {
+    it("should throw UnauthorizedException on invalid token", async () => {
       // Arrange
-      const token = 'invalid-jwt-token';
+      const token = "invalid-jwt-token";
 
-      jest.spyOn(jwtService, 'verifyAsync').mockRejectedValue(new Error('Invalid token'));
+      jest.spyOn(jwtService, "verifyAsync").mockRejectedValue(new Error("Invalid token"));
 
       // Act & Assert
       await expect(service.validateJwt(token)).rejects.toThrow(UnauthorizedException);
     });
 
-    it('should throw UnauthorizedException on expired token', async () => {
+    it("should throw UnauthorizedException on expired token", async () => {
       // Arrange
-      const token = 'expired-jwt-token';
+      const token = "expired-jwt-token";
 
-      jest.spyOn(jwtService, 'verifyAsync').mockRejectedValue(new Error('Token expired'));
+      jest.spyOn(jwtService, "verifyAsync").mockRejectedValue(new Error("Token expired"));
 
       // Act & Assert
       await expect(service.validateJwt(token)).rejects.toThrow(UnauthorizedException);

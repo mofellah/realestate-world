@@ -3,7 +3,7 @@
  * Handles all agency-related API calls (profile, portfolio, team, etc.)
  */
 
-import { apiClient } from './api-client';
+import { apiClient } from "./api-client";
 
 // ============================================================================
 // TYPES
@@ -11,7 +11,7 @@ import { apiClient } from './api-client';
 
 export interface AgencyRole {
   userId: string;
-  role: 'owner' | 'manager' | 'agent' | 'sales_manager' | 'support_agent';
+  role: "owner" | "manager" | "agent" | "sales_manager" | "support_agent";
   user?: {
     id: string;
     email: string;
@@ -21,7 +21,7 @@ export interface AgencyRole {
 export interface AgencyInfo {
   id: string;
   personId: string;
-  tier: 'basic' | 'pro' | 'premium';
+  tier: "basic" | "pro" | "premium";
   description?: string;
   profileImageUrl?: string;
   maxAgents?: number;
@@ -42,8 +42,8 @@ export interface AgencyInfo {
 export interface PropertyListing {
   id: string;
   propertyId: string;
-  type: 'sale' | 'rental' | 'short_term' | 'lease';
-  status: 'draft' | 'published' | 'paused' | 'expired';
+  type: "sale" | "rental" | "short_term" | "lease";
+  status: "draft" | "published" | "paused" | "expired";
   property?: {
     id: string;
     type: string;
@@ -71,7 +71,7 @@ export interface AgencyPortfolio {
 
 export interface CreateAgencyDto {
   personId: string;
-  tier?: 'basic' | 'pro' | 'premium';
+  tier?: "basic" | "pro" | "premium";
   description?: string;
   profileImageUrl?: string;
   maxAgents?: number;
@@ -88,7 +88,7 @@ export interface UpdateAgencyDto {
 
 export interface AddAgentDto {
   userId: string;
-  role: 'owner' | 'manager' | 'agent' | 'sales_manager' | 'support_agent';
+  role: "owner" | "manager" | "agent" | "sales_manager" | "support_agent";
 }
 
 // ============================================================================
@@ -100,7 +100,7 @@ class AgenciesService {
    * Create a new agency
    */
   async createAgency(data: CreateAgencyDto): Promise<AgencyInfo> {
-    return apiClient.post<AgencyInfo>('/agencies', data);
+    return apiClient.post<AgencyInfo>("/agencies", data);
   }
 
   /**
@@ -135,7 +135,9 @@ class AgenciesService {
    * Get agency portfolio (all listings)
    */
   async getPortfolio(agencyId: string, skip = 0, take = 20): Promise<AgencyPortfolio> {
-    return apiClient.get<AgencyPortfolio>(`/agencies/${agencyId}/portfolio?skip=${skip}&take=${take}`);
+    return apiClient.get<AgencyPortfolio>(
+      `/agencies/${agencyId}/portfolio?skip=${skip}&take=${take}`,
+    );
   }
 
   /**

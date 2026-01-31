@@ -108,7 +108,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
-          working-directory: apps/frontend
+          config-file: apps/frontend/cypress.config.ts
           wait-on: 'http://localhost:3000/health, http://localhost:4173'
           wait-on-timeout: 120
           record: false

@@ -2,12 +2,12 @@
  * Winston-based logger with structured JSON output
  */
 
-import winston from 'winston';
+import winston from "winston";
 
 /**
  * Log levels (from lowest to highest priority)
  */
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+export type LogLevel = "debug" | "info" | "warn" | "error";
 
 /**
  * Log metadata interface
@@ -29,31 +29,32 @@ export interface LogMeta {
  * @returns Winston logger instance
  */
 export function createLogger(
-  level: LogLevel = 'info',
+  level: LogLevel = "info",
   options: {
     service?: string;
     filePath?: string;
     enableConsole?: boolean;
   } = {},
 ) {
-  const { service = 'app', filePath, enableConsole = true } = options;
+  const { service = "app", filePath, enableConsole = true } = options;
 
   // Define log format
   const logFormat = winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
     winston.format.errors({ stack: true }),
     winston.format.json(),
   );
 
   // Console format with colors for development
   const consoleFormat = winston.format.combine(
-    winston.format.timestamp({ format: 'HH:mm:ss' }),
+    winston.format.timestamp({ format: "HH:mm:ss" }),
     winston.format.colorize(),
     winston.format.printf(({ timestamp, level, message, correlationId, ...meta }) => {
-      const metaStr = Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '';
-      const traceId = correlationId && typeof correlationId === 'string' 
-        ? `[${correlationId.substring(0, 8)}]` 
-        : '';
+      const metaStr = Object.keys(meta).length ? JSON.stringify(meta, null, 2) : "";
+      const traceId =
+        correlationId && typeof correlationId === "string"
+          ? `[${correlationId.substring(0, 8)}]`
+          : "";
       return `${timestamp} ${level} ${traceId} ${message} ${metaStr}`;
     }),
   );
@@ -65,7 +66,7 @@ export function createLogger(
   if (enableConsole) {
     transports.push(
       new winston.transports.Console({
-        format: process.env.NODE_ENV === 'production' ? logFormat : consoleFormat,
+        format: process.env.NODE_ENV === "production" ? logFormat : consoleFormat,
       }),
     );
   }
@@ -100,7 +101,7 @@ export class Logger {
   private defaultMeta: LogMeta;
 
   constructor(
-    level: LogLevel = 'info',
+    level: LogLevel = "info",
     options: {
       service?: string;
       filePath?: string;
@@ -171,11 +172,8 @@ export class Logger {
 /**
  * Default logger instance
  */
-export const logger = new Logger(
-  (process.env.LOG_LEVEL as LogLevel) || 'info',
-  {
-    service: process.env.SERVICE_NAME || 'app',
-    filePath: process.env.LOG_FILE_PATH,
-    enableConsole: true,
-  },
-);
+export const logger = new Logger((process.env.LOG_LEVEL as LogLevel) || "info", {
+  service: process.env.SERVICE_NAME || "app",
+  filePath: process.env.LOG_FILE_PATH,
+  enableConsole: true,
+});

@@ -1,7 +1,7 @@
 // Header component with navigation
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import ThemeToggle from './ThemeToggle';
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -9,7 +9,7 @@ export default function Header() {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -42,15 +42,12 @@ export default function Header() {
             <ThemeToggle />
             {isAuthenticated && user ? (
               <>
-                <Link 
-                  to="/dashboard" 
-                  className="text-gray-700 hover:text-blue-600 font-medium"
-                >
+                <Link to="/dashboard" className="text-gray-700 hover:text-blue-600 font-medium">
                   Dashboard
                 </Link>
                 <div className="flex items-center space-x-3">
                   <img
-                    src={user.avatarUrl || 'https://via.placeholder.com/40'}
+                    src={user.avatarUrl || "https://via.placeholder.com/40"}
                     alt={user.email}
                     className="w-10 h-10 rounded-full"
                   />
@@ -64,14 +61,14 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link 
-                  to="/login" 
+                <Link
+                  to="/login"
                   className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600"
                 >
                   Sign In
                 </Link>
-                <Link 
-                  to="/register" 
+                <Link
+                  to="/register"
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                 >
                   Get Started

@@ -5,18 +5,18 @@
 
 interface SkeletonProps {
   className?: string;
-  variant?: 'text' | 'title' | 'card' | 'avatar' | 'image';
+  variant?: "text" | "title" | "card" | "avatar" | "image";
 }
 
-export function Skeleton({ className = '', variant = 'text' }: SkeletonProps) {
-  const baseClasses = 'animate-pulse bg-gray-200 dark:bg-gray-700 rounded';
-  
+export function Skeleton({ className = "", variant = "text" }: SkeletonProps) {
+  const baseClasses = "animate-pulse bg-gray-200 dark:bg-gray-700 rounded";
+
   const variantClasses: Record<string, string> = {
-    text: 'h-4 w-full',
-    title: 'h-6 w-3/4',
-    card: 'h-48 w-full',
-    avatar: 'h-12 w-12 rounded-full',
-    image: 'h-80 w-full',
+    text: "h-4 w-full",
+    title: "h-6 w-3/4",
+    card: "h-48 w-full",
+    avatar: "h-12 w-12 rounded-full",
+    image: "h-80 w-full",
   };
 
   return <div className={`${baseClasses} ${variantClasses[variant]} ${className}`} />;

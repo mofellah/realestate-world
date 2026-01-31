@@ -3,12 +3,12 @@
  * Tests for role-based access control and authorization
  */
 
-import { Test, TestingModule } from '@nestjs/testing';
-import { ExecutionContext, ForbiddenException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { RolesGuard } from '../guards/roles.guard';
+import { Test, TestingModule } from "@nestjs/testing";
+import { ExecutionContext, ForbiddenException } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { RolesGuard } from "../guards/roles.guard";
 
-describe('RolesGuard', () => {
+describe("RolesGuard", () => {
   let guard: RolesGuard;
   let reflector: Reflector;
 
@@ -39,10 +39,7 @@ describe('RolesGuard', () => {
   /**
    * Helper to create a mock ExecutionContext
    */
-  const createMockExecutionContext = (
-    request: any,
-    requiredRoles?: string[],
-  ): ExecutionContext => {
+  const createMockExecutionContext = (request: any, requiredRoles?: string[]): ExecutionContext => {
     const mockContext = {
       switchToHttp: jest.fn().mockReturnValue({
         getRequest: jest.fn().mockReturnValue(request),
@@ -52,8 +49,8 @@ describe('RolesGuard', () => {
     } as unknown as ExecutionContext;
 
     // Mock reflector for this context
-    jest.spyOn(reflector, 'getAllAndOverride').mockImplementation((key: unknown) => {
-      if (key === 'roles') {
+    jest.spyOn(reflector, "getAllAndOverride").mockImplementation((key: unknown) => {
+      if (key === "roles") {
         return requiredRoles || [];
       }
       return undefined;
@@ -62,18 +59,18 @@ describe('RolesGuard', () => {
     return mockContext;
   };
 
-  describe('canActivate', () => {
-    it('should return true if user has required role', () => {
+  describe("canActivate", () => {
+    it("should return true if user has required role", () => {
       // Arrange
       const mockRequest = {
         user: {
-          id: 'user-123',
-          roles: ['admin'],
-          correlationId: 'trace-123',
+          id: "user-123",
+          roles: ["admin"],
+          correlationId: "trace-123",
         },
-        correlationId: 'trace-123',
+        correlationId: "trace-123",
       };
-      const requiredRoles = ['admin'];
+      const requiredRoles = ["admin"];
       const context = createMockExecutionContext(mockRequest, requiredRoles);
 
       // Act
@@ -83,17 +80,17 @@ describe('RolesGuard', () => {
       expect(result).toBe(true);
     });
 
-    it('should return true if user has multiple roles including required role', () => {
+    it("should return true if user has multiple roles including required role", () => {
       // Arrange
       const mockRequest = {
         user: {
-          id: 'user-123',
-          roles: ['user', 'admin', 'moderator'],
-          correlationId: 'trace-123',
+          id: "user-123",
+          roles: ["user", "admin", "moderator"],
+          correlationId: "trace-123",
         },
-        correlationId: 'trace-123',
+        correlationId: "trace-123",
       };
-      const requiredRoles = ['admin'];
+      const requiredRoles = ["admin"];
       const context = createMockExecutionContext(mockRequest, requiredRoles);
 
       // Act
@@ -103,15 +100,15 @@ describe('RolesGuard', () => {
       expect(result).toBe(true);
     });
 
-    it('should return true if no roles required (public endpoint)', () => {
+    it("should return true if no roles required (public endpoint)", () => {
       // Arrange
       const mockRequest = {
         user: {
-          id: 'user-123',
-          roles: ['user'],
-          correlationId: 'trace-123',
+          id: "user-123",
+          roles: ["user"],
+          correlationId: "trace-123",
         },
-        correlationId: 'trace-123',
+        correlationId: "trace-123",
       };
       const context = createMockExecutionContext(mockRequest, undefined);
 
@@ -122,68 +119,68 @@ describe('RolesGuard', () => {
       expect(result).toBe(true);
     });
 
-    it('should throw ForbiddenException if user lacks required role', () => {
+    it("should throw ForbiddenException if user lacks required role", () => {
       // Arrange
       const mockRequest = {
         user: {
-          id: 'user-123',
-          roles: ['user'],
-          correlationId: 'trace-123',
+          id: "user-123",
+          roles: ["user"],
+          correlationId: "trace-123",
         },
-        correlationId: 'trace-123',
+        correlationId: "trace-123",
       };
-      const requiredRoles = ['admin'];
+      const requiredRoles = ["admin"];
       const context = createMockExecutionContext(mockRequest, requiredRoles);
 
       // Act & Assert
       expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
     });
 
-    it('should throw ForbiddenException if user has no roles but admin required', () => {
+    it("should throw ForbiddenException if user has no roles but admin required", () => {
       // Arrange
       const mockRequest = {
         user: {
-          id: 'user-123',
+          id: "user-123",
           roles: [],
-          correlationId: 'trace-123',
+          correlationId: "trace-123",
         },
-        correlationId: 'trace-123',
+        correlationId: "trace-123",
       };
-      const requiredRoles = ['admin'];
+      const requiredRoles = ["admin"];
       const context = createMockExecutionContext(mockRequest, requiredRoles);
 
       // Act & Assert
       expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
     });
 
-    it('should throw ForbiddenException if user has one required role but not other', () => {
+    it("should throw ForbiddenException if user has one required role but not other", () => {
       // Arrange
       const mockRequest = {
         user: {
-          id: 'user-123',
-          roles: ['user'],
-          correlationId: 'trace-123',
+          id: "user-123",
+          roles: ["user"],
+          correlationId: "trace-123",
         },
-        correlationId: 'trace-123',
+        correlationId: "trace-123",
       };
-      const requiredRoles = ['admin', 'moderator'];
+      const requiredRoles = ["admin", "moderator"];
       const context = createMockExecutionContext(mockRequest, requiredRoles);
 
       // Act & Assert
       expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
     });
 
-    it('should return true if user has one of multiple required roles', () => {
+    it("should return true if user has one of multiple required roles", () => {
       // Arrange
       const mockRequest = {
         user: {
-          id: 'user-123',
-          roles: ['moderator'],
-          correlationId: 'trace-123',
+          id: "user-123",
+          roles: ["moderator"],
+          correlationId: "trace-123",
         },
-        correlationId: 'trace-123',
+        correlationId: "trace-123",
       };
-      const requiredRoles = ['admin', 'moderator'];
+      const requiredRoles = ["admin", "moderator"];
       const context = createMockExecutionContext(mockRequest, requiredRoles);
 
       // Act
@@ -193,71 +190,71 @@ describe('RolesGuard', () => {
       expect(result).toBe(true);
     });
 
-    it('should throw ForbiddenException if no user found', () => {
+    it("should throw ForbiddenException if no user found", () => {
       // Arrange
       const mockRequest = {
         user: null,
-        correlationId: 'trace-123',
+        correlationId: "trace-123",
       };
-      const requiredRoles = ['admin'];
+      const requiredRoles = ["admin"];
       const context = createMockExecutionContext(mockRequest, requiredRoles);
 
       // Act & Assert
       expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
     });
 
-    it('should include message with required roles in ForbiddenException', () => {
+    it("should include message with required roles in ForbiddenException", () => {
       // Arrange
       const mockRequest = {
         user: {
-          id: 'user-123',
-          roles: ['user'],
-          correlationId: 'trace-123',
+          id: "user-123",
+          roles: ["user"],
+          correlationId: "trace-123",
         },
-        correlationId: 'trace-123',
+        correlationId: "trace-123",
       };
-      const requiredRoles = ['admin', 'moderator'];
+      const requiredRoles = ["admin", "moderator"];
       const context = createMockExecutionContext(mockRequest, requiredRoles);
 
       // Act & Assert
       try {
         guard.canActivate(context);
-        fail('Should have thrown ForbiddenException');
+        fail("Should have thrown ForbiddenException");
       } catch (error: any) {
         expect(error).toBeInstanceOf(ForbiddenException);
-        expect(error.message).toContain('admin');
-        expect(error.message).toContain('moderator');
+        expect(error.message).toContain("admin");
+        expect(error.message).toContain("moderator");
       }
     });
 
-    it('should handle undefined roles in user object', () => {
+    it("should handle undefined roles in user object", () => {
       // Arrange
       const mockRequest = {
         user: {
-          id: 'user-123',
+          id: "user-123",
           roles: undefined,
-          correlationId: 'trace-123',
+          correlationId: "trace-123",
         },
-        correlationId: 'trace-123',
+        correlationId: "trace-123",
       };
-      const requiredRoles = ['admin'];
+      const requiredRoles = ["admin"];
       const context = createMockExecutionContext(mockRequest, requiredRoles);
 
       // Act & Assert
       expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
     });
 
-    it('should handle case sensitivity correctly', () => {
+    it("should handle case sensitivity correctly", () => {
       // Arrange
       const mockRequest = {
         user: {
-          id: 'user-123',
-          roles: ['Admin'], // Different case
-          correlationId: 'trace-123',
+          id: "user-123",
+          roles: ["Admin"], // Different case
+          correlationId: "trace-123",
         },
-        correlationId: 'trace-123',
+        correlationId: "trace-123",
       };
-      const requiredRoles = ['admin']; // lowercase
+      const requiredRoles = ["admin"]; // lowercase
       const context = createMockExecutionContext(mockRequest, requiredRoles);
 
       // Act & Assert
@@ -265,15 +262,15 @@ describe('RolesGuard', () => {
       expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
     });
 
-    it('should return true when empty roles required array', () => {
+    it("should return true when empty roles required array", () => {
       // Arrange
       const mockRequest = {
         user: {
-          id: 'user-123',
-          roles: ['user'],
-          correlationId: 'trace-123',
+          id: "user-123",
+          roles: ["user"],
+          correlationId: "trace-123",
         },
-        correlationId: 'trace-123',
+        correlationId: "trace-123",
       };
       const requiredRoles: string[] = [];
       const context = createMockExecutionContext(mockRequest, requiredRoles);

@@ -3,21 +3,21 @@
  * Provides mock implementations of authentication methods for testing
  */
 
-import type { LoginResponse, RegisterResponse } from '@boilerplate/types';
+import type { LoginResponse, RegisterResponse } from "@boilerplate/types";
 
 const defaultLoginResponse: LoginResponse = {
-  accessToken: 'token',
-  refreshToken: 'refresh',
+  accessToken: "token",
+  refreshToken: "refresh",
 };
 
 const defaultRegisterResponse: RegisterResponse = {
-  accessToken: 'token',
-  refreshToken: 'refresh',
+  accessToken: "token",
+  refreshToken: "refresh",
   expiresIn: 900,
   user: {
-    id: 'user-id',
-    email: 'test@example.com',
-    name: 'Test User',
+    id: "user-id",
+    email: "test@example.com",
+    name: "Test User",
     isActive: true,
     createdAt: new Date(),
     updatedAt: new Date(),

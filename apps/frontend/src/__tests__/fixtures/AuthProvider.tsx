@@ -3,14 +3,14 @@
  * Wrapper component that provides mock authentication context in tests
  */
 
-import React from 'react';
+import React from "react";
 
 export const mockAuthContext = {
   user: {
-    id: 'test-user-id',
-    email: 'test@example.com',
-    name: 'Test User',
-    role: 'user' as const,
+    id: "test-user-id",
+    email: "test@example.com",
+    name: "Test User",
+    role: "user" as const,
     isActive: true,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

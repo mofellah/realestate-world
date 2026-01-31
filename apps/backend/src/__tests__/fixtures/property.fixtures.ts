@@ -1,6 +1,6 @@
 /**
  * Property Test Fixtures
- * 
+ *
  * Provides factory functions to create mock property and address data for tests.
  * Used for testing property-related services and controllers.
  */
@@ -52,14 +52,14 @@ type Address = {
 export function createMockAddress(overrides?: Partial<Address>): Address {
   const now = new Date();
   return {
-    id: 'addr-' + Math.random().toString(36).substring(7),
-    streetName: 'Test Street',
-    streetNumber: '123',
+    id: "addr-" + Math.random().toString(36).substring(7),
+    streetName: "Test Street",
+    streetNumber: "123",
     unit: null,
-    postalCode: '1000',
-    city: 'Brussels',
-    region: 'Brussel',
-    country_code: 'BE',
+    postalCode: "1000",
+    city: "Brussels",
+    region: "Brussel",
+    country_code: "BE",
     geoObjectId: null,
     metadata: null,
     createdAt: now,
@@ -80,24 +80,24 @@ export function createMockProperty(
   userId: string,
   ownerPersonId: string,
   addressId: string,
-  overrides?: Partial<Property>
+  overrides?: Partial<Property>,
 ): Property {
   const now = new Date();
   return {
-    id: 'prop-' + Math.random().toString(36).substring(7),
-    title: 'Test Property',
-    description: 'A test property for unit tests',
+    id: "prop-" + Math.random().toString(36).substring(7),
+    title: "Test Property",
+    description: "A test property for unit tests",
     addressId: addressId,
     ownerPersonId: ownerPersonId,
     userId: userId,
     ownerDocumentUrl: null,
-    propertyType: 'house',
+    propertyType: "house",
     bedrooms: 3,
     bathrooms: 2,
     surfaceArea: 150,
     gardenSize: 50,
     yearBuilt: 2015,
-    amenitiesList: ['garage', 'garden'],
+    amenitiesList: ["garage", "garden"],
     metadata: null,
     parentPropertyId: null,
     isAvailable: true,
@@ -121,7 +121,7 @@ export function createMockProperties(
   ownerPersonId: string,
   addressId: string,
   count: number,
-  overrides?: Partial<Property>
+  overrides?: Partial<Property>,
 ): Property[] {
   return Array.from({ length: count }, (_, i) =>
     createMockProperty(userId, ownerPersonId, addressId, {
@@ -144,10 +144,10 @@ export function createMockApartment(
   userId: string,
   ownerPersonId: string,
   addressId: string,
-  overrides?: Partial<Property>
+  overrides?: Partial<Property>,
 ): Property {
   return createMockProperty(userId, ownerPersonId, addressId, {
-    propertyType: 'apartment',
+    propertyType: "apartment",
     gardenSize: 0,
     ...overrides,
   });
@@ -165,10 +165,10 @@ export function createMockHouse(
   userId: string,
   ownerPersonId: string,
   addressId: string,
-  overrides?: Partial<Property>
+  overrides?: Partial<Property>,
 ): Property {
   return createMockProperty(userId, ownerPersonId, addressId, {
-    propertyType: 'house',
+    propertyType: "house",
     gardenSize: 100,
     ...overrides,
   });

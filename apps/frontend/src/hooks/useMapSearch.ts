@@ -3,22 +3,24 @@
  * Spatial property search with PostGIS queries
  */
 
-import { useState, useCallback } from 'react';
-import { apiClient } from '@/services/api-client';
-import type { PropertyFilters } from '@/components/Map/FilterPanel';
+import { useState, useCallback } from "react";
+import { apiClient } from "@/services/api-client";
+import type { PropertyFilters } from "@/components/Map/FilterPanel";
 
 interface Property {
   id: string;
   title: string;
   description?: string;
-  address: {
-    latitude?: number;
-    longitude?: number;
-    street?: string;
-    streetName?: string;
-    city: string;
-    country_code?: string;
-  } | string; // Can be string or object
+  address:
+    | {
+        latitude?: number;
+        longitude?: number;
+        street?: string;
+        streetName?: string;
+        city: string;
+        country_code?: string;
+      }
+    | string; // Can be string or object
   propertyType?: string;
   bedrooms?: number;
   bathrooms?: number;
@@ -45,32 +47,32 @@ export function useMapSearch() {
     try {
       // Build query params
       const params = new URLSearchParams();
-      
-      if (filters.priceMin) params.append('priceMin', filters.priceMin.toString());
-      if (filters.priceMax) params.append('priceMax', filters.priceMax.toString());
-      if (filters.propertyType) params.append('type', filters.propertyType);
-      if (filters.bedrooms) params.append('bedrooms', filters.bedrooms.toString());
-      if (filters.bathrooms) params.append('bathrooms', filters.bathrooms.toString());
-      
+
+      if (filters.priceMin) params.append("priceMin", filters.priceMin.toString());
+      if (filters.priceMax) params.append("priceMax", filters.priceMax.toString());
+      if (filters.propertyType) params.append("type", filters.propertyType);
+      if (filters.bedrooms) params.append("bedrooms", filters.bedrooms.toString());
+      if (filters.bathrooms) params.append("bathrooms", filters.bathrooms.toString());
+
       // Spatial filter (PostGIS ST_DWithin)
       if (filters.radius && center) {
-        params.append('latitude', center[1].toString());
-        params.append('longitude', center[0].toString());
-        params.append('radius', (filters.radius * 1000).toString()); // km to meters
+        params.append("latitude", center[1].toString());
+        params.append("longitude", center[0].toString());
+        params.append("radius", (filters.radius * 1000).toString()); // km to meters
       }
 
       const url = `/properties/search?${params.toString()}`;
-      console.log('[useMapSearch] Fetching from:', url);
-      
+      console.log("[useMapSearch] Fetching from:", url);
+
       const response = await apiClient.get<SearchResult>(url);
-      
-      console.log('[useMapSearch] Response received:', response);
-      
+
+      console.log("[useMapSearch] Response received:", response);
+
       setProperties(response.properties);
       setTotal(response.total);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Search failed';
-      console.error('[useMapSearch] Error:', errorMessage);
+      const errorMessage = err instanceof Error ? err.message : "Search failed";
+      console.error("[useMapSearch] Error:", errorMessage);
       setError(errorMessage);
       setProperties([]);
       setTotal(0);

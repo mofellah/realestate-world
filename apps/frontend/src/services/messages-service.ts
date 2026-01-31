@@ -3,7 +3,7 @@
  * Handles all messaging-related API calls (send, inbox, threads, etc.)
  */
 
-import { apiClient } from './api-client';
+import { apiClient } from "./api-client";
 
 // ============================================================================
 // TYPES
@@ -16,7 +16,7 @@ export interface Message {
   subject_line?: string;
   body: string;
   isRead: boolean;
-  messageType: 'inquiry' | 'response';
+  messageType: "inquiry" | "response";
   threadId?: string;
   subjectId?: string;
   createdAt: string;
@@ -48,7 +48,7 @@ export interface CreateMessageDto {
   recipientId: string;
   subject_line?: string;
   body: string;
-  messageType?: 'inquiry' | 'response';
+  messageType?: "inquiry" | "response";
   threadId?: string;
   subjectId?: string;
 }
@@ -70,7 +70,7 @@ class MessagesService {
    * Send a new message
    */
   async sendMessage(data: CreateMessageDto): Promise<Message> {
-    return apiClient.post<Message>('/messages', data);
+    return apiClient.post<Message>("/messages", data);
   }
 
   /**
@@ -78,16 +78,16 @@ class MessagesService {
    */
   async getMessages(params?: QueryMessagesDto): Promise<Message[]> {
     const queryString = new URLSearchParams();
-    
-    if (params?.threadId) queryString.append('threadId', params.threadId);
-    if (params?.isRead !== undefined) queryString.append('isRead', params.isRead.toString());
-    if (params?.subjectId) queryString.append('subjectId', params.subjectId);
-    if (params?.skip !== undefined) queryString.append('skip', params.skip.toString());
-    if (params?.take !== undefined) queryString.append('take', params.take.toString());
+
+    if (params?.threadId) queryString.append("threadId", params.threadId);
+    if (params?.isRead !== undefined) queryString.append("isRead", params.isRead.toString());
+    if (params?.subjectId) queryString.append("subjectId", params.subjectId);
+    if (params?.skip !== undefined) queryString.append("skip", params.skip.toString());
+    if (params?.take !== undefined) queryString.append("take", params.take.toString());
 
     const query = queryString.toString();
-    const endpoint = query ? `/messages?${query}` : '/messages';
-    
+    const endpoint = query ? `/messages?${query}` : "/messages";
+
     const response = await apiClient.get<{ messages: Message[]; total: number }>(endpoint);
     return response.messages || [];
   }
@@ -117,7 +117,9 @@ class MessagesService {
    * Get inbox (unread messages grouped by thread)
    */
   async getInbox(skip = 0, take = 20): Promise<Message[]> {
-    const response = await apiClient.get<{ messages: Message[]; total: number }>(`/messages?isRead=false&skip=${skip}&take=${take}`);
+    const response = await apiClient.get<{ messages: Message[]; total: number }>(
+      `/messages?isRead=false&skip=${skip}&take=${take}`,
+    );
     return response.messages || [];
   }
 }
