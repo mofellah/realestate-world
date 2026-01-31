@@ -139,8 +139,6 @@ export default function MapView({
     // Clear existing markers
     source.clear();
 
-    console.log(`[MapView] Adding ${properties.length} properties to map`);
-
     // Add markers for properties that have location data
     const features = properties
       .filter((property) => {
@@ -189,7 +187,6 @@ export default function MapView({
       })
       .filter((f) => f !== null) as Feature<Point>[];
 
-    console.log(`[MapView] Added ${features.length} markers to map`);
     source.addFeatures(features);
   }, [propertyMarkersLayer, properties]);
 
