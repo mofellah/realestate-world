@@ -20,6 +20,7 @@ import {
   ApiQuery,
 } from "@nestjs/swagger";
 import { ListingsService } from "./listings.service";
+import { ListingUseCasesService } from "../use-cases/listing.use-cases.service";
 import { JwtGuard } from "../auth/guards/jwt.guard";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { JwtPayload } from "@boilerplate/types";
@@ -30,7 +31,10 @@ import { CreateListingDto, UpdateListingDto } from "./dto/listing.dto";
 @UseGuards(JwtGuard)
 @ApiBearerAuth("JWT-auth")
 export class ListingsController {
-  constructor(private listingsService: ListingsService) {}
+  constructor(
+    private listingsService: ListingsService,
+    private listingUseCases: ListingUseCasesService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -39,7 +43,7 @@ export class ListingsController {
   @ApiResponse({ status: 400, description: "Invalid input data" })
   @ApiResponse({ status: 403, description: "Not the property owner" })
   async create(@Body() dto: CreateListingDto, @CurrentUser() user: JwtPayload) {
-    return this.listingsService.create(user.sub, dto);
+    return this.listingUseCases.create(user.sub, dto);
   }
 
   @Get()

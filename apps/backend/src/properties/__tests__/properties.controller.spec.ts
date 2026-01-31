@@ -3,6 +3,8 @@
  */
 import { PropertiesController } from "../properties.controller";
 import { PropertiesService } from "../properties.service";
+import { PropertyUseCasesService } from "../../use-cases/property.use-cases.service";
+import { OwnerContactUseCasesService } from "../../use-cases/owner-contact.use-cases.service";
 
 const makeService = () => ({
   create: jest.fn(),
@@ -16,29 +18,42 @@ const makeService = () => ({
 describe("PropertiesController", () => {
   let controller: PropertiesController;
   let service: ReturnType<typeof makeService>;
+  let propertyUseCases: { create: jest.Mock; search: jest.Mock };
+  let ownerContactUseCases: { contactOwner: jest.Mock };
 
   beforeEach(() => {
     service = makeService();
-    controller = new PropertiesController(service as unknown as PropertiesService);
+    propertyUseCases = {
+      create: jest.fn(),
+      search: jest.fn(),
+    };
+    ownerContactUseCases = {
+      contactOwner: jest.fn(),
+    };
+    controller = new PropertiesController(
+      service as unknown as PropertiesService,
+      propertyUseCases as unknown as PropertyUseCasesService,
+      ownerContactUseCases as unknown as OwnerContactUseCasesService,
+    );
   });
 
   it("should create property", async () => {
     const dto = { addressId: "addr-1" } as any;
     const user = { sub: "user-1" } as any;
-    service.create.mockResolvedValue({ id: "prop-1" });
+    propertyUseCases.create.mockResolvedValue({ id: "prop-1" });
 
     await controller.create(dto, user);
 
-    expect(service.create).toHaveBeenCalledWith("user-1", dto);
+    expect(propertyUseCases.create).toHaveBeenCalledWith("user-1", dto);
   });
 
   it("should search properties", async () => {
     const filters = { city: "Berlin" } as any;
-    service.search.mockResolvedValue([]);
+    propertyUseCases.search.mockResolvedValue([]);
 
     await controller.search(filters);
 
-    expect(service.search).toHaveBeenCalledWith(filters);
+    expect(propertyUseCases.search).toHaveBeenCalledWith(filters);
   });
 
   it("should find all properties for user", async () => {

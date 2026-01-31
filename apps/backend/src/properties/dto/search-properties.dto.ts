@@ -26,11 +26,11 @@ export class SearchPropertiesDto {
   // Property type filter
   @ApiPropertyOptional({
     description: "Property type",
-    enum: ["house", "apartment", "condo", "land", "commercial", "other"],
+    enum: ["studio", "house", "apartment", "villa", "land", "room", "commercial", "other"],
   })
   @IsOptional()
   @IsString()
-  @IsIn(["house", "apartment", "condo", "land", "commercial", "other"])
+  @IsIn(["studio", "house", "apartment", "villa", "land", "room", "commercial", "other"])
   type?: string;
 
   // Bedrooms/Bathrooms filter

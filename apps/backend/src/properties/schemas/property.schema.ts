@@ -5,7 +5,16 @@
 
 import { z } from "zod";
 
-export const PropertyTypeEnum = z.enum(["house", "apartment", "condo", "land", "commercial"]);
+export const PropertyTypeEnum = z.enum([
+  "studio",
+  "house",
+  "apartment",
+  "villa",
+  "land",
+  "room",
+  "commercial",
+  "other",
+]);
 
 /**
  * Create Property Schema

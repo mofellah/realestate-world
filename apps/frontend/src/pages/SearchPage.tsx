@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import MapView from "@/components/Map/MapView";
 import FilterPanel, { PropertyFilters } from "@/components/Map/FilterPanel";
 import { useMapSearch } from "@/hooks/useMapSearch";
 import { PropertyCardSkeleton } from "@/components/Skeleton";
 
 export default function SearchPage() {
+  const navigate = useNavigate();
   const { properties, total, loading, search, error } = useMapSearch();
   const [filters, setFilters] = useState<PropertyFilters>({});
   const [viewMode, setViewMode] = useState<"map" | "list">("list");
@@ -33,6 +34,10 @@ export default function SearchPage() {
     if (filters.bedrooms) params.set("bedrooms", filters.bedrooms.toString());
 
     window.history.pushState({}, "", `?${params.toString()}`);
+  };
+
+  const handlePropertyClick = (property: any) => {
+    navigate(`/property/${property.id}`);
   };
 
   return (
@@ -107,7 +112,12 @@ export default function SearchPage() {
                 className="bg-white rounded-lg shadow-md overflow-hidden"
                 style={{ height: "600px" }}
               >
-                <MapView center={center} zoom={12} properties={properties} />
+                <MapView
+                  center={center}
+                  zoom={12}
+                  properties={properties}
+                  onPropertyClick={handlePropertyClick}
+                />
               </div>
             )}
 

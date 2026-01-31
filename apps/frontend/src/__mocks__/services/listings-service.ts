@@ -20,7 +20,7 @@ const defaultListing: Listing = {
 
 export const listingsService = {
   createListing: jest.fn().mockResolvedValue(defaultListing),
-  getMyListings: jest.fn().mockResolvedValue([defaultListing]),
+  getMyListings: jest.fn().mockResolvedValue({ listings: [defaultListing], total: 1 }),
   getListing: jest.fn().mockResolvedValue(defaultListing),
   updateListing: jest.fn().mockResolvedValue(defaultListing),
   deleteListing: jest.fn().mockResolvedValue(undefined),

@@ -16,8 +16,11 @@ interface Property {
 
 interface ListingFormData {
   propertyId: string;
-  type: "sale" | "rent" | "airbnb" | "lease";
+  type: "sale" | "rental" | "short_term" | "lease";
   status: "draft" | "published";
+  price: string;
+  currency: string;
+  periodType?: string;
 }
 
 export default function CreateListingPage() {
@@ -32,6 +35,9 @@ export default function CreateListingPage() {
     propertyId: "",
     type: "sale",
     status: "draft",
+    price: "",
+    currency: "EUR",
+    periodType: "monthly",
   });
 
   useEffect(() => {
@@ -64,12 +70,22 @@ export default function CreateListingPage() {
       return;
     }
 
+    if (!formData.price || Number(formData.price) <= 0) {
+      setError("Please enter a valid price");
+      return;
+    }
+
     try {
       setSubmitting(true);
       setError(null);
       setSuccess(null);
 
-      const submissionData = statusOverride ? { ...formData, status: statusOverride } : formData;
+      const submissionData = {
+        ...formData,
+        status: statusOverride || formData.status,
+        price: Number(formData.price),
+        periodType: formData.type === "sale" ? undefined : formData.periodType,
+      };
       await listingsService.createListing(submissionData);
 
       setSuccess("Listing created successfully!");
@@ -87,6 +103,16 @@ export default function CreateListingPage() {
 
   const updateFormData = (updates: Partial<ListingFormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
+  };
+
+  const handleTypeChange = (value: ListingFormData["type"]) => {
+    const nextPeriodType =
+      value === "short_term" ? "per_night" : value === "sale" ? undefined : "monthly";
+    setFormData((prev) => ({
+      ...prev,
+      type: value,
+      periodType: nextPeriodType,
+    }));
   };
 
   const selectedProperty = properties.find((p) => p.id === formData.propertyId);
@@ -156,12 +182,12 @@ export default function CreateListingPage() {
           <select
             data-testid="listing-type-select"
             value={formData.type}
-            onChange={(e) => updateFormData({ type: e.target.value as any })}
+            onChange={(e) => handleTypeChange(e.target.value as ListingFormData["type"])}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="sale">Sale</option>
-            <option value="rent">Rent</option>
-            <option value="airbnb">Airbnb</option>
+            <option value="rental">Rental</option>
+            <option value="short_term">Short term</option>
             <option value="lease">Lease</option>
           </select>
         </div>
@@ -174,9 +200,27 @@ export default function CreateListingPage() {
             type="number"
             placeholder="Enter price"
             required
+            value={formData.price}
+            onChange={(e) => updateFormData({ price: e.target.value })}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
+
+        {/* Period Type (for recurring listings) */}
+        {formData.type !== "sale" && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Billing Period</label>
+            <select
+              value={formData.periodType}
+              onChange={(e) => updateFormData({ periodType: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="monthly">Monthly</option>
+              <option value="per_week">Per week</option>
+              <option value="per_night">Per night</option>
+            </select>
+          </div>
+        )}
 
         {/* Status */}
         <div>

@@ -6,7 +6,7 @@ interface PropertyFormData {
   title: string;
   description: string;
   propertyType: string;
-  listingType: "sale" | "rent";
+  listingType: "sale" | "rental";
   price: string;
   street: string;
   city: string;
@@ -197,8 +197,8 @@ export default function EditPropertyPage() {
                 <label className="flex items-center">
                   <input
                     type="radio"
-                    checked={formData.listingType === "rent"}
-                    onChange={() => updateFormData({ listingType: "rent" })}
+                    checked={formData.listingType === "rental"}
+                    onChange={() => updateFormData({ listingType: "rental" })}
                     className="mr-2"
                   />
                   For Rent
