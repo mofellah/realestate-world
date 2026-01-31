@@ -27,6 +27,7 @@ export default function CreateListingPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [formData, setFormData] = useState<ListingFormData>({
     propertyId: "",
     type: "sale",
@@ -50,8 +51,8 @@ export default function CreateListingPage() {
     loadProperties();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent, statusOverride?: "draft" | "published") => {
+    e?.preventDefault();
 
     if (!user) {
       setError("You must be logged in to create a listing");
@@ -66,10 +67,15 @@ export default function CreateListingPage() {
     try {
       setSubmitting(true);
       setError(null);
+      setSuccess(null);
 
-      await listingsService.createListing(formData);
-
-      navigate("/dashboard/my-listings");
+      const submissionData = statusOverride ? { ...formData, status: statusOverride } : formData;
+      await listingsService.createListing(submissionData);
+      
+      setSuccess("Listing created successfully!");
+      setTimeout(() => {
+        navigate("/dashboard/my-listings");
+      }, 1500);
     } catch (err) {
       console.error("[CreateListing] Error:", err);
       const errorMsg = err instanceof Error ? err.message : "Failed to create listing";
@@ -94,14 +100,21 @@ export default function CreateListingPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div data-testid="create-listing-form" className="max-w-3xl mx-auto p-6">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Create Listing</h1>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+        {success && (
+          <div data-testid="success-toast" className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <p className="text-green-700 font-semibold">Success</p>
+            <p className="text-green-600 text-sm">{success}</p>
+          </div>
+        )}
+        
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div data-testid="error-toast" className="bg-red-50 border border-red-200 rounded-lg p-4">
             <p className="text-red-700 font-semibold">Error</p>
-            <p className="text-red-600 text-sm">{error}</p>
+            <p data-testid="error-message" className="text-red-600 text-sm">{error}</p>
           </div>
         )}
 
@@ -135,59 +148,62 @@ export default function CreateListingPage() {
         {/* Listing Type */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Listing Type *</label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {["sale", "rent", "airbnb", "lease"].map((type) => (
-              <label
-                key={type}
-                className={`flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                  formData.type === type
-                    ? "border-blue-600 bg-blue-50"
-                    : "border-gray-300 hover:border-gray-400"
-                }`}
-              >
-                <input
-                  type="radio"
-                  value={type}
-                  checked={formData.type === type}
-                  onChange={(e) => updateFormData({ type: e.target.value as any })}
-                  className="sr-only"
-                />
-                <span className="font-medium capitalize">{type}</span>
-              </label>
-            ))}
-          </div>
+          <select
+            data-testid="listing-type-select"
+            value={formData.type}
+            onChange={(e) => updateFormData({ type: e.target.value as any })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="sale">Sale</option>
+            <option value="rent">Rent</option>
+            <option value="airbnb">Airbnb</option>
+            <option value="lease">Lease</option>
+          </select>
+        </div>
+
+        {/* Price Input */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Price *</label>
+          <input
+            data-testid="listing-price-input"
+            type="number"
+            placeholder="Enter price"
+            required
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
         </div>
 
         {/* Status */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Publish Status *</label>
           <div className="flex gap-4">
-            <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer flex-1">
-              <input
-                type="radio"
-                value="draft"
-                checked={formData.status === "draft"}
-                onChange={(e) => updateFormData({ status: e.target.value as any })}
-                className="mr-3"
-              />
-              <div>
-                <div className="font-medium">Save as Draft</div>
-                <div className="text-sm text-gray-600">Not visible to searchers</div>
-              </div>
-            </label>
-            <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer flex-1">
-              <input
-                type="radio"
-                value="published"
-                checked={formData.status === "published"}
-                onChange={(e) => updateFormData({ status: e.target.value as any })}
-                className="mr-3"
-              />
-              <div>
-                <div className="font-medium">Publish Now</div>
-                <div className="text-sm text-gray-600">Make visible immediately</div>
-              </div>
-            </label>
+            <button
+              type="button"
+              data-testid="save-draft-button"
+              onClick={() => handleSubmit(undefined, "draft")}
+              disabled={submitting}
+              className={`flex-1 p-4 border-2 rounded-lg transition-colors disabled:opacity-50 ${
+                formData.status === "draft"
+                  ? "border-blue-600 bg-blue-50"
+                  : "border-gray-300 hover:border-gray-400"
+              }`}
+            >
+              <div className="font-medium">Save as Draft</div>
+              <div className="text-sm text-gray-600">Not visible to searchers</div>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSubmit(undefined, "published")}
+              disabled={submitting}
+              className={`flex-1 p-4 border-2 rounded-lg transition-colors disabled:opacity-50 ${
+                formData.status === "published"
+                  ? "border-blue-600 bg-blue-50"
+                  : "border-gray-300 hover:border-gray-400"
+              }`}
+            >
+              <div className="font-medium">Publish Now</div>
+              <div className="text-sm text-gray-600">Make visible immediately</div>
+            </button>
           </div>
         </div>
 

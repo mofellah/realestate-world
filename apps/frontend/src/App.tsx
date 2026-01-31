@@ -87,6 +87,7 @@ export default function App() {
             <Route path="properties" element={<MyPropertiesPage />} />
             <Route path="properties/create" element={<CreatePropertyPage />} />
             <Route path="properties/:id/edit" element={<EditPropertyPage />} />
+            <Route path="properties/:id/create-listing" element={<CreateListingPage />} />
             <Route path="listings" element={<MyListingsPage />} />
             <Route path="listings/create" element={<CreateListingPage />} />
             <Route path="messages" element={<MessagesPage />} />
