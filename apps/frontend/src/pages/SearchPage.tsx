@@ -1,33 +1,28 @@
-// Search Page - Interactive map + filters + property list
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { usePropertyStore } from '../stores/propertyStore';
-import { useUIStore } from '../stores/uiStore';
-import { PropertyType, ListingType } from '../types';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import MapView from "@/components/Map/MapView";
+import FilterPanel, { PropertyFilters } from "@/components/Map/FilterPanel";
+import { useMapSearch } from "@/hooks/useMapSearch";
+import { PropertyCardSkeleton } from "@/components/Skeleton";
 
 export default function SearchPage() {
-  const { 
-    filteredListings, 
-    filters, 
-    setFilters, 
-    applyFilters, 
-    clearFilters,
-    isLoading 
-  } = usePropertyStore();
-  
-  const { isFilterPanelOpen, toggleFilterPanel } = useUIStore();
-  const [viewMode, setViewMode] = useState<'map' | 'list'>('list');
+  const { properties, total, loading, search, error } = useMapSearch();
+  const [filters, setFilters] = useState<PropertyFilters>({});
+  const [viewMode, setViewMode] = useState<"map" | "list">("map");
+  const [center] = useState<[number, number]>([4.3517, 50.8503]); // Brussels
 
   useEffect(() => {
-    applyFilters();
-  }, [applyFilters]);
+    // Initial search
+    search(filters, center);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const handleFilterChange = (key: string, value: any) => {
-    setFilters({ [key]: value });
-  };
+  useEffect(() => {
+    // Properties loaded and updated
+  }, [properties, total]);
 
   const handleApplyFilters = () => {
-    applyFilters();
+    search(filters, center);
   };
 
   return (
@@ -37,228 +32,98 @@ export default function SearchPage() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold">Search Properties</h1>
-            <p className="text-gray-600 mt-2">
-              {filteredListings.length} properties found
-            </p>
+            <p className="text-gray-600 mt-2">{total} properties found</p>
           </div>
           <div className="flex space-x-2">
             <button
-              onClick={() => setViewMode('list')}
+              onClick={() => setViewMode("list")}
               className={`px-4 py-2 rounded-lg font-medium ${
-                viewMode === 'list' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                viewMode === "list"
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >
               📋 List
             </button>
             <button
-              onClick={() => setViewMode('map')}
+              onClick={() => setViewMode("map")}
               className={`px-4 py-2 rounded-lg font-medium ${
-                viewMode === 'map' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                viewMode === "map"
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >
               🗺️ Map
-            </button>
-            <button
-              onClick={toggleFilterPanel}
-              className="px-4 py-2 bg-white rounded-lg font-medium hover:bg-gray-100"
-            >
-              🔍 Filters
             </button>
           </div>
         </div>
 
         <div className="flex gap-6">
           {/* Filter Panel */}
-          {isFilterPanelOpen && (
-            <aside className="w-80 bg-white rounded-lg shadow-sm p-6 h-fit">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold">Filters</h2>
-                <button 
-                  onClick={clearFilters}
-                  className="text-sm text-blue-600 hover:underline"
-                >
-                  Clear All
-                </button>
-              </div>
+          <aside className="w-80">
+            <FilterPanel filters={filters} onChange={setFilters} onApply={handleApplyFilters} />
+          </aside>
 
-              {/* Property Type */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Property Type
-                </label>
-                <div className="space-y-2">
-                  {Object.values(PropertyType).map(type => (
-                    <label key={type} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={filters.propertyType?.includes(type) || false}
-                        onChange={(e) => {
-                          const current = filters.propertyType || [];
-                          const updated = e.target.checked
-                            ? [...current, type]
-                            : current.filter(t => t !== type);
-                          handleFilterChange('propertyType', updated);
-                        }}
-                        className="mr-2"
-                      />
-                      <span className="capitalize">{type.replace('_', ' ')}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Listing Type */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Listing Type
-                </label>
-                <div className="space-y-2">
-                  {Object.values(ListingType).map(type => (
-                    <label key={type} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={filters.listingType?.includes(type) || false}
-                        onChange={(e) => {
-                          const current = filters.listingType || [];
-                          const updated = e.target.checked
-                            ? [...current, type]
-                            : current.filter(t => t !== type);
-                          handleFilterChange('listingType', updated);
-                        }}
-                        className="mr-2"
-                      />
-                      <span className="capitalize">{type.replace('_', ' ')}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Price Range */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price Range (€)
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    value={filters.priceMin || ''}
-                    onChange={(e) => handleFilterChange('priceMin', parseInt(e.target.value) || undefined)}
-                    className="w-1/2 px-3 py-2 border rounded-lg"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    value={filters.priceMax || ''}
-                    onChange={(e) => handleFilterChange('priceMax', parseInt(e.target.value) || undefined)}
-                    className="w-1/2 px-3 py-2 border rounded-lg"
-                  />
-                </div>
-              </div>
-
-              {/* Bedrooms */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Bedrooms (min)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={filters.bedroomsMin || ''}
-                  onChange={(e) => handleFilterChange('bedroomsMin', parseInt(e.target.value) || undefined)}
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-              </div>
-
-              {/* City */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  City
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., Brussels"
-                  value={filters.city || ''}
-                  onChange={(e) => handleFilterChange('city', e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-              </div>
-
-              <button
-                onClick={handleApplyFilters}
-                className="w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
-              >
-                Apply Filters
-              </button>
-            </aside>
-          )}
-
-          {/* Results */}
+          {/* Main Content */}
           <main className="flex-1">
-            {viewMode === 'map' ? (
-              <div className="bg-white rounded-lg shadow-sm p-6 h-[600px] flex items-center justify-center">
-                <div className="text-center text-gray-500">
-                  <div className="text-6xl mb-4">🗺️</div>
-                  <p className="text-xl font-medium">Interactive Map Coming Soon</p>
-                  <p className="text-sm mt-2">Leaflet/Mapbox integration will be added</p>
-                </div>
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <p className="text-red-700 font-semibold">Search Error</p>
+                <p className="text-red-600 text-sm">{error}</p>
               </div>
-            ) : (
+            )}
+
+            {loading && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <PropertyCardSkeleton key={i} />
+                ))}
+              </div>
+            )}
+
+            {!loading && viewMode === "map" && (
+              <div
+                className="bg-white rounded-lg shadow-md overflow-hidden"
+                style={{ height: "600px" }}
+              >
+                <MapView center={center} zoom={12} properties={properties} />
+              </div>
+            )}
+
+            {!loading && viewMode === "list" && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {isLoading ? (
-                  <div className="col-span-full text-center py-12">Loading...</div>
-                ) : filteredListings.length === 0 ? (
-                  <div className="col-span-full text-center py-12 text-gray-500">
+                {properties.length === 0 ? (
+                  <div className="col-span-full text-center py-8 text-gray-500">
                     No properties found. Try adjusting your filters.
                   </div>
                 ) : (
-                  filteredListings.map(listing => (
+                  properties.map((property) => (
                     <Link
-                      key={listing.id}
-                      to={`/property/${listing.id}`}
-                      className="bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow overflow-hidden"
+                      key={property.id}
+                      to={`/property/${property.id}`}
+                      className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
                     >
-                      <img
-                        src={listing.property.images?.[0] || 'https://via.placeholder.com/400x300'}
-                        alt={listing.property.title}
-                        className="w-full h-48 object-cover"
-                      />
+                      <div className="aspect-video bg-gray-200">
+                        <div className="h-full flex items-center justify-center text-gray-400">
+                          No Image
+                        </div>
+                      </div>
                       <div className="p-4">
-                        <h3 className="font-semibold text-lg mb-2 line-clamp-1">
-                          {listing.property.title}
-                        </h3>
-                        <p className="text-gray-600 text-sm mb-3">
-                          {listing.property.address.city}, {listing.property.address.country_code}
+                        <h3 className="font-semibold text-lg mb-2">{property.title}</h3>
+                        <p className="text-gray-600 text-sm mb-2">
+                          {typeof property.address === "string"
+                            ? property.address
+                            : property.address?.city || "No location"}
                         </p>
-                        <div className="flex justify-between items-center mb-3">
-                          <span className="text-2xl font-bold text-blue-600">
-                            €{listing.paymentTerms.termType === 'onetime' 
-                              ? (listing.paymentTerms as any).amount.toLocaleString()
-                              : (listing.paymentTerms as any).amountPerPeriod.toLocaleString()
-                            }
-                            {listing.paymentTerms.termType !== 'onetime' && '/mo'}
-                          </span>
-                          <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full uppercase">
-                            {listing.type.replace('_', ' ')}
-                          </span>
-                        </div>
-                        <div className="flex items-center text-sm text-gray-500 space-x-3">
-                          {listing.property.bedrooms && (
-                            <span>🛏️ {listing.property.bedrooms}</span>
+                        <p className="text-xl font-bold text-blue-600">
+                          ${property.price?.toLocaleString() ?? "N/A"}
+                        </p>
+                        <div className="flex space-x-4 mt-2 text-sm text-gray-500">
+                          {property.bedrooms && <span>🛏️ {property.bedrooms}</span>}
+                          {property.bathrooms && <span>🚿 {property.bathrooms}</span>}
+                          {property.areaSquareMeters && (
+                            <span>📏 {property.areaSquareMeters}m²</span>
                           )}
-                          {listing.property.bathrooms && (
-                            <span>🚿 {listing.property.bathrooms}</span>
-                          )}
-                          {listing.property.surfaceArea && (
-                            <span>📐 {listing.property.surfaceArea}m²</span>
-                          )}
-                        </div>
-                        <div className="mt-3 text-xs text-gray-400">
-                          👁️ {listing.viewCount || 0} views • 💬 {listing.inquiryCount || 0} inquiries
                         </div>
                       </div>
                     </Link>

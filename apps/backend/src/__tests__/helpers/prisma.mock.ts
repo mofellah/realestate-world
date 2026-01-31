@@ -1,11 +1,11 @@
 /**
  * Prisma Mock Helpers
- * 
+ *
  * Provides utilities for mocking PrismaService in tests.
  * These helpers set up proper mocks for database operations.
  */
 
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from "../../prisma/prisma.service";
 
 /**
  * Create a fully mocked PrismaService
@@ -165,7 +165,7 @@ export function mockCount(model: Record<string, unknown>, count: number): jest.M
  */
 export function resetModelMocks(model: Record<string, unknown>): void {
   Object.values(model).forEach((method: any) => {
-    if (typeof method === 'function' && method.mockReset) {
+    if (typeof method === "function" && method.mockReset) {
       method.mockReset();
     }
   });
@@ -177,7 +177,7 @@ export function resetModelMocks(model: Record<string, unknown>): void {
  */
 export function resetAllMocks(prismaService: jest.Mocked<PrismaService>): void {
   Object.values(prismaService).forEach((model: any) => {
-    if (typeof model === 'object' && model !== null) {
+    if (typeof model === "object" && model !== null) {
       resetModelMocks(model);
     }
   });

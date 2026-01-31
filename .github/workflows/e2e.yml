@@ -59,39 +59,63 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/boilerplate_test
 
       - name: Build backend
-        run: npm run build --workspace=@boilerplate/backend
+        run: |
+          npm run build --workspace=@boilerplate/backend
+          if [ ! -f "apps/backend/dist/apps/backend/src/main.js" ]; then
+            echo "❌ Backend build failed - dist/apps/backend/src/main.js not found"
+            ls -la apps/backend/dist/ || echo "dist/ directory doesn't exist"
+            exit 1
+          fi
+          echo "✅ Backend built successfully"
 
       - name: Build frontend
-        run: npm run build --workspace=@boilerplate/frontend
+        run: |
+          npm run build --workspace=@boilerplate/frontend
+          if [ ! -d "apps/frontend/dist" ]; then
+            echo "❌ Frontend build failed - dist/ directory not found"
+            exit 1
+          fi
+          echo "✅ Frontend built successfully"
 
       - name: Start backend server (background)
         run: |
-          npm run start:prod --workspace=@boilerplate/backend &
+          npm run start:prod --workspace=@boilerplate/backend > backend.log 2>&1 &
           echo $! > backend.pid
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/boilerplate_test
-          JWT_SECRET: test-secret-key-for-ci
-          JWT_REFRESH_SECRET: test-refresh-secret-for-ci
+          JWT_SECRET: test-secret-key-for-ci-minimum-32-characters-long
+          JWT_REFRESH_SECRET: test-refresh-secret-for-ci-minimum-32-characters-long
+          REFRESH_TOKEN_SECRET: test-refresh-secret-for-ci-minimum-32-characters-long
           PORT: 3000
-          NODE_ENV: test
+          NODE_ENV: production
+          FRONTEND_URL: http://localhost:4173
 
       - name: Start frontend server (background)
         run: |
-          npm run preview --workspace=@boilerplate/frontend &
+          npm run preview --workspace=@boilerplate/frontend > frontend.log 2>&1 &
           echo $! > frontend.pid
         env:
           VITE_API_URL: http://localhost:3000
 
       - name: Wait for backend health
         run: |
-          for i in {1..30}; do
+          for i in {1..60}; do
             if curl -f http://localhost:3000/health; then
               echo "✅ Backend is ready"
               break
             fi
-            echo "⏳ Waiting for backend... ($i/30)"
+            echo "⏳ Waiting for backend... ($i/60)"
+            if [ $i -eq 30 ]; then
+              echo "📋 Backend logs:"
+              cat backend.log || echo "No backend logs"
+            fi
             sleep 2
           done
+          if ! curl -f http://localhost:3000/health; then
+            echo "❌ Backend failed to start"
+            cat backend.log || echo "No backend logs"
+            exit 1
+          fi
 
       - name: Wait for frontend
         run: |
@@ -107,8 +131,10 @@ jobs:
       - name: Run Cypress E2E tests
         uses: cypress-io/github-action@v6
         with:
-          working-directory: apps/frontend
+          install: false
           browser: chrome
+          working-directory: apps/frontend
+          config-file: cypress.config.js
           wait-on: 'http://localhost:3000/health, http://localhost:4173'
           wait-on-timeout: 120
           record: false

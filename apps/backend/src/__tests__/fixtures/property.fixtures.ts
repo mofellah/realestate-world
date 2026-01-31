@@ -1,11 +1,48 @@
 /**
  * Property Test Fixtures
- * 
+ *
  * Provides factory functions to create mock property and address data for tests.
  * Used for testing property-related services and controllers.
  */
 
-import { Property, Address } from '@prisma/client';
+// Property type matching Prisma Property model
+type Property = {
+  id: string;
+  title: string;
+  description: string | null;
+  propertyType: string;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  surfaceArea: number | null;
+  gardenSize: number | null;
+  yearBuilt: number | null;
+  amenitiesList: string[];
+  addressId: string;
+  ownerPersonId: string;
+  userId: string | null;
+  ownerDocumentUrl: string | null;
+  parentPropertyId: string | null;
+  isAvailable: boolean;
+  metadata: unknown | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+// Address type matching Prisma Address model
+type Address = {
+  id: string;
+  streetName: string;
+  streetNumber: string | null;
+  unit: string | null;
+  postalCode: string;
+  city: string;
+  region: string | null;
+  country_code: string;
+  geoObjectId: string | null;
+  metadata: unknown | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 /**
  * Create a mock address entity
@@ -15,14 +52,14 @@ import { Property, Address } from '@prisma/client';
 export function createMockAddress(overrides?: Partial<Address>): Address {
   const now = new Date();
   return {
-    id: 'addr-' + Math.random().toString(36).substring(7),
-    streetName: 'Test Street',
-    streetNumber: '123',
+    id: "addr-" + Math.random().toString(36).substring(7),
+    streetName: "Test Street",
+    streetNumber: "123",
     unit: null,
-    postalCode: '1000',
-    city: 'Brussels',
-    region: 'Brussel',
-    country_code: 'BE',
+    postalCode: "1000",
+    city: "Brussels",
+    region: "Brussel",
+    country_code: "BE",
     geoObjectId: null,
     metadata: null,
     createdAt: now,
@@ -43,24 +80,24 @@ export function createMockProperty(
   userId: string,
   ownerPersonId: string,
   addressId: string,
-  overrides?: Partial<Property>
+  overrides?: Partial<Property>,
 ): Property {
   const now = new Date();
   return {
-    id: 'prop-' + Math.random().toString(36).substring(7),
-    title: 'Test Property',
-    description: 'A test property for unit tests',
+    id: "prop-" + Math.random().toString(36).substring(7),
+    title: "Test Property",
+    description: "A test property for unit tests",
     addressId: addressId,
     ownerPersonId: ownerPersonId,
     userId: userId,
     ownerDocumentUrl: null,
-    propertyType: 'house',
+    propertyType: "house",
     bedrooms: 3,
     bathrooms: 2,
     surfaceArea: 150,
     gardenSize: 50,
     yearBuilt: 2015,
-    amenitiesList: ['garage', 'garden'],
+    amenitiesList: ["garage", "garden"],
     metadata: null,
     parentPropertyId: null,
     isAvailable: true,
@@ -84,7 +121,7 @@ export function createMockProperties(
   ownerPersonId: string,
   addressId: string,
   count: number,
-  overrides?: Partial<Property>
+  overrides?: Partial<Property>,
 ): Property[] {
   return Array.from({ length: count }, (_, i) =>
     createMockProperty(userId, ownerPersonId, addressId, {
@@ -107,10 +144,10 @@ export function createMockApartment(
   userId: string,
   ownerPersonId: string,
   addressId: string,
-  overrides?: Partial<Property>
+  overrides?: Partial<Property>,
 ): Property {
   return createMockProperty(userId, ownerPersonId, addressId, {
-    propertyType: 'apartment',
+    propertyType: "apartment",
     gardenSize: 0,
     ...overrides,
   });
@@ -128,10 +165,10 @@ export function createMockHouse(
   userId: string,
   ownerPersonId: string,
   addressId: string,
-  overrides?: Partial<Property>
+  overrides?: Partial<Property>,
 ): Property {
   return createMockProperty(userId, ownerPersonId, addressId, {
-    propertyType: 'house',
+    propertyType: "house",
     gardenSize: 100,
     ...overrides,
   });

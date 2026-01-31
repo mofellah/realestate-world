@@ -4,4 +4,4 @@
  */
 
 // Export environment validation
-export * from './env';
+export * from "./env";

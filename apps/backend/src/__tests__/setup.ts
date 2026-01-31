@@ -1,6 +1,6 @@
 /**
  * Jest Global Setup File
- * 
+ *
  * Configures the test environment before any tests run.
  * Handles:
  * - Environment variables for testing
@@ -15,15 +15,17 @@
 // ============================================================================
 
 // Set test environment variables
-process.env.NODE_ENV = 'test';
-process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://test:test@localhost:5432/boilerplate_test';
-process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret-key-for-testing-only-with-minimum-32-characters-required';
-process.env.JWT_ACCESS_EXPIRY = '15m';
-process.env.JWT_REFRESH_EXPIRY = '7d';
-process.env.FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
-process.env.PORT = '3001';
-process.env.HOST = '0.0.0.0';
-process.env.LOG_LEVEL = 'warn';
+process.env.NODE_ENV = "test";
+process.env.DATABASE_URL =
+  process.env.DATABASE_URL || "postgresql://test:test@localhost:5432/boilerplate_test";
+process.env.JWT_SECRET =
+  process.env.JWT_SECRET || "test-secret-key-for-testing-only-with-minimum-32-characters-required";
+process.env.JWT_ACCESS_EXPIRY = "15m";
+process.env.JWT_REFRESH_EXPIRY = "7d";
+process.env.FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+process.env.PORT = "3001";
+process.env.HOST = "0.0.0.0";
+process.env.LOG_LEVEL = "warn";
 
 // ============================================================================
 // Global Mocks
@@ -42,27 +44,27 @@ const originalWarn = console.warn;
 beforeAll(() => {
   // Suppress specific expected errors during tests
   console.error = jest.fn((...args) => {
-    const errorMessage = args[0]?.toString?.() || '';
-    
+    const errorMessage = args[0]?.toString?.() || "";
+
     // Allow these error patterns through
     const expectedPatterns = [
-      'Environment validation failed',
-      'Invalid backend environment',
-      'ENOENT',
-      'Cannot find module',
+      "Environment validation failed",
+      "Invalid backend environment",
+      "ENOENT",
+      "Cannot find module",
     ];
-    
-    const isExpected = expectedPatterns.some(pattern => errorMessage.includes(pattern));
-    
+
+    const isExpected = expectedPatterns.some((pattern) => errorMessage.includes(pattern));
+
     if (!isExpected) {
       originalError.call(console, ...args);
     }
   });
-  
+
   console.warn = jest.fn((...args) => {
-    const warnMessage = args[0]?.toString?.() || '';
-    const isExpected = warnMessage.includes('deprecation');
-    
+    const warnMessage = args[0]?.toString?.() || "";
+    const isExpected = warnMessage.includes("deprecation");
+
     if (!isExpected) {
       originalWarn.call(console, ...args);
     }
@@ -101,7 +103,7 @@ export function generateTestCorrelationId(): string {
 beforeEach(() => {
   // Clear all mocks before each test
   jest.clearAllMocks();
-  
+
   // Reset any global state if needed
   jest.restoreAllMocks();
 });
@@ -141,9 +143,9 @@ globalThis.testContext = {
 // ============================================================================
 
 // Suppress Prisma warnings if needed
-process.on('warning', (warning) => {
+process.on("warning", (warning) => {
   // Only log unexpected warnings
-  if (!warning.message.includes('DeprecationWarning')) {
+  if (!warning.message.includes("DeprecationWarning")) {
     console.warn(warning);
   }
 });

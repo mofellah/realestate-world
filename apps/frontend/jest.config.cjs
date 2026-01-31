@@ -13,14 +13,22 @@ module.exports = {
     '<rootDir>/src/**/?(*.)+(spec|test).{ts,tsx}',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json' }],
+    '^.+\\.tsx?$': ['ts-jest', {
+      tsconfig: '<rootDir>/tsconfig.json',
+      useESM: true,
+    }],
   },
   setupFilesAfterEnv: ['<rootDir>/src/setup-tests.ts'],
+  testEnvironmentOptions: {
+    customExportConditions: [''],
+  },
   globals: {
     'import.meta': {
       env: {
         VITE_API_URL: 'http://localhost:3000',
+        MODE: 'test',
       },
     },
   },

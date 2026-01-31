@@ -1,25 +1,32 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { authService } from '@/services/auth-service';
-import '../styles/auth-form.scss';
+import { useState } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import "../styles/auth-form.scss";
 
 export default function LoginPage() {
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const location = useLocation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Get the page they tried to visit before login
+  const from = (location.state as any)?.from?.pathname || "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      await authService.login(email, password);
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      await login(email, password);
+      // Navigate to the page they tried to visit, or dashboard
+      navigate(from, { replace: true });
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || "Login failed";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -28,7 +35,7 @@ export default function LoginPage() {
   return (
     <div className="auth-container">
       <div className="auth-form">
-        <h1>Login</h1>
+        <h1>Login to Real Estate World</h1>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -36,10 +43,13 @@ export default function LoginPage() {
             <input
               id="email"
               type="email"
+              data-testid="email-input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="admin@example.com"
+              autoComplete="email"
+              disabled={loading}
             />
           </div>
           <div className="form-group">
@@ -47,14 +57,18 @@ export default function LoginPage() {
             <input
               id="password"
               type="password"
+              data-testid="password-input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              placeholder="Admin123!"
+              placeholder="••••••••"
+              minLength={8}
+              autoComplete="current-password"
+              disabled={loading}
             />
           </div>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+          <button type="submit" disabled={loading} className="btn-primary">
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
         <p className="form-footer">

@@ -6,81 +6,81 @@
 // ============================================================================
 
 export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin',
+  USER = "user",
+  ADMIN = "admin",
 }
 
 export enum PropertyType {
-  HOUSE = 'house',
-  APARTMENT = 'apartment',
-  VILLA = 'villa',
-  LAND = 'land',
-  ROOM = 'room',
-  COMMERCIAL = 'commercial',
-  OTHER = 'other',
+  HOUSE = "house",
+  APARTMENT = "apartment",
+  VILLA = "villa",
+  LAND = "land",
+  ROOM = "room",
+  COMMERCIAL = "commercial",
+  OTHER = "other",
 }
 
 export enum ListingType {
-  SALE = 'sale',
-  RENTAL = 'rental',
-  SHORT_TERM = 'short_term',
-  LEASE = 'lease',
+  SALE = "sale",
+  RENTAL = "rental",
+  SHORT_TERM = "short_term",
+  LEASE = "lease",
 }
 
 export enum ListingStatus {
-  DRAFT = 'draft',
-  PUBLISHED = 'published',
-  PAUSED = 'paused',
-  EXPIRED = 'expired',
+  DRAFT = "draft",
+  PUBLISHED = "published",
+  PAUSED = "paused",
+  EXPIRED = "expired",
 }
 
 export enum PaymentTermType {
-  ONETIME = 'onetime',
-  PERIODIC = 'periodic',
-  COMPOSITE = 'composite',
+  ONETIME = "onetime",
+  PERIODIC = "periodic",
+  COMPOSITE = "composite",
 }
 
 export enum AgencyTierType {
-  BASIC = 'basic',
-  PRO = 'pro',
-  PREMIUM = 'premium',
+  BASIC = "basic",
+  PRO = "pro",
+  PREMIUM = "premium",
 }
 
 export enum AgencyRoleType {
-  OWNER = 'owner',
-  MANAGER = 'manager',
-  AGENT = 'agent',
-  SALES_MANAGER = 'sales_manager',
-  SUPPORT_AGENT = 'support_agent',
+  OWNER = "owner",
+  MANAGER = "manager",
+  AGENT = "agent",
+  SALES_MANAGER = "sales_manager",
+  SUPPORT_AGENT = "support_agent",
 }
 
 export enum AmenityTypeEnum {
-  HOSPITAL = 'hospital',
-  SCHOOL = 'school',
-  PARK = 'park',
-  SHOPPING = 'shopping',
-  RESTAURANT = 'restaurant',
-  CAFE = 'cafe',
-  BANK = 'bank',
-  PHARMACY = 'pharmacy',
-  GYM = 'gym',
-  PUBLIC_TRANSPORT = 'public_transport',
-  LIBRARY = 'library',
-  POLICE = 'police',
-  FIRE_STATION = 'fire_station',
-  SUPERMARKET = 'supermarket',
-  GAS_STATION = 'gas_station',
-  OTHER = 'other',
+  HOSPITAL = "hospital",
+  SCHOOL = "school",
+  PARK = "park",
+  SHOPPING = "shopping",
+  RESTAURANT = "restaurant",
+  CAFE = "cafe",
+  BANK = "bank",
+  PHARMACY = "pharmacy",
+  GYM = "gym",
+  PUBLIC_TRANSPORT = "public_transport",
+  LIBRARY = "library",
+  POLICE = "police",
+  FIRE_STATION = "fire_station",
+  SUPERMARKET = "supermarket",
+  GAS_STATION = "gas_station",
+  OTHER = "other",
 }
 
 export enum MessageType {
-  INQUIRY = 'inquiry',
-  RESPONSE = 'response',
+  INQUIRY = "inquiry",
+  RESPONSE = "response",
 }
 
 export enum ViewType {
-  PREVIEW = 'preview',
-  DETAIL = 'detail',
+  PREVIEW = "preview",
+  DETAIL = "detail",
 }
 
 // ============================================================================
@@ -145,7 +145,7 @@ export interface User {
 
 export interface GeoObject {
   id: string;
-  type: 'point' | 'polygon' | 'multipolygon' | 'linestring';
+  type: "point" | "polygon" | "multipolygon" | "linestring";
   latitude?: number;
   longitude?: number;
   geoJson?: any;
@@ -226,7 +226,7 @@ export interface PeriodicPaymentTerm extends PaymentTermsBase {
 
 export interface CompositePaymentTerm extends PaymentTermsBase {
   termType: PaymentTermType.COMPOSITE;
-  compositionType: 'split' | 'phased' | 'combined';
+  compositionType: "split" | "phased" | "combined";
   componentTerms: any; // JSON array
 }
 
@@ -392,7 +392,12 @@ export interface TransitStopAmenity extends AmenityBase {
   };
 }
 
-export type Amenity = HospitalAmenity | SchoolAmenity | RestaurantAmenity | TransitStopAmenity | AmenityBase;
+export type Amenity =
+  | HospitalAmenity
+  | SchoolAmenity
+  | RestaurantAmenity
+  | TransitStopAmenity
+  | AmenityBase;
 
 // ============================================================================
 // MESSAGES

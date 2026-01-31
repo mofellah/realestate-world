@@ -1,8 +1,12 @@
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { Logger } from '@boilerplate/logger';
-import { Prisma } from '@prisma/client';
-import crypto from 'crypto';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { Logger } from "@boilerplate/logger";
+import crypto from "crypto";
 
 /**
  * ListingsService - CRUD operations for property listings
@@ -11,7 +15,7 @@ import crypto from 'crypto';
  */
 @Injectable()
 export class ListingsService {
-  private logger = new Logger('info', { service: 'ListingsService' });
+  private logger = new Logger("info", { service: "ListingsService" });
 
   constructor(private prisma: PrismaService) {}
 
@@ -29,18 +33,18 @@ export class ListingsService {
     try {
       // Validate required fields first
       if (!data.propertyId || !data.type || !data.paymentTermsId) {
-        throw new BadRequestException('propertyId, type, and paymentTermsId required');
+        throw new BadRequestException("propertyId, type, and paymentTermsId required");
       }
 
       // Validate property exists
       const property = await this.prisma.property.findUnique({
         where: { id: data.propertyId },
       });
-      if (!property) throw new NotFoundException('Property not found');
+      if (!property) throw new NotFoundException("Property not found");
 
       // Validate user owns the property
       if (property.userId !== userId) {
-        throw new ForbiddenException('Not owner of property');
+        throw new ForbiddenException("Not owner of property");
       }
 
       const listing = await this.prisma.listing.create({
@@ -49,7 +53,7 @@ export class ListingsService {
           propertyId: data.propertyId,
           createdBy: userId,
           paymentTermsId: data.paymentTermsId,
-          status: data.status || 'draft',
+          status: data.status || "draft",
           visibilityStart: data.visibilityStart || null,
           visibilityEnd: data.visibilityEnd || null,
           visibilityDays: data.visibilityDays || null,
@@ -60,14 +64,14 @@ export class ListingsService {
       this.logger.info(`Listing ${listing.id} created by ${userId}`);
       return listing;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown';
+      const msg = error instanceof Error ? error.message : "Unknown";
       this.logger.error(`Listing create failed: ${msg}`);
-      
+
       // Handle Prisma foreign key constraint errors
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
-        throw new BadRequestException('Invalid paymentTermsId or propertyId');
+      if (error && typeof error === "object" && "code" in error && error.code === "P2003") {
+        throw new BadRequestException("Invalid paymentTermsId or propertyId");
       }
-      
+
       throw error;
     }
   }
@@ -87,7 +91,7 @@ export class ListingsService {
           },
           skip,
           take,
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           include: { property: true, creator: true, paymentTerms: true },
         }),
         this.prisma.listing.count({
@@ -97,7 +101,7 @@ export class ListingsService {
 
       return { listings, total };
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown';
+      const msg = error instanceof Error ? error.message : "Unknown";
       this.logger.error(`Listing findByUser failed: ${msg}`);
       throw error;
     }
@@ -113,10 +117,10 @@ export class ListingsService {
         include: { property: true, creator: true, paymentTerms: true },
       });
 
-      if (!listing) throw new NotFoundException('Listing not found');
+      if (!listing) throw new NotFoundException("Listing not found");
       return listing;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown';
+      const msg = error instanceof Error ? error.message : "Unknown";
       this.logger.error(`Listing findById failed: ${msg}`);
       throw error;
     }
@@ -133,9 +137,9 @@ export class ListingsService {
       const listing = await this.prisma.listing.findUnique({
         where: { id },
       });
-      if (!listing) throw new NotFoundException('Listing not found');
+      if (!listing) throw new NotFoundException("Listing not found");
       if (listing.createdBy !== userId) {
-        throw new ForbiddenException('Not owner');
+        throw new ForbiddenException("Not owner");
       }
 
       const updated = await this.prisma.listing.update({
@@ -152,7 +156,7 @@ export class ListingsService {
       this.logger.info(`Listing ${id} updated by ${userId}`);
       return updated;
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown';
+      const msg = error instanceof Error ? error.message : "Unknown";
       this.logger.error(`Listing update failed: ${msg}`);
       throw error;
     }
@@ -169,16 +173,16 @@ export class ListingsService {
       const listing = await this.prisma.listing.findUnique({
         where: { id },
       });
-      if (!listing) throw new NotFoundException('Listing not found');
+      if (!listing) throw new NotFoundException("Listing not found");
       if (listing.createdBy !== userId) {
-        throw new ForbiddenException('Not owner');
+        throw new ForbiddenException("Not owner");
       }
 
       await this.prisma.listing.delete({ where: { id } });
 
       this.logger.info(`Listing ${id} deleted by ${userId}`);
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown';
+      const msg = error instanceof Error ? error.message : "Unknown";
       this.logger.error(`Listing delete failed: ${msg}`);
       throw error;
     }

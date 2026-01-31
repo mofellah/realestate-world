@@ -3,11 +3,11 @@
  * Passport strategy for JWT validation
  */
 
-import { Injectable } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { backendConfig } from '@boilerplate/config';
-import type { JwtPayload } from '@boilerplate/types';
+import { Injectable } from "@nestjs/common";
+import { PassportStrategy } from "@nestjs/passport";
+import { ExtractJwt, Strategy } from "passport-jwt";
+import { backendConfig } from "@boilerplate/config";
+import type { JwtPayload } from "@boilerplate/types";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

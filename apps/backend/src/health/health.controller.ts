@@ -3,10 +3,10 @@
  * Health check endpoint for liveness probes
  */
 
-import { Controller, Get } from '@nestjs/common';
-import { Public } from '../auth/decorators/auth.decorators';
+import { Controller, Get } from "@nestjs/common";
+import { Public } from "../auth/decorators/auth.decorators";
 
-@Controller('health')
+@Controller("health")
 export class HealthController {
   /**
    * GET /health
@@ -17,7 +17,7 @@ export class HealthController {
   @Public()
   health() {
     return {
-      status: 'ok',
+      status: "ok",
       timestamp: new Date().toISOString(),
     };
   }

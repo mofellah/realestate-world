@@ -3,9 +3,9 @@
  * Root endpoint
  */
 
-import { Controller, Get } from '@nestjs/common';
-import { Public } from './auth/decorators/auth.decorators';
-import { AppService } from './app.service';
+import { Controller, Get } from "@nestjs/common";
+import { Public } from "./auth/decorators/auth.decorators";
+import { AppService } from "./app.service";
 
 @Controller()
 export class AppController {

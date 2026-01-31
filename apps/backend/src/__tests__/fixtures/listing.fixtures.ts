@@ -1,11 +1,25 @@
 /**
  * Listing Test Fixtures
- * 
+ *
  * Provides factory functions to create mock listing data for tests.
  * Includes base Listing and specialized subtypes (SaleListing, RentalListing).
  */
 
-import { Listing } from '@prisma/client';
+// Listing type matching Prisma Listing model
+type Listing = {
+  id: string;
+  propertyId: string;
+  type: string;
+  status: string;
+  paymentTermsId: string;
+  visibilityStart: Date | null;
+  visibilityEnd: Date | null;
+  visibilityDays: number | null;
+  publishedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+};
 
 /**
  * Create a mock base listing entity
@@ -19,16 +33,16 @@ export function createMockListing(
   propertyId: string,
   createdBy: string,
   paymentTermsId: string,
-  overrides?: Partial<Listing>
+  overrides?: Partial<Listing>,
 ): Listing {
   const now = new Date();
   return {
-    id: 'list-' + Math.random().toString(36).substring(7),
+    id: "list-" + Math.random().toString(36).substring(7),
     propertyId: propertyId,
     createdBy: createdBy,
     paymentTermsId: paymentTermsId,
-    type: 'sale',
-    status: 'draft',
+    type: "sale",
+    status: "draft",
     publishedAt: null,
     visibilityStart: null,
     visibilityEnd: null,
@@ -51,10 +65,10 @@ export function createMockSaleListing(
   propertyId: string,
   createdBy: string,
   paymentTermsId: string,
-  overrides?: Partial<Listing>
+  overrides?: Partial<Listing>,
 ): Listing {
   return createMockListing(propertyId, createdBy, paymentTermsId, {
-    type: 'sale',
+    type: "sale",
     ...overrides,
   });
 }
@@ -71,10 +85,10 @@ export function createMockRentalListing(
   propertyId: string,
   createdBy: string,
   paymentTermsId: string,
-  overrides?: Partial<Listing>
+  overrides?: Partial<Listing>,
 ): Listing {
   return createMockListing(propertyId, createdBy, paymentTermsId, {
-    type: 'rental',
+    type: "rental",
     ...overrides,
   });
 }
@@ -91,10 +105,10 @@ export function createMockShortTermListing(
   propertyId: string,
   createdBy: string,
   paymentTermsId: string,
-  overrides?: Partial<Listing>
+  overrides?: Partial<Listing>,
 ): Listing {
   return createMockListing(propertyId, createdBy, paymentTermsId, {
-    type: 'short_term',
+    type: "short_term",
     ...overrides,
   });
 }
@@ -111,10 +125,10 @@ export function createMockPublishedListing(
   propertyId: string,
   createdBy: string,
   paymentTermsId: string,
-  overrides?: Partial<Listing>
+  overrides?: Partial<Listing>,
 ): Listing {
   return createMockListing(propertyId, createdBy, paymentTermsId, {
-    status: 'published',
+    status: "published",
     publishedAt: new Date(),
     ...overrides,
   });
@@ -134,7 +148,7 @@ export function createMockListings(
   createdBy: string,
   paymentTermsId: string,
   count: number,
-  overrides?: Partial<Listing>
+  overrides?: Partial<Listing>,
 ): Listing[] {
   return Array.from({ length: count }, (_, i) =>
     createMockListing(propertyId, createdBy, paymentTermsId, {

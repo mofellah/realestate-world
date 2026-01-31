@@ -3,7 +3,7 @@
  * Configure testing environment, global test utilities, and mocks
  */
 
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -23,7 +23,7 @@ const localStorageMock = (() => {
   };
 })();
 
-Object.defineProperty(window, 'localStorage', {
+Object.defineProperty(window, "localStorage", {
   value: localStorageMock,
 });
 
@@ -38,11 +38,11 @@ const originalError = console.error;
 beforeAll(() => {
   console.error = (...args: any[]) => {
     if (
-      typeof args[0] === 'string' &&
-      (args[0].includes('Not implemented: HTMLFormElement.prototype.submit') ||
-        args[0].includes('Warning: useLayoutEffect') ||
-        args[0].includes('Warning: An update to') ||
-        args[0].includes('wrapped in act(...)'))
+      typeof args[0] === "string" &&
+      (args[0].includes("Not implemented: HTMLFormElement.prototype.submit") ||
+        args[0].includes("Warning: useLayoutEffect") ||
+        args[0].includes("Warning: An update to") ||
+        args[0].includes("wrapped in act(...)"))
     ) {
       return;
     }

@@ -7,13 +7,14 @@
 // Database Models (aligned with Prisma schema from db/schema.prisma)
 // ============================================================================
 
-export type UserRoleEnum = 'user' | 'admin';
+export type UserRoleEnum = "user" | "admin";
 
 export interface User {
   id: string;
   email: string;
   passwordHash: string; // bcrypt hash
   avatarUrl: string | null;
+  name: string | null;
   role: UserRoleEnum; // Single role enum
   isActive: boolean;
   country_code: string | null;
@@ -75,7 +76,7 @@ export interface TokenPair {
   expiresIn: number; // seconds until access token expires
 }
 
-export interface UserWithRoles extends Omit<User, 'passwordHash'> {
+export interface UserWithRoles extends Omit<User, "passwordHash"> {
   name: string | null; // Name from Person table (for convenience)
   roles: UserRoleEnum[]; // Array for compatibility (single role for now)
   permissions: string[]; // Permissions (empty for now, future RBAC)
@@ -92,7 +93,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse extends TokenPair {
-  user: Omit<User, 'password'>;
+  user: Omit<User, "passwordHash">;
 }
 
 export interface RefreshRequest {
@@ -113,7 +114,7 @@ export interface RegisterRequest {
 }
 
 export interface RegisterResponse extends TokenPair {
-  user: Omit<User, 'password'>;
+  user: Omit<User, "password">;
 }
 
 // User endpoints
@@ -127,7 +128,7 @@ export interface UpdateUserRequest {
 }
 
 export interface UpdateUserResponse {
-  user: Omit<User, 'password'>;
+  user: Omit<User, "password">;
 }
 
 // Generic API response wrappers

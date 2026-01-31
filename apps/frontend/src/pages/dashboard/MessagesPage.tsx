@@ -1,197 +1,191 @@
-import React, { useState } from 'react';
-
-// MessagesPage - Real-time messaging interface
-interface Message {
-  id: string;
-  senderId: string;
-  content: string;
-  timestamp: string;
-  read: boolean;
-}
-
-interface Conversation {
-  id: string;
-  otherUser: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-  lastMessage: string;
-  lastMessageTime: string;
-  unreadCount: number;
-  messages: Message[];
-}
+import React, { useEffect, useState } from "react";
+import { messagesService, Message } from "../../services/messages-service";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function MessagesPage() {
-  const [conversations] = useState<Conversation[]>([
-    {
-      id: 'conv-1',
-      otherUser: { id: 'user-2', name: 'Sarah Johnson' },
-      lastMessage: 'Is the property still available?',
-      lastMessageTime: '2 min ago',
-      unreadCount: 2,
-      messages: [
-        { id: 'm1', senderId: 'user-2', content: 'Hi, I\'m interested in your property', timestamp: '10:30 AM', read: true },
-        { id: 'm2', senderId: 'current', content: 'Great! Which one are you looking at?', timestamp: '10:32 AM', read: true },
-        { id: 'm3', senderId: 'user-2', content: 'Is the property still available?', timestamp: '10:35 AM', read: false },
-      ],
-    },
-    {
-      id: 'conv-2',
-      otherUser: { id: 'user-3', name: 'Michael Chen' },
-      lastMessage: 'Thanks for the information',
-      lastMessageTime: '1 hour ago',
-      unreadCount: 0,
-      messages: [
-        { id: 'm4', senderId: 'user-3', content: 'Can you tell me more about the location?', timestamp: 'Yesterday', read: true },
-        { id: 'm5', senderId: 'current', content: 'It\'s in downtown, close to transit', timestamp: 'Yesterday', read: true },
-        { id: 'm6', senderId: 'user-3', content: 'Thanks for the information', timestamp: '1 hour ago', read: true },
-      ],
-    },
-  ]);
+  const { user } = useAuth();
 
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(
-    conversations[0]
-  );
-  const [newMessage, setNewMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
+  const [newMessage, setNewMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim() || !selectedConversation) return;
-    
-    // TODO: Send message via API
-    console.log('Sending message:', newMessage);
-    setNewMessage('');
+  // Load messages on mount
+  const loadMessages = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await messagesService.getMessages({ take: 50 });
+      setMessages(data);
+      if (data.length > 0 && !selectedThreadId) {
+        setSelectedThreadId(data[0].threadId || data[0].id);
+      }
+    } catch (err) {
+      console.error("[Messages] Failed to load messages:", err);
+      const errorMsg = err instanceof Error ? err.message : "Failed to load messages";
+      setError(errorMsg);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return (
-    <div className="h-[calc(100vh-4rem)] flex">
-        {/* Conversations List */}
-        <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
-          <div className="p-4 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900">Messages</h2>
-            <div className="mt-3">
-              <input
-                type="text"
-                placeholder="Search conversations..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
+  useEffect(() => {
+    loadMessages();
+  }, []);
 
-          <div className="flex-1 overflow-y-auto">
-            {conversations.map((conv) => (
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newMessage.trim() || !selectedThreadId) return;
+
+    try {
+      setSending(true);
+      const messageData = await messagesService.sendMessage({
+        recipientId: selectedThreadId.split("-")[1] || "",
+        body: newMessage,
+        messageType: "response",
+        threadId: selectedThreadId,
+      });
+
+      setMessages([...messages, messageData]);
+      setNewMessage("");
+    } catch (err) {
+      console.error("Failed to send message:", err);
+      setError("Failed to send message");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const threadMessages = messages.filter(
+    (msg) => !selectedThreadId || msg.threadId === selectedThreadId || msg.id === selectedThreadId,
+  );
+
+  // Group messages by thread
+  const threadGroups = messages.reduce(
+    (acc, msg) => {
+      const threadId = msg.threadId || msg.id;
+      if (!acc[threadId]) {
+        acc[threadId] = [];
+      }
+      acc[threadId].push(msg);
+      return acc;
+    },
+    {} as Record<string, Message[]>,
+  );
+
+  const threads = Object.entries(threadGroups).map(([threadId, msgs]) => ({
+    threadId,
+    lastMessage: msgs[msgs.length - 1],
+    unreadCount: msgs.filter((m) => !m.isRead && m.recipientId === user?.id).length,
+    messages: msgs,
+  }));
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-500">Loading messages...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen flex bg-gray-100">
+      {/* Conversations List */}
+      <div className="w-1/3 bg-white border-r border-gray-300">
+        <div className="p-4 border-b">
+          <h2 className="text-xl font-bold">Messages</h2>
+        </div>
+        <div className="overflow-y-auto h-full">
+          {threads.length === 0 ? (
+            <div className="p-4 text-center text-gray-500">No messages yet</div>
+          ) : (
+            threads.map((thread) => (
               <div
-                key={conv.id}
-                onClick={() => setSelectedConversation(conv)}
-                className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 ${
-                  selectedConversation?.id === conv.id ? 'bg-blue-50' : ''
+                key={thread.threadId}
+                onClick={() => setSelectedThreadId(thread.threadId)}
+                className={`p-4 border-b cursor-pointer hover:bg-gray-50 ${
+                  selectedThreadId === thread.threadId
+                    ? "bg-blue-50 border-l-4 border-blue-500"
+                    : ""
                 }`}
               >
-                <div className="flex items-start space-x-3">
-                  <div className="w-12 h-12 rounded-full bg-gray-300 flex-shrink-0 flex items-center justify-center text-white font-semibold">
-                    {conv.otherUser.avatar ? (
-                      <img src={conv.otherUser.avatar} alt="" className="w-full h-full rounded-full object-cover" />
-                    ) : (
-                      conv.otherUser.name.charAt(0)
-                    )}
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm">
+                      {thread.lastMessage.sender?.email || "Unknown"}
+                    </p>
+                    <p className="text-xs text-gray-600 truncate">{thread.lastMessage.body}</p>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start">
-                      <p className="font-semibold text-gray-900 truncate">
-                        {conv.otherUser.name}
-                      </p>
-                      <span className="text-xs text-gray-500">{conv.lastMessageTime}</span>
-                    </div>
-                    <p className="text-sm text-gray-600 truncate">{conv.lastMessage}</p>
-                    {conv.unreadCount > 0 && (
-                      <span className="inline-block mt-1 bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">
-                        {conv.unreadCount}
-                      </span>
-                    )}
-                  </div>
+                  {thread.unreadCount > 0 && (
+                    <span className="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded-full">
+                      {thread.unreadCount}
+                    </span>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
+            ))
+          )}
         </div>
+      </div>
 
-        {/* Message Thread */}
-        {selectedConversation ? (
-          <div className="flex-1 flex flex-col bg-gray-50">
-            {/* Thread Header */}
-            <div className="bg-white p-4 border-b border-gray-200">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-white font-semibold">
-                  {selectedConversation.otherUser.name.charAt(0)}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    {selectedConversation.otherUser.name}
-                  </h3>
-                  <p className="text-xs text-gray-500">Online</p>
-                </div>
-              </div>
-            </div>
-
+      {/* Chat Area */}
+      <div className="w-2/3 bg-white flex flex-col">
+        {selectedThreadId ? (
+          <>
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {selectedConversation.messages.map((message) => (
+              {threadMessages.map((msg) => (
                 <div
-                  key={message.id}
-                  className={`flex ${
-                    message.senderId === 'current' ? 'justify-end' : 'justify-start'
-                  }`}
+                  key={msg.id}
+                  className={`flex ${msg.senderId === user?.id ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                      message.senderId === 'current'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white text-gray-900'
+                    className={`px-4 py-2 rounded-lg max-w-xs ${
+                      msg.senderId === user?.id
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-900"
                     }`}
                   >
-                    <p>{message.content}</p>
-                    <p
-                      className={`text-xs mt-1 ${
-                        message.senderId === 'current' ? 'text-blue-100' : 'text-gray-500'
-                      }`}
-                    >
-                      {message.timestamp}
+                    <p className="text-sm">{msg.body}</p>
+                    <p className="text-xs mt-1 opacity-70">
+                      {new Date(msg.createdAt).toLocaleTimeString()}
                     </p>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Message Input */}
-            <div className="bg-white p-4 border-t border-gray-200">
-              <div className="flex space-x-2">
+            {/* Input */}
+            <div className="border-t p-4 bg-gray-50">
+              <form onSubmit={handleSendMessage} className="flex gap-2">
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder="Type a message..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Type your message..."
+                  className="flex-1 px-4 py-2 border rounded-lg"
+                  disabled={sending}
                 />
                 <button
-                  onClick={handleSendMessage}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                  type="submit"
+                  disabled={sending || !newMessage.trim()}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
                 >
-                  Send
+                  {sending ? "Sending..." : "Send"}
                 </button>
-              </div>
+              </form>
+              {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
             </div>
-          </div>
+          </>
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-gray-50">
-            <div className="text-center text-gray-500">
-              <svg className="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <p>Select a conversation to start messaging</p>
-            </div>
+          <div className="flex items-center justify-center h-full text-gray-500">
+            Select a conversation to start messaging
           </div>
         )}
       </div>
+    </div>
   );
 }

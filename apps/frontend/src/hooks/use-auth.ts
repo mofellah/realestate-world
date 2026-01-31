@@ -3,10 +3,10 @@
  * Manage authentication state (current user, loading)
  */
 
-import { useState, useEffect } from 'react';
-import type { UserWithRoles } from '@boilerplate/types';
-import { tokenStorage } from '@/utils/token-storage';
-import { decodeJWT } from '@/utils/jwt-decode';
+import { useState, useEffect } from "react";
+import type { UserWithRoles } from "@boilerplate/types";
+import { tokenStorage } from "@/utils/token-storage";
+import { decodeJWT } from "@/utils/jwt-decode";
 
 interface UseAuthReturn {
   user: UserWithRoles | null;

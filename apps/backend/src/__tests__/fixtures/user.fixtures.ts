@@ -1,11 +1,24 @@
 /**
  * User Test Fixtures
- * 
+ *
  * Provides factory functions to create mock user data for tests.
  * All fixtures return properly typed objects matching the Prisma schema.
  */
 
-import { User } from '@prisma/client';
+// User type matching Prisma User model
+type User = {
+  id: string;
+  email: string;
+  passwordHash: string;
+  role: string;
+  name: string | null;
+  avatarUrl: string | null;
+  isActive: boolean;
+  country_code: string | null;
+  personId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 /**
  * Create a basic mock user with defaults
@@ -15,12 +28,12 @@ import { User } from '@prisma/client';
 export function createMockUser(overrides?: Partial<User>): User {
   const now = new Date();
   return {
-    id: 'user-' + Math.random().toString(36).substring(7),
-    email: 'user@test.com',
-    passwordHash: 'hashed-password-123',
+    id: "user-" + Math.random().toString(36).substring(7),
+    email: "user@test.com",
+    passwordHash: "hashed-password-123",
     avatarUrl: null,
     name: null,
-    role: 'user',
+    role: "user",
     isActive: true,
     country_code: null,
     personId: null,
@@ -37,8 +50,8 @@ export function createMockUser(overrides?: Partial<User>): User {
  */
 export function createMockAdmin(overrides?: Partial<User>): User {
   return createMockUser({
-    email: 'admin@test.com',
-    role: 'admin',
+    email: "admin@test.com",
+    role: "admin",
     ...overrides,
   });
 }

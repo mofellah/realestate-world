@@ -3,7 +3,7 @@
  * Decode JWT token without verification (client-side only)
  */
 
-import type { JwtPayload } from '@boilerplate/types';
+import type { JwtPayload } from "@boilerplate/types";
 
 /**
  * Decode JWT token and extract payload
@@ -13,18 +13,16 @@ import type { JwtPayload } from '@boilerplate/types';
  */
 export function decodeJWT(token: string): JwtPayload | null {
   try {
-    const parts = token.split('.');
+    const parts = token.split(".");
     if (parts.length !== 3) {
       return null;
     }
 
-    const decoded = JSON.parse(
-      atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
-    );
+    const decoded = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
 
     return decoded as JwtPayload;
   } catch (error) {
-    console.error('Failed to decode JWT:', error);
+    console.error("Failed to decode JWT:", error);
     return null;
   }
 }

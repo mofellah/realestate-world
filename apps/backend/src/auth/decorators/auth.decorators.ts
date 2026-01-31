@@ -3,8 +3,8 @@
  * Custom decorators for auth guards and metadata
  */
 
-import { createParamDecorator, ExecutionContext, SetMetadata } from '@nestjs/common';
-import type { UserWithRoles } from '@boilerplate/types';
+import { createParamDecorator, ExecutionContext, SetMetadata } from "@nestjs/common";
+import type { UserWithRoles } from "@boilerplate/types";
 
 /**
  * CurrentUser Decorator
@@ -23,10 +23,10 @@ export const CurrentUser = createParamDecorator(
  * Sets required roles metadata for RoleGuard
  * @param roles - Array of role names required to access the endpoint
  */
-export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
+export const Roles = (...roles: string[]) => SetMetadata("roles", roles);
 
 /**
  * Public Decorator
  * Marks a route as public (no JWT required)
  */
-export const Public = () => SetMetadata('isPublic', true);
+export const Public = () => SetMetadata("isPublic", true);

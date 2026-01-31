@@ -1,15 +1,24 @@
-# Boilerplate Documentation Index
+# Documentation Index
 
-**Last Updated**: 2026-01-26  
-**Status**: Framework + Cleanup Complete (docs aligned)
+**Last Updated**: January 29, 2026  
+**Status**: Core Features Complete | Testing 97.4% Pass Rate
 
 ---
 
-## 📚 Documentation Overview
+## 📖 Quick Navigation
 
-This boilerplate is **AI-optimized** with explicit decisions, patterns, and locations. Start here to understand the project structure and get onboarded.
+**New to the project?** Start with these essential docs:
 
-### Documents (Read in Order)
+1. **[../README.md](../README.md)** — Project overview (5 min)
+2. **[../QUICK_REFERENCE.md](../QUICK_REFERENCE.md)** — Commands & tips (3 min)
+3. **[../QUICK_START.md](../QUICK_START.md)** — Setup guide (10 min)
+4. **[PROJECT_HISTORY.md](PROJECT_HISTORY.md)** — Current status (10 min)
+
+---
+
+## 📚 Core Documentation
+
+### Architecture & Design
 
 1. **[specs/boilerplate.md](../specs/boilerplate.md)** (START HERE)
    - Goals, acceptance criteria, BDD scenarios
@@ -303,7 +312,17 @@ By end of Phase 1-3, the boilerplate should:
 
 ---
 
-## 📝 Notes
+## � Historical Documentation
+
+**Archived documentation** (superseded or completed):
+- **[archive/README.md](archive/README.md)** — Index of archived docs
+- **[sessions/](sessions/)** — Development session summaries
+
+These folders contain historical status reports, bug fix summaries, and session notes that have been consolidated into current documentation.
+
+---
+
+## �📝 Notes
 
 - This framework is **AI-optimized**: every decision, pattern, and location is explicit
 - Strict **BDD/TDD discipline**: tests before code, scenarios first

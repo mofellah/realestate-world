@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Diagnostic</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .section {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .success { border-left-color: #28a745; }
+        .error { border-left-color: #dc3545; }
+        .warning { border-left-color: #ffc107; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Real Estate API Diagnostic</h1>
+    
+    <div class="section">
+        <h2>1. Browser Environment</h2>
+        <pre id="env"></pre>
+    </div>
+
+    <div class="section">
+        <h2>2. Test API Endpoints</h2>
+        <button onclick="testHealth()">Test Health</button>
+        <button onclick="testLogin()">Test Login</button>
+        <pre id="results"></pre>
+    </div>
+
+    <div class="section">
+        <h2>3. CORS Preflight Test</h2>
+        <button onclick="testCORS()">Test CORS Preflight</button>
+        <pre id="cors-results"></pre>
+    </div>
+
+    <script>
+        // Show environment
+        document.getElementById('env').textContent = JSON.stringify({
+            hostname: window.location.hostname,
+            port: window.location.port,
+            protocol: window.location.protocol,
+            pathname: window.location.pathname,
+            userAgent: navigator.userAgent.substring(0, 50) + '...',
+        }, null, 2);
+
+        function log(msg) {
+            console.log('[Diagnostic]', msg);
+            document.getElementById('results').textContent += msg + '\n';
+        }
+
+        async function testHealth() {
+            document.getElementById('results').textContent = '';
+            log('[1] Testing /api/health (via Vite proxy)');
+            
+            try {
+                const response = await fetch('/api/health', { method: 'GET' });
+                log(`[2] Response status: ${response.status}`);
+                log(`[3] CORS headers:`);
+                log(`    Access-Control-Allow-Origin: ${response.headers.get('Access-Control-Allow-Origin')}`);
+                
+                const data = await response.json();
+                log(`[4] Response data: ${JSON.stringify(data)}`);
+            } catch (error) {
+                log(`[ERROR] ${error.message}`);
+                log(`[ERROR] Stack: ${error.stack}`);
+            }
+        }
+
+        async function testLogin() {
+            document.getElementById('results').textContent = '';
+            log('[1] Testing /api/auth/login');
+            log('[2] Sending: {"email":"user@example.com","password":"User123!"}');
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: 'user@example.com', password: 'User123!' })
+                });
+                
+                log(`[3] Response status: ${response.status}`);
+                log(`[4] Response type: ${response.type}`);
+                log(`[5] CORS headers:`);
+                log(`    Access-Control-Allow-Origin: ${response.headers.get('Access-Control-Allow-Origin')}`);
+                log(`    Access-Control-Allow-Credentials: ${response.headers.get('Access-Control-Allow-Credentials')}`);
+                
+                const data = await response.json();
+                log(`[6] Response data: ${JSON.stringify(data).substring(0, 200)}...`);
+                log(`[SUCCESS] Login endpoint working!`);
+            } catch (error) {
+                log(`[ERROR] ${error.message}`);
+                log(`[ERROR] Stack: ${error.stack}`);
+            }
+        }
+
+        async function testCORS() {
+            document.getElementById('cors-results').textContent = '';
+            log = (msg) => {
+                console.log('[CORS Test]', msg);
+                document.getElementById('cors-results').textContent += msg + '\n';
+            };
+            
+            log('[1] Sending OPTIONS preflight to /api/auth/login');
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'content-type'
+                    }
+                });
+                
+                log(`[2] Preflight response status: ${response.status}`);
+                log(`[3] Response headers:`);
+                log(`    Allow-Origin: ${response.headers.get('Access-Control-Allow-Origin')}`);
+                log(`    Allow-Methods: ${response.headers.get('Access-Control-Allow-Methods')}`);
+                log(`    Allow-Headers: ${response.headers.get('Access-Control-Allow-Headers')}`);
+                log(`    Allow-Credentials: ${response.headers.get('Access-Control-Allow-Credentials')}`);
+            } catch (error) {
+                log(`[ERROR] ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>

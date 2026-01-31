@@ -3,25 +3,24 @@
  * Endpoints for login, refresh, logout
  */
 
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Req } from "@nestjs/common";
+import { Throttle } from "@nestjs/throttler";
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from "@nestjs/swagger";
+import { AuthService } from "./auth.service";
+import { JwtGuard } from "./guards/jwt.guard";
+import { CurrentUser, Public } from "./decorators/auth.decorators";
 import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { AuthService } from './auth.service';
-import { JwtGuard } from './guards/jwt.guard';
-import { CurrentUser, Public } from './decorators/auth.decorators';
-import { LoginDto, RegisterDto, RefreshDto, LoginResponseDto, LogoutResponseDto } from './dto/auth.dto';
-import type { UserWithRoles } from '@boilerplate/types';
-import type { RequestWithCorrelation } from '../common/types';
+  LoginDto,
+  RegisterDto,
+  RefreshDto,
+  LoginResponseDto,
+  LogoutResponseDto,
+} from "./dto/auth.dto";
+import type { UserWithRoles } from "@boilerplate/types";
+import type { RequestWithCorrelation } from "../common/types";
 
-@ApiTags('Authentication')
-@Controller('auth')
+@ApiTags("Authentication")
+@Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
 
@@ -29,17 +28,20 @@ export class AuthController {
    * POST /auth/login
    * Login with email and password
    * Returns: { accessToken, refreshToken, expiresIn, user }
+   * ✅ Rate limited: 5 attempts per 15 minutes (prevents brute force)
    */
-  @Post('login')
+  @Throttle({ default: { limit: 5, ttl: 15 * 60 * 1000 } })
+  @Post("login")
   @Public()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Login with email and password' })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Login successful',
+  @ApiOperation({ summary: "Login with email and password" })
+  @ApiResponse({
+    status: 200,
+    description: "Login successful",
     type: LoginResponseDto,
   })
-  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @ApiResponse({ status: 401, description: "Invalid credentials" })
+  @ApiResponse({ status: 429, description: "Too many login attempts" })
   async login(@Body() loginRequest: LoginDto, @Req() req: RequestWithCorrelation) {
     const correlationId = req.correlationId;
     return this.authService.login(loginRequest, correlationId);
@@ -49,17 +51,20 @@ export class AuthController {
    * POST /auth/register
    * Register a new user with email, password, and optional name
    * Returns: { accessToken, refreshToken, expiresIn, user }
+   * ✅ Rate limited: 5 attempts per 15 minutes (prevents spam registration)
    */
-  @Post('register')
+  @Throttle({ default: { limit: 5, ttl: 15 * 60 * 1000 } })
+  @Post("register")
   @Public()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Register a new user account' })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'Registration successful',
+  @ApiOperation({ summary: "Register a new user account" })
+  @ApiResponse({
+    status: 201,
+    description: "Registration successful",
     type: LoginResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Invalid input or email already exists' })
+  @ApiResponse({ status: 400, description: "Invalid input or email already exists" })
+  @ApiResponse({ status: 429, description: "Too many registration attempts" })
   async register(@Body() registerRequest: RegisterDto, @Req() req: RequestWithCorrelation) {
     const correlationId = req.correlationId;
     return this.authService.register(registerRequest, correlationId);
@@ -69,16 +74,19 @@ export class AuthController {
    * POST /auth/refresh
    * Refresh access token using refresh token
    * Returns: { accessToken, refreshToken, expiresIn }
+   * ✅ Rate limited: 5 attempts per 15 minutes (prevents token refresh abuse)
    */
-  @Post('refresh')
+  @Throttle({ default: { limit: 5, ttl: 15 * 60 * 1000 } })
+  @Post("refresh")
   @Public()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Refresh access token' })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Token refreshed successfully',
+  @ApiOperation({ summary: "Refresh access token" })
+  @ApiResponse({
+    status: 200,
+    description: "Token refreshed successfully",
   })
-  @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
+  @ApiResponse({ status: 401, description: "Invalid or expired refresh token" })
+  @ApiResponse({ status: 429, description: "Too many refresh attempts" })
   async refresh(@Body() refreshRequest: RefreshDto, @Req() req: RequestWithCorrelation) {
     const correlationId = req.correlationId;
     return this.authService.refreshToken(refreshRequest.refreshToken, correlationId);
@@ -90,17 +98,17 @@ export class AuthController {
    * Requires: Valid JWT token
    * Returns: { success: true }
    */
-  @Post('logout')
+  @Post("logout")
   @UseGuards(JwtGuard)
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Logout and revoke tokens' })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Logout successful',
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({ summary: "Logout and revoke tokens" })
+  @ApiResponse({
+    status: 200,
+    description: "Logout successful",
     type: LogoutResponseDto,
   })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
   async logout(@CurrentUser() user: UserWithRoles, @Req() req: RequestWithCorrelation) {
     const correlationId = req.correlationId;
     return this.authService.logout(user.id, correlationId);

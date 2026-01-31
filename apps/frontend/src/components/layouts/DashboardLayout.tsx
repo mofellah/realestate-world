@@ -1,7 +1,7 @@
 // Dashboard layout with sidebar
-import { Outlet } from 'react-router-dom';
-import DashboardSidebar from '../DashboardSidebar';
-import Header from '../Header';
+import { Outlet } from "react-router-dom";
+import DashboardSidebar from "../DashboardSidebar";
+import Header from "../Header";
 
 export default function DashboardLayout() {
   return (

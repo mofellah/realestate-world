@@ -20,8 +20,8 @@ COPY apps/backend/package*.json ./apps/backend/
 COPY packages/*/package*.json ./packages/
 COPY db/package*.json ./db/
 
-# Install all dependencies
-RUN npm ci --workspace=apps/backend --include-workspace-root
+# Install all dependencies (including devDependencies needed for TypeScript compilation)
+RUN npm ci --include-workspace-root
 
 # Copy source code
 COPY tsconfig.json ./

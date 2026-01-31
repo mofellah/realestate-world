@@ -1,5 +1,5 @@
 // Footer component
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -25,10 +25,26 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li><Link to="/search" className="hover:text-white">Search Properties</Link></li>
-              <li><Link to="/dashboard/properties/create" className="hover:text-white">List Property</Link></li>
-              <li><Link to="/#how-it-works" className="hover:text-white">How It Works</Link></li>
-              <li><Link to="/#pricing" className="hover:text-white">Pricing</Link></li>
+              <li>
+                <Link to="/search" className="hover:text-white">
+                  Search Properties
+                </Link>
+              </li>
+              <li>
+                <Link to="/dashboard/properties/create" className="hover:text-white">
+                  List Property
+                </Link>
+              </li>
+              <li>
+                <Link to="/#how-it-works" className="hover:text-white">
+                  How It Works
+                </Link>
+              </li>
+              <li>
+                <Link to="/#pricing" className="hover:text-white">
+                  Pricing
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -36,10 +52,26 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-4">Support</h3>
             <ul className="space-y-2">
-              <li><Link to="/help" className="hover:text-white">Help Center</Link></li>
-              <li><Link to="/contact" className="hover:text-white">Contact Us</Link></li>
-              <li><Link to="/faq" className="hover:text-white">FAQ</Link></li>
-              <li><Link to="/terms" className="hover:text-white">Terms of Service</Link></li>
+              <li>
+                <Link to="/help" className="hover:text-white">
+                  Help Center
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-white">
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="hover:text-white">
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="hover:text-white">
+                  Terms of Service
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -47,9 +79,21 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-4">Markets</h3>
             <ul className="space-y-2">
-              <li><Link to="/search?country=BE" className="hover:text-white">🇧🇪 Belgium</Link></li>
-              <li><Link to="/search?country=NL" className="hover:text-white">🇳🇱 Netherlands</Link></li>
-              <li><Link to="/search?country=CH" className="hover:text-white">🇨🇭 Switzerland</Link></li>
+              <li>
+                <Link to="/search?country=BE" className="hover:text-white">
+                  🇧🇪 Belgium
+                </Link>
+              </li>
+              <li>
+                <Link to="/search?country=NL" className="hover:text-white">
+                  🇳🇱 Netherlands
+                </Link>
+              </li>
+              <li>
+                <Link to="/search?country=CH" className="hover:text-white">
+                  🇨🇭 Switzerland
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

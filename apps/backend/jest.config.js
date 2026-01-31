@@ -52,11 +52,8 @@ module.exports = {
   
   coverageDirectory: '../../../coverage/backend',
   
-  // Timeouts
-  testTimeout: 10000,     // 10s default for unit tests
-  
   // Serial execution to prevent test database conflicts
-  runInBand: true,
+  maxWorkers: 1,  // Run tests sequentially
   
   // Setup
   setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
@@ -64,7 +61,8 @@ module.exports = {
   // Test discovery patterns
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.spec.ts',
-    '<rootDir>/src/**/?(*.)+(spec).ts',
+    '<rootDir>/src/**/__tests__/**/*.test.ts',
+    '<rootDir>/src/**/?(*.)+(spec|test).ts',
   ],
   
   // Ignore patterns
@@ -79,41 +77,12 @@ module.exports = {
     '/dist/',
   ],
   
-  // Reporters (default console + JSON summary)
-  reporters: [
-    'default',
-    // Temporarily disabled jest-junit due to missing dependency
-    // [
-    //   'jest-junit',
-    //   {
-    //     outputDirectory: '../../../coverage/backend',
-    //     outputName: 'test-results.xml',
-    //     ancestorSeparator: ' › ',
-    //   },
-    // ],
-  ],
-  
-  // TypeScript transformation
-  globals: {
-    'ts-jest': {
-      useESM: false,
-      isolatedModules: true,
-      babelConfig: false,
-    },
-  },
-  
   transform: {
     '^.+\\.ts$': [
       'ts-jest',
       {
-        useESM: false,
         tsconfig: '<rootDir>/tsconfig.json',
-        isolatedModules: true,
-        babelConfig: false,
       },
     ],
   },
-  
-  // Verbose output for debugging
-  verbose: true,
 };

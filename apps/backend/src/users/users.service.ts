@@ -3,14 +3,14 @@
  * Business logic for user operations
  */
 
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { Logger } from '@boilerplate/logger';
-import type { UserWithRoles } from '@boilerplate/types';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { Logger } from "@boilerplate/logger";
+import type { UserWithRoles } from "@boilerplate/types";
 
 @Injectable()
 export class UsersService {
-  private logger = new Logger('info', { service: 'UsersService' });
+  private logger = new Logger("info", { service: "UsersService" });
 
   constructor(private prisma: PrismaService) {}
 
@@ -23,10 +23,10 @@ export class UsersService {
     });
 
     if (!user) {
-      this.logger.warn('User not found', { userId });
+      this.logger.warn("User not found", { userId });
       throw new NotFoundException({
-        message: 'User not found',
-        error: 'USER_NOT_FOUND',
+        message: "User not found",
+        error: "USER_NOT_FOUND",
       });
     }
 
