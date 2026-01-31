@@ -91,7 +91,10 @@ describe("main bootstrap", () => {
 
     expect(mockApp.enableCors).toHaveBeenCalledWith(
       expect.objectContaining({
-        origin: "http://example.com",
+        origin: expect.any(Function),
+        credentials: true,
+        methods: expect.arrayContaining(["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]),
+        allowedHeaders: expect.arrayContaining(["Content-Type", "Authorization"]),
       }),
     );
     expect(mockApp.listen).toHaveBeenCalledWith(3000, "0.0.0.0");
