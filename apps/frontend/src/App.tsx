@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import { usePropertyStore } from "./stores/propertyStore";
+import { useAuth } from "./contexts/AuthContext";
 
 // Theme Provider
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -40,6 +41,12 @@ import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 
 import "./styles/layout.scss";
 
+// Root redirect component
+function RootRedirect() {
+  const { user } = useAuth();
+  return <Navigate to={user ? "/dashboard" : "/login"} replace />;
+}
+
 export default function App() {
   const { fetchListings, fetchProperties } = usePropertyStore();
 
@@ -53,9 +60,12 @@ export default function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <Routes>
+          {/* Root redirect based on auth status */}
+          <Route path="/" element={<RootRedirect />} />
+
           {/* Public Routes with Main Layout */}
           <Route element={<MainLayout />}>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/home" element={<HomePage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/property/:id" element={<PropertyDetailPage />} />
           </Route>
