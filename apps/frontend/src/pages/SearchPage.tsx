@@ -8,13 +8,14 @@ import { PropertyCardSkeleton } from "@/components/Skeleton";
 export default function SearchPage() {
   const { properties, total, loading, search, error } = useMapSearch();
   const [filters, setFilters] = useState<PropertyFilters>({});
-  const [viewMode, setViewMode] = useState<"map" | "list">("map");
+  const [viewMode, setViewMode] = useState<"map" | "list">("list");
   const [center] = useState<[number, number]>([4.3517, 50.8503]); // Brussels
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
 
   useEffect(() => {
     // Initial search
     search(filters, center);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -23,10 +24,19 @@ export default function SearchPage() {
 
   const handleApplyFilters = () => {
     search(filters, center);
+    
+    // Update URL with filter params for shareable links
+    const params = new URLSearchParams();
+    if (filters.priceMin) params.set("priceMin", filters.priceMin.toString());
+    if (filters.priceMax) params.set("priceMax", filters.priceMax.toString());
+    if (filters.type) params.set("type", filters.type);
+    if (filters.bedrooms) params.set("bedrooms", filters.bedrooms.toString());
+    
+    window.history.pushState({}, "", `?${params.toString()}`);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div data-testid="search-page" className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -36,6 +46,14 @@ export default function SearchPage() {
           </div>
           <div className="flex space-x-2">
             <button
+              data-testid="filter-toggle"
+              onClick={() => setFilterPanelOpen(!filterPanelOpen)}
+              className="px-4 py-2 rounded-lg font-medium bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
+            >
+              🔍 Filters
+            </button>
+            <button
+              data-testid="view-toggle-list"
               onClick={() => setViewMode("list")}
               className={`px-4 py-2 rounded-lg font-medium ${
                 viewMode === "list"
@@ -46,6 +64,7 @@ export default function SearchPage() {
               📋 List
             </button>
             <button
+              data-testid="view-toggle-map"
               onClick={() => setViewMode("map")}
               className={`px-4 py-2 rounded-lg font-medium ${
                 viewMode === "map"
@@ -60,9 +79,15 @@ export default function SearchPage() {
 
         <div className="flex gap-6">
           {/* Filter Panel */}
-          <aside className="w-80">
-            <FilterPanel filters={filters} onChange={setFilters} onApply={handleApplyFilters} />
-          </aside>
+          {filterPanelOpen && (
+            <aside className="w-80">
+              <FilterPanel
+                filters={filters}
+                onChange={setFilters}
+                onApply={handleApplyFilters}
+              />
+            </aside>
+          )}
 
           {/* Main Content */}
           <main className="flex-1">
@@ -86,12 +111,16 @@ export default function SearchPage() {
                 className="bg-white rounded-lg shadow-md overflow-hidden"
                 style={{ height: "600px" }}
               >
-                <MapView center={center} zoom={12} properties={properties} />
+                <MapView
+                  center={center}
+                  zoom={12}
+                  properties={properties}
+                />
               </div>
             )}
 
             {!loading && viewMode === "list" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div data-testid="listing-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {properties.length === 0 ? (
                   <div className="col-span-full text-center py-8 text-gray-500">
                     No properties found. Try adjusting your filters.
@@ -101,6 +130,7 @@ export default function SearchPage() {
                     <Link
                       key={property.id}
                       to={`/property/${property.id}`}
+                      data-testid="listing-card"
                       className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
                     >
                       <div className="aspect-video bg-gray-200">
@@ -110,16 +140,21 @@ export default function SearchPage() {
                       </div>
                       <div className="p-4">
                         <h3 className="font-semibold text-lg mb-2">{property.title}</h3>
-                        <p className="text-gray-600 text-sm mb-2">
+                        <p data-testid="property-type" className="text-gray-500 text-xs uppercase mb-1">
+                          {property.type || "N/A"}
+                        </p>
+                        <p data-testid="property-address" className="text-gray-600 text-sm mb-2">
                           {typeof property.address === "string"
                             ? property.address
                             : property.address?.city || "No location"}
                         </p>
-                        <p className="text-xl font-bold text-blue-600">
+                        <p data-testid="property-price" className="text-xl font-bold text-blue-600">
                           ${property.price?.toLocaleString() ?? "N/A"}
                         </p>
                         <div className="flex space-x-4 mt-2 text-sm text-gray-500">
-                          {property.bedrooms && <span>🛏️ {property.bedrooms}</span>}
+                          {property.bedrooms && (
+                            <span data-testid="property-bedrooms">🛏️ {property.bedrooms}</span>
+                          )}
                           {property.bathrooms && <span>🚿 {property.bathrooms}</span>}
                           {property.areaSquareMeters && (
                             <span>📏 {property.areaSquareMeters}m²</span>
