@@ -2,10 +2,8 @@
  * E2E Test: Property Listing Creation and Publication Flow
  * Maps to BDD scenarios from specs/bdd/02-property-listing.feature
  * Tests the full owner flow: create listing, set visibility, publish
- *
- * TODO: Enable when property listing UI is implemented
  */
-describe.skip("Property Listing Management", () => {
+describe("Property Listing Management", () => {
   const baseUrl = "";
 
   beforeEach(() => {
