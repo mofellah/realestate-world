@@ -1,7 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Logger } from '@boilerplate/logger';
-import { Prisma } from '@prisma/client';
 import crypto from 'crypto';
 
 /**

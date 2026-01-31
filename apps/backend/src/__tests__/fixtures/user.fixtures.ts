@@ -7,7 +7,7 @@
 
 import { Prisma } from '@prisma/client';
 
-type User = Prisma.UserGetPayload<{}>;
+type User = Prisma.UserGetPayload<Record<string, never>>;
 
 /**
  * Create a basic mock user with defaults

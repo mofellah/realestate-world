@@ -7,8 +7,8 @@
 
 import { Prisma } from '@prisma/client';
 
-type Property = Prisma.PropertyGetPayload<{}>;
-type Address = Prisma.AddressGetPayload<{}>;
+type Property = Prisma.PropertyGetPayload<Record<string, never>>;
+type Address = Prisma.AddressGetPayload<Record<string, never>>;
 
 /**
  * Create a mock address entity

@@ -10,7 +10,6 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { comparePassword, hashPassword } from '@boilerplate/utils';
 import { backendConfig } from '@boilerplate/config';

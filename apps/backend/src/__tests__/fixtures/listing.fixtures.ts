@@ -7,7 +7,7 @@
 
 import { Prisma } from '@prisma/client';
 
-type Listing = Prisma.ListingGetPayload<{}>;
+type Listing = Prisma.ListingGetPayload<Record<string, never>>;
 
 /**
  * Create a mock base listing entity

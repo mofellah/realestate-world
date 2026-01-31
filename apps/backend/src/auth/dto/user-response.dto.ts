@@ -7,7 +7,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Prisma, UserRole } from '@prisma/client';
 
-type User = Prisma.UserGetPayload<{}>;
+type User = Prisma.UserGetPayload<Record<string, never>>;
 
 export class UserResponseDto implements Omit<User, 'passwordHash'> {
   @ApiProperty({
