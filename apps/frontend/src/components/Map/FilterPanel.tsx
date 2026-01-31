@@ -70,11 +70,21 @@ export default function FilterPanel({ filters, onChange, onApply }: PropertyFilt
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">All Types</option>
-          <option data-testid="type-option-house" value="house">House</option>
-          <option data-testid="type-option-apartment" value="apartment">Apartment</option>
-          <option data-testid="type-option-condo" value="condo">Condo</option>
-          <option data-testid="type-option-land" value="land">Land</option>
-          <option data-testid="type-option-commercial" value="commercial">Commercial</option>
+          <option data-testid="type-option-house" value="house">
+            House
+          </option>
+          <option data-testid="type-option-apartment" value="apartment">
+            Apartment
+          </option>
+          <option data-testid="type-option-condo" value="condo">
+            Condo
+          </option>
+          <option data-testid="type-option-land" value="land">
+            Land
+          </option>
+          <option data-testid="type-option-commercial" value="commercial">
+            Commercial
+          </option>
         </select>
       </div>
 
@@ -90,11 +100,21 @@ export default function FilterPanel({ filters, onChange, onApply }: PropertyFilt
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">Any</option>
-          <option data-testid="bedrooms-option-1" value="1">1+</option>
-          <option data-testid="bedrooms-option-2" value="2">2+</option>
-          <option data-testid="bedrooms-option-3" value="3">3+</option>
-          <option data-testid="bedrooms-option-4" value="4">4+</option>
-          <option data-testid="bedrooms-option-5" value="5">5+</option>
+          <option data-testid="bedrooms-option-1" value="1">
+            1+
+          </option>
+          <option data-testid="bedrooms-option-2" value="2">
+            2+
+          </option>
+          <option data-testid="bedrooms-option-3" value="3">
+            3+
+          </option>
+          <option data-testid="bedrooms-option-4" value="4">
+            4+
+          </option>
+          <option data-testid="bedrooms-option-5" value="5">
+            5+
+          </option>
         </select>
       </div>
 
@@ -110,9 +130,15 @@ export default function FilterPanel({ filters, onChange, onApply }: PropertyFilt
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">Any</option>
-          <option data-testid="bathrooms-option-1" value="1">1+</option>
-          <option data-testid="bathrooms-option-2" value="2">2+</option>
-          <option data-testid="bathrooms-option-3" value="3">3+</option>
+          <option data-testid="bathrooms-option-1" value="1">
+            1+
+          </option>
+          <option data-testid="bathrooms-option-2" value="2">
+            2+
+          </option>
+          <option data-testid="bathrooms-option-3" value="3">
+            3+
+          </option>
         </select>
       </div>
 

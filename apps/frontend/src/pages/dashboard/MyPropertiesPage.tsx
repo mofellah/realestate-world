@@ -117,7 +117,10 @@ export default function MyPropertiesPage() {
           </Link>
         </div>
       ) : (
-        <div data-testid="property-list" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          data-testid="property-list"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           {filteredProperties.map((property) => (
             <div
               key={property.id}
@@ -140,7 +143,10 @@ export default function MyPropertiesPage() {
 
               {/* Property Details */}
               <div className="p-4">
-                <h3 data-testid="property-title" className="text-lg font-semibold text-gray-900 mb-2 capitalize">
+                <h3
+                  data-testid="property-title"
+                  className="text-lg font-semibold text-gray-900 mb-2 capitalize"
+                >
                   {property.type}
                 </h3>
 
@@ -149,7 +155,10 @@ export default function MyPropertiesPage() {
                   {property.address.city}, {property.address.country}
                 </p>
 
-                <div data-testid="property-status" className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mb-3">
+                <div
+                  data-testid="property-status"
+                  className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mb-3"
+                >
                   Active
                 </div>
 

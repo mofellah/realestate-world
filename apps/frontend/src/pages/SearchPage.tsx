@@ -24,14 +24,14 @@ export default function SearchPage() {
 
   const handleApplyFilters = () => {
     search(filters, center);
-    
+
     // Update URL with filter params for shareable links
     const params = new URLSearchParams();
     if (filters.priceMin) params.set("priceMin", filters.priceMin.toString());
     if (filters.priceMax) params.set("priceMax", filters.priceMax.toString());
     if (filters.type) params.set("type", filters.type);
     if (filters.bedrooms) params.set("bedrooms", filters.bedrooms.toString());
-    
+
     window.history.pushState({}, "", `?${params.toString()}`);
   };
 
@@ -81,11 +81,7 @@ export default function SearchPage() {
           {/* Filter Panel */}
           {filterPanelOpen && (
             <aside className="w-80">
-              <FilterPanel
-                filters={filters}
-                onChange={setFilters}
-                onApply={handleApplyFilters}
-              />
+              <FilterPanel filters={filters} onChange={setFilters} onApply={handleApplyFilters} />
             </aside>
           )}
 
@@ -111,16 +107,15 @@ export default function SearchPage() {
                 className="bg-white rounded-lg shadow-md overflow-hidden"
                 style={{ height: "600px" }}
               >
-                <MapView
-                  center={center}
-                  zoom={12}
-                  properties={properties}
-                />
+                <MapView center={center} zoom={12} properties={properties} />
               </div>
             )}
 
             {!loading && viewMode === "list" && (
-              <div data-testid="listing-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div
+                data-testid="listing-grid"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
                 {properties.length === 0 ? (
                   <div className="col-span-full text-center py-8 text-gray-500">
                     No properties found. Try adjusting your filters.
@@ -140,7 +135,10 @@ export default function SearchPage() {
                       </div>
                       <div className="p-4">
                         <h3 className="font-semibold text-lg mb-2">{property.title}</h3>
-                        <p data-testid="property-type" className="text-gray-500 text-xs uppercase mb-1">
+                        <p
+                          data-testid="property-type"
+                          className="text-gray-500 text-xs uppercase mb-1"
+                        >
                           {property.type || "N/A"}
                         </p>
                         <p data-testid="property-address" className="text-gray-600 text-sm mb-2">

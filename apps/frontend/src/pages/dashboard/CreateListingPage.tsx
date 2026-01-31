@@ -71,7 +71,7 @@ export default function CreateListingPage() {
 
       const submissionData = statusOverride ? { ...formData, status: statusOverride } : formData;
       await listingsService.createListing(submissionData);
-      
+
       setSuccess("Listing created successfully!");
       setTimeout(() => {
         navigate("/dashboard/my-listings");
@@ -105,16 +105,21 @@ export default function CreateListingPage() {
 
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
         {success && (
-          <div data-testid="success-toast" className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div
+            data-testid="success-toast"
+            className="bg-green-50 border border-green-200 rounded-lg p-4"
+          >
             <p className="text-green-700 font-semibold">Success</p>
             <p className="text-green-600 text-sm">{success}</p>
           </div>
         )}
-        
+
         {error && (
           <div data-testid="error-toast" className="bg-red-50 border border-red-200 rounded-lg p-4">
             <p className="text-red-700 font-semibold">Error</p>
-            <p data-testid="error-message" className="text-red-600 text-sm">{error}</p>
+            <p data-testid="error-message" className="text-red-600 text-sm">
+              {error}
+            </p>
           </div>
         )}
 

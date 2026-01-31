@@ -20,7 +20,7 @@ describe("Property Search and Discovery", () => {
 
       // Then: User sees property listings (or empty state if no properties)
       // Note: This might be 0 if backend has no properties
-      cy.get('[data-testid="listing-card"]').should("have.length.greaterThanOrEqual", 0);
+      cy.get('[data-testid="listing-card"]').should("have.length.at.least", 0);
     });
 
     it.skip("should display property preview cards with essential info", () => {
@@ -59,17 +59,20 @@ describe("Property Search and Discovery", () => {
 
   describe("Scenario: Searcher filters properties by criteria", () => {
     it("should open and close filter panel", () => {
+      // Initially: Filter panel should not exist
+      cy.get('[data-testid="filter-panel"]').should("not.exist");
+
       // When: User clicks filter toggle
       cy.get('[data-testid="filter-toggle"]').click();
 
-      // Then: Filter panel opens
-      cy.get('[data-testid="filter-panel"]').should("be.visible");
+      // Then: Filter panel appears in DOM
+      cy.get('[data-testid="filter-panel"]').should("exist").should("be.visible");
 
       // When: User clicks filter toggle again
       cy.get('[data-testid="filter-toggle"]').click();
 
-      // Then: Filter panel closes
-      cy.get('[data-testid="filter-panel"]').should("not.be.visible");
+      // Then: Filter panel is removed from DOM
+      cy.get('[data-testid="filter-panel"]').should("not.exist");
     });
 
     it.skip("should filter by price range", () => {
@@ -102,7 +105,7 @@ describe("Property Search and Discovery", () => {
       cy.get('[data-testid="filter-toggle"]').click();
 
       // When: User selects property type
-      cy.get('[data-testid="property-type-filter"]').select('apartment');
+      cy.get('[data-testid="property-type-filter"]').select("apartment");
 
       // And: User clicks Apply
       cy.get('[data-testid="filter-apply-button"]').click();
@@ -118,7 +121,7 @@ describe("Property Search and Discovery", () => {
       cy.get('[data-testid="filter-toggle"]').click();
 
       // When: User selects bedrooms filter
-      cy.get('[data-testid="bedrooms-filter"]').select('2');
+      cy.get('[data-testid="bedrooms-filter"]').select("2");
 
       // And: User clicks Apply
       cy.get('[data-testid="filter-apply-button"]').click();
@@ -281,7 +284,7 @@ describe("Property Search and Discovery", () => {
 
       // When: User applies multiple filters
       cy.get('[data-testid="price-min-input"]').clear().type("150000");
-      cy.get('[data-testid="property-type-filter"]').select('apartment');
+      cy.get('[data-testid="property-type-filter"]').select("apartment");
 
       // And: User clicks Apply
       cy.get('[data-testid="filter-apply-button"]').click();
