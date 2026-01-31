@@ -67,7 +67,12 @@ export default function LoginPage() {
               disabled={loading}
             />
           </div>
-          <button type="submit" disabled={loading} className="btn-primary">
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-primary"
+            data-testid="login-button"
+          >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>

@@ -3,7 +3,8 @@
  * Maps to BDD scenarios from specs/bdd/02-property-listing.feature
  * Tests the full owner flow: create listing, set visibility, publish
  *
- * TODO: Enable when property listing UI is implemented
+ * NOTE: These tests are currently skipped as they require backend data (properties)
+ * to be present. They should be enabled when backend seeding is implemented.
  */
 describe.skip("Property Listing Management", () => {
   const baseUrl = "";

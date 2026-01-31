@@ -144,5 +144,12 @@ export default function MapView({
     source.addFeatures(features);
   }, [propertyMarkersLayer, properties]);
 
-  return <div ref={mapRef} className="w-full h-full" style={{ minHeight: "500px" }} />;
+  return (
+    <div
+      data-testid="property-map"
+      ref={mapRef}
+      className="w-full h-full"
+      style={{ minHeight: "500px" }}
+    />
+  );
 }

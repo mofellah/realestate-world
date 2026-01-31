@@ -112,7 +112,7 @@ describe("FilterPanel Component", () => {
       const propertyTypeSelect = selects[0]; // First select: Property Type
 
       fireEvent.change(propertyTypeSelect, { target: { value: "apartment" } });
-      expect(mockOnChange).toHaveBeenCalledWith({ propertyType: "apartment" });
+      expect(mockOnChange).toHaveBeenCalledWith({ type: "apartment" });
     });
 
     it("should handle bedrooms changes", () => {
@@ -147,7 +147,7 @@ describe("FilterPanel Component", () => {
 
     it("should display existing filter values", () => {
       renderFilterPanel({
-        propertyType: "house",
+        type: "house",
         bedrooms: 3,
         bathrooms: 2,
         radius: 5,
@@ -185,7 +185,7 @@ describe("FilterPanel Component", () => {
       const filters: PropertyFilters = {
         priceMin: 150000,
         priceMax: 400000,
-        propertyType: "apartment",
+        type: "apartment",
         bedrooms: 2,
         bathrooms: 1,
         radius: 5,
@@ -204,14 +204,14 @@ describe("FilterPanel Component", () => {
     });
 
     it("should preserve other filters when one changes", () => {
-      renderFilterPanel({ priceMin: 100000, propertyType: "house" });
+      renderFilterPanel({ priceMin: 100000, type: "house" });
 
       const selects = screen.getAllByRole("combobox") as HTMLSelectElement[];
       fireEvent.change(selects[1], { target: { value: "3" } }); // Change bedrooms (index 1)
 
       expect(mockOnChange).toHaveBeenCalledWith({
         priceMin: 100000,
-        propertyType: "house",
+        type: "house",
         bedrooms: 3,
       });
     });

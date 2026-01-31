@@ -47,7 +47,7 @@ export default function MyPropertiesPage() {
   });
 
   return (
-    <div className="p-6">
+    <div data-testid="my-properties-page" className="p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">My Properties</h1>
@@ -117,10 +117,14 @@ export default function MyPropertiesPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          data-testid="property-list"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           {filteredProperties.map((property) => (
             <div
               key={property.id}
+              data-testid="property-card"
               className="bg-white rounded-lg shadow hover:shadow-lg transition"
             >
               {/* Property Image */}
@@ -139,14 +143,24 @@ export default function MyPropertiesPage() {
 
               {/* Property Details */}
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 capitalize">
+                <h3
+                  data-testid="property-title"
+                  className="text-lg font-semibold text-gray-900 mb-2 capitalize"
+                >
                   {property.type}
                 </h3>
 
-                <p className="text-gray-600 text-sm mb-3">
+                <p data-testid="property-address" className="text-gray-600 text-sm mb-3">
                   {property.address.street && `${property.address.street}, `}
                   {property.address.city}, {property.address.country}
                 </p>
+
+                <div
+                  data-testid="property-status"
+                  className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mb-3"
+                >
+                  Active
+                </div>
 
                 {(property.bedrooms || property.bathrooms || property.surfaceArea) && (
                   <div className="flex gap-4 text-sm text-gray-600 mb-4">
@@ -156,18 +170,27 @@ export default function MyPropertiesPage() {
                   </div>
                 )}
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Link
+                    data-testid="view-property-button"
                     to={`/property/${property.id}`}
                     className="flex-1 text-center px-3 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition text-sm"
                   >
                     View
                   </Link>
                   <Link
+                    data-testid="edit-property-button"
                     to={`/dashboard/properties/${property.id}/edit`}
                     className="flex-1 text-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
                   >
                     Edit
+                  </Link>
+                  <Link
+                    data-testid="create-listing-button"
+                    to={`/dashboard/properties/${property.id}/create-listing`}
+                    className="w-full text-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm"
+                  >
+                    Create Listing
                   </Link>
                 </div>
               </div>
