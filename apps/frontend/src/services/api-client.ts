@@ -11,7 +11,6 @@ import { parseApiError } from "@/utils/api-error";
 const isNode = typeof window === "undefined";
 const API_URL = isNode ? process.env.VITE_API_URL || "http://localhost:3000" : "/api";
 
-
 interface FetchOptions extends RequestInit {
   headers?: Record<string, string>;
 }
@@ -47,7 +46,6 @@ class ApiClient {
       ...this.getAuthHeader(),
       ...options.headers,
     };
-
 
     try {
       const response = await fetch(url, {
