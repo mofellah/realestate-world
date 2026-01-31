@@ -59,10 +59,23 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/boilerplate_test
 
       - name: Build backend
-        run: npm run build --workspace=@boilerplate/backend
+        run: |
+          npm run build --workspace=@boilerplate/backend
+          if [ ! -f "apps/backend/dist/main.js" ]; then
+            echo "❌ Backend build failed - dist/main.js not found"
+            ls -la apps/backend/dist/ || echo "dist/ directory doesn't exist"
+            exit 1
+          fi
+          echo "✅ Backend built successfully"
 
       - name: Build frontend
-        run: npm run build --workspace=@boilerplate/frontend
+        run: |
+          npm run build --workspace=@boilerplate/frontend
+          if [ ! -d "apps/frontend/dist" ]; then
+            echo "❌ Frontend build failed - dist/ directory not found"
+            exit 1
+          fi
+          echo "✅ Frontend built successfully"
 
       - name: Start backend server (background)
         run: |
