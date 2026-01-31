@@ -5,7 +5,10 @@
  * Used for testing property-related services and controllers.
  */
 
-import { Property, Address } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+
+type Property = Prisma.PropertyGetPayload<{}>;
+type Address = Prisma.AddressGetPayload<{}>;
 
 /**
  * Create a mock address entity

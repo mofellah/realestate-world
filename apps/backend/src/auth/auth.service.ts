@@ -10,7 +10,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserRole } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { comparePassword, hashPassword } from '@boilerplate/utils';
 import { backendConfig } from '@boilerplate/config';
@@ -215,7 +215,7 @@ export class AuthService {
       data: {
         email,
         passwordHash: hashedPassword,
-        role: UserRole.user,
+        role: 'user',
         isActive: true,
         name: name ?? undefined,
       },

@@ -5,8 +5,9 @@
  */
 
 import { ApiProperty } from '@nestjs/swagger';
-import { UserRole } from '@prisma/client';
-import type { User } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
+
+type User = Prisma.UserGetPayload<{}>;
 
 export class UserResponseDto implements Omit<User, 'passwordHash'> {
   @ApiProperty({

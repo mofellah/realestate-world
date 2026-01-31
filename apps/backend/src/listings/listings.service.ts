@@ -64,7 +64,7 @@ export class ListingsService {
       this.logger.error(`Listing create failed: ${msg}`);
       
       // Handle Prisma foreign key constraint errors
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'P2003') {
         throw new BadRequestException('Invalid paymentTermsId or propertyId');
       }
       

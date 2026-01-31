@@ -5,7 +5,9 @@
  * Includes base Listing and specialized subtypes (SaleListing, RentalListing).
  */
 
-import { Listing } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+
+type Listing = Prisma.ListingGetPayload<{}>;
 
 /**
  * Create a mock base listing entity

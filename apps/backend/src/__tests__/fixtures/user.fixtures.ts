@@ -5,7 +5,9 @@
  * All fixtures return properly typed objects matching the Prisma schema.
  */
 
-import { User } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+
+type User = Prisma.UserGetPayload<{}>;
 
 /**
  * Create a basic mock user with defaults

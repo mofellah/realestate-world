@@ -2,7 +2,7 @@ import { Injectable, BadRequestException, NotFoundException, ForbiddenException,
 import { REQUEST } from '@nestjs/core';
 import { PrismaService } from '../prisma/prisma.service';
 import { Logger } from '@boilerplate/logger';
-import { Prisma, PropertyType as PrismaPropertyType } from '@prisma/client';
+import { Prisma, PropertyType } from '@prisma/client';
 import { ZodError } from 'zod';
 import crypto from 'crypto';
 import type { Request } from 'express';
@@ -67,11 +67,11 @@ export class PropertiesService {
       if (!user) throw new NotFoundException(`User not found`);
       if (!user.person) throw new BadRequestException('User person record missing');
 
-      // ✅ Validate property type against Prisma enum (no `as any` needed)
-      const propertyType = (validatedData.propertyType || 'house') as PrismaPropertyType;
-      if (!Object.values(PrismaPropertyType).includes(propertyType)) {
+      // ✅ Validate property type against Prisma enum
+      const propertyType = (validatedData.propertyType || 'house') as PropertyType;
+      if (!Object.values(PropertyType).includes(propertyType)) {
         throw new BadRequestException(
-          `Invalid propertyType. Must be one of: ${Object.values(PrismaPropertyType).join(', ')}`
+          `Invalid propertyType. Must be one of: ${Object.values(PropertyType).join(', ')}`
         );
       }
 
@@ -102,7 +102,7 @@ export class PropertiesService {
       this.logger.error(`Property create failed: ${msg}`);
       
       // Handle Prisma foreign key constraint errors
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'P2003') {
         throw new BadRequestException('Invalid address ID');
       }
       
@@ -328,10 +328,10 @@ export class PropertiesService {
       // Validate property type if provided
       let propertyType = undefined;
       if (validatedData.propertyType) {
-        propertyType = validatedData.propertyType as PrismaPropertyType;
-        if (!Object.values(PrismaPropertyType).includes(propertyType)) {
+        propertyType = validatedData.propertyType as PropertyType;
+        if (!Object.values(PropertyType).includes(propertyType)) {
           throw new BadRequestException(
-            `Invalid propertyType. Must be one of: ${Object.values(PrismaPropertyType).join(', ')}`
+            `Invalid propertyType. Must be one of: ${Object.values(PropertyType).join(', ')}`
           );
         }
       }
@@ -459,7 +459,7 @@ export class PropertiesService {
             )
         `;
 
-        const spatialIds = spatialProperties.map(p => p.id);
+        const spatialIds = spatialProperties.map((p: { id: string }) => p.id);
         
         // If no properties in radius, return empty
         if (spatialIds.length === 0) {

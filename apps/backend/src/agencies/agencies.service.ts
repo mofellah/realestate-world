@@ -204,7 +204,7 @@ export class AgenciesService {
         throw new NotFoundException('Agency not found');
       }
 
-      const adminRole = agency.employees.find(e => e.userId === adminUserId && (e.role === 'owner' || e.role === 'manager'));
+      const adminRole = agency.employees.find((e: { userId: string; role: string }) => e.userId === adminUserId && (e.role === 'owner' || e.role === 'manager'));
       if (!adminRole) {
         throw new ForbiddenException('Only agency owners/managers can add agents');
       }
@@ -224,7 +224,7 @@ export class AgenciesService {
       }
 
       // Check if already an employee
-      const existing = agency.employees.find(e => e.userId === dto.userId);
+      const existing = agency.employees.find((e: { userId: string }) => e.userId === dto.userId);
       if (existing) {
         throw new BadRequestException('User is already an employee of this agency');
       }
@@ -282,19 +282,19 @@ export class AgenciesService {
         throw new NotFoundException('Agency not found');
       }
 
-      const adminRole = agency.employees.find(e => e.userId === adminUserId && (e.role === 'owner' || e.role === 'manager'));
+      const adminRole = agency.employees.find((e: { userId: string; role: string }) => e.userId === adminUserId && (e.role === 'owner' || e.role === 'manager'));
       if (!adminRole) {
         throw new ForbiddenException('Only agency owners/managers can remove agents');
       }
 
       // Find agent role
-      const agentRole = agency.employees.find(e => e.userId === agentUserId);
+      const agentRole = agency.employees.find((e: { userId: string; role: string; id: string }) => e.userId === agentUserId);
       if (!agentRole) {
         throw new NotFoundException('Agent not found in agency');
       }
 
       // Can't remove the last owner
-      const owners = agency.employees.filter(e => e.role === 'owner');
+      const owners = agency.employees.filter((e: { role: string }) => e.role === 'owner');
       if (owners.length === 1 && agentRole.role === 'owner') {
         throw new BadRequestException('Cannot remove the last owner from agency');
       }
@@ -332,7 +332,7 @@ export class AgenciesService {
       }
 
       // Get all employee user IDs
-      const employeeIds = agency.employees.map(e => e.userId);
+      const employeeIds = agency.employees.map((e: { userId: string }) => e.userId);
 
       // Get properties owned by agency employees
       const [properties, total] = await Promise.all([
