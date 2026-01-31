@@ -83,9 +83,9 @@ jobs:
           echo $! > backend.pid
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/boilerplate_test
-          JWT_SECRET: test-secret-key-for-ci
-          JWT_REFRESH_SECRET: test-refresh-secret-for-ci
-          REFRESH_TOKEN_SECRET: test-refresh-secret-for-ci
+          JWT_SECRET: test-secret-key-for-ci-minimum-32-characters-long
+          JWT_REFRESH_SECRET: test-refresh-secret-for-ci-minimum-32-characters-long
+          REFRESH_TOKEN_SECRET: test-refresh-secret-for-ci-minimum-32-characters-long
           PORT: 3000
           NODE_ENV: production
           FRONTEND_URL: http://localhost:4173
