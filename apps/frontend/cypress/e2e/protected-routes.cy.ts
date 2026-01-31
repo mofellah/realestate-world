@@ -9,7 +9,7 @@ describe("Protected Routes E2E", () => {
   });
 
   it("should redirect to login when accessing dashboard without token", () => {
-    cy.visit("http://localhost:5173/dashboard");
+    cy.visit("/dashboard");
     cy.url().should("include", "/login");
   });
 
@@ -22,7 +22,7 @@ describe("Protected Routes E2E", () => {
       win.localStorage.setItem("accessToken", mockToken);
     });
 
-    cy.visit("http://localhost:5173/dashboard");
+    cy.visit("/dashboard");
     cy.url().should("include", "/dashboard");
   });
 
@@ -33,7 +33,7 @@ describe("Protected Routes E2E", () => {
       win.localStorage.setItem("accessToken", mockToken);
     });
 
-    cy.visit("http://localhost:5173/dashboard");
+    cy.visit("/dashboard");
 
     // Should stay on dashboard
     cy.url().should("include", "/dashboard");
@@ -43,7 +43,7 @@ describe("Protected Routes E2E", () => {
   });
 
   it("should show loading state while checking authentication", () => {
-    cy.visit("http://localhost:5173/dashboard");
+    cy.visit("/dashboard");
 
     // Dashboard should briefly show loading state
     // (timing depends on implementation)
@@ -58,7 +58,7 @@ describe("Protected Routes E2E", () => {
       win.localStorage.setItem("accessToken", expiredToken);
     });
 
-    cy.visit("http://localhost:5173/login");
+    cy.visit("/login");
 
     // Try to login with wrong credentials to trigger 401
     cy.get('input[type="email"]').type("admin@example.com");
@@ -76,7 +76,7 @@ describe("Protected Routes E2E", () => {
       win.localStorage.setItem("accessToken", mockToken);
     });
 
-    cy.visit("http://localhost:5173/");
+    cy.visit("/");
     cy.url().should("include", "/dashboard");
   });
 });

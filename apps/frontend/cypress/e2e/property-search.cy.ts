@@ -4,7 +4,7 @@
  * Tests the full user flow: search, filter, view details
  */
 describe("Property Search and Discovery", () => {
-  const baseUrl = "http://localhost:5173";
+  const baseUrl = "";
 
   beforeEach(() => {
     cy.visit(`${baseUrl}/search`);

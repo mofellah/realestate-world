@@ -10,7 +10,7 @@ import "@testing-library/cypress/add-commands";
 Cypress.Commands.add(
   "login",
   (email: string = "admin@example.com", password: string = "Admin123!") => {
-    cy.visit("http://localhost:5173/login");
+    cy.visit("/login");
     cy.get('input[type="email"]').type(email);
     cy.get('input[type="password"]').type(password);
     cy.get('button[type="submit"]').click();

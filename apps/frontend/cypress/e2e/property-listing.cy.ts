@@ -4,7 +4,7 @@
  * Tests the full owner flow: create listing, set visibility, publish
  */
 describe("Property Listing Management", () => {
-  const baseUrl = "http://localhost:5173";
+  const baseUrl = "";
 
   beforeEach(() => {
     // Login as property owner

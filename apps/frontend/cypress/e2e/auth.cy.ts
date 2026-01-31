@@ -10,12 +10,12 @@ describe("Auth Flow E2E", () => {
   });
 
   it("should redirect to login when not authenticated", () => {
-    cy.visit("http://localhost:5173");
+    cy.visit("");
     cy.url().should("include", "/login");
   });
 
   it("should login successfully with admin credentials", () => {
-    cy.visit("http://localhost:5173/login");
+    cy.visit("/login");
 
     // Fill form
     cy.get('input[type="email"]').type("admin@example.com");
@@ -30,7 +30,7 @@ describe("Auth Flow E2E", () => {
   });
 
   it("should display user email on dashboard after login", () => {
-    cy.visit("http://localhost:5173/login");
+    cy.visit("/login");
 
     // Login
     cy.get('input[type="email"]').type("admin@example.com");
@@ -43,7 +43,7 @@ describe("Auth Flow E2E", () => {
   });
 
   it("should logout and redirect to login", () => {
-    cy.visit("http://localhost:5173/login");
+    cy.visit("/login");
 
     // Login first
     cy.get('input[type="email"]').type("admin@example.com");
@@ -62,7 +62,7 @@ describe("Auth Flow E2E", () => {
   });
 
   it("should display error on invalid login", () => {
-    cy.visit("http://localhost:5173/login");
+    cy.visit("/login");
 
     // Try to login with wrong credentials
     cy.get('input[type="email"]').type("invalid@example.com");
@@ -74,7 +74,7 @@ describe("Auth Flow E2E", () => {
   });
 
   it("should preserve login state across page refreshes", () => {
-    cy.visit("http://localhost:5173/login");
+    cy.visit("/login");
 
     // Login
     cy.get('input[type="email"]').type("admin@example.com");
@@ -93,7 +93,7 @@ describe("Auth Flow E2E", () => {
   });
 
   it("should disable submit button during login", () => {
-    cy.visit("http://localhost:5173/login");
+    cy.visit("/login");
 
     // Fill form
     cy.get('input[type="email"]').type("admin@example.com");
@@ -107,7 +107,7 @@ describe("Auth Flow E2E", () => {
   });
 
   it("should allow switching between login and register", () => {
-    cy.visit("http://localhost:5173/login");
+    cy.visit("/login");
 
     // Click register link
     cy.get("a").contains("Register here").click();
