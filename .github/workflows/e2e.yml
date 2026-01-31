@@ -107,6 +107,7 @@ jobs:
       - name: Run Cypress E2E tests
         uses: cypress-io/github-action@v6
         with:
+          install: false
           browser: chrome
           config-file: apps/frontend/cypress.config.ts
           wait-on: 'http://localhost:3000/health, http://localhost:4173'
