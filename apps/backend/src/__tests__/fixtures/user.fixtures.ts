@@ -5,9 +5,20 @@
  * All fixtures return properly typed objects matching the Prisma schema.
  */
 
-import { Prisma } from '@prisma/client';
-
-type User = Prisma.UserGetPayload<Record<string, never>>;
+// User type matching Prisma User model
+type User = {
+  id: string;
+  email: string;
+  passwordHash: string;
+  role: string;
+  name: string | null;
+  avatarUrl: string | null;
+  isActive: boolean;
+  country_code: string | null;
+  personId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 /**
  * Create a basic mock user with defaults

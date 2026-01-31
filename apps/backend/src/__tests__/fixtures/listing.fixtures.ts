@@ -5,9 +5,21 @@
  * Includes base Listing and specialized subtypes (SaleListing, RentalListing).
  */
 
-import { Prisma } from '@prisma/client';
-
-type Listing = Prisma.ListingGetPayload<Record<string, never>>;
+// Listing type matching Prisma Listing model
+type Listing = {
+  id: string;
+  propertyId: string;
+  type: string;
+  status: string;
+  paymentTermsId: string;
+  visibilityStart: Date | null;
+  visibilityEnd: Date | null;
+  visibilityDays: number | null;
+  publishedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+};
 
 /**
  * Create a mock base listing entity

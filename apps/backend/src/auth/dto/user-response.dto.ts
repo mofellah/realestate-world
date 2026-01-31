@@ -5,9 +5,30 @@
  */
 
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma, UserRole } from '@prisma/client';
 
-type User = Prisma.UserGetPayload<Record<string, never>>;
+// UserRole enum - define inline to avoid Prisma client dependency issues
+export enum UserRole {
+  user = 'user',
+  admin = 'admin',
+}
+
+// Use the shared type from packages/types
+export type UserRoleEnum = 'user' | 'admin';
+
+// User type matching Prisma User model (accepts any role string from Prisma)
+type User = {
+  id: string;
+  email: string;
+  passwordHash: string;
+  role: UserRoleEnum; // Use the enum type
+  name: string | null;
+  avatarUrl: string | null;
+  isActive: boolean;
+  country_code: string | null;
+  personId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 export class UserResponseDto implements Omit<User, 'passwordHash'> {
   @ApiProperty({
@@ -27,7 +48,7 @@ export class UserResponseDto implements Omit<User, 'passwordHash'> {
     example: 'user',
     enum: UserRole,
   })
-  role: UserRole;
+  role: UserRoleEnum; // Use the enum type to match shared types
 
   @ApiProperty({
     description: 'Whether user account is active',

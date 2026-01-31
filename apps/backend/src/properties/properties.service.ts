@@ -2,12 +2,22 @@ import { Injectable, BadRequestException, NotFoundException, ForbiddenException,
 import { REQUEST } from '@nestjs/core';
 import { PrismaService } from '../prisma/prisma.service';
 import { Logger } from '@boilerplate/logger';
-import { PropertyType } from '@prisma/client';
 import { ZodError } from 'zod';
 import crypto from 'crypto';
 import type { Request } from 'express';
 import type { CreatePropertyDto } from './dto/property.dto';
 import { CreatePropertySchema, UpdatePropertySchema, SearchPropertiesSchema } from './schemas/property.schema';
+
+// PropertyType enum matching Prisma schema
+enum PropertyType {
+  house = 'house',
+  apartment = 'apartment',
+  villa = 'villa',
+  land = 'land',
+  room = 'room',
+  commercial = 'commercial',
+  other = 'other',
+}
 
 /**
  * PropertiesService - CRUD operations for properties

@@ -5,10 +5,44 @@
  * Used for testing property-related services and controllers.
  */
 
-import { Prisma } from '@prisma/client';
+// Property type matching Prisma Property model
+type Property = {
+  id: string;
+  title: string;
+  description: string | null;
+  propertyType: string;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  surfaceArea: number | null;
+  gardenSize: number | null;
+  yearBuilt: number | null;
+  amenitiesList: string[];
+  addressId: string;
+  ownerPersonId: string;
+  userId: string | null;
+  ownerDocumentUrl: string | null;
+  parentPropertyId: string | null;
+  isAvailable: boolean;
+  metadata: unknown | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
-type Property = Prisma.PropertyGetPayload<Record<string, never>>;
-type Address = Prisma.AddressGetPayload<Record<string, never>>;
+// Address type matching Prisma Address model
+type Address = {
+  id: string;
+  streetName: string;
+  streetNumber: string | null;
+  unit: string | null;
+  postalCode: string;
+  city: string;
+  region: string | null;
+  country_code: string;
+  geoObjectId: string | null;
+  metadata: unknown | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 /**
  * Create a mock address entity
