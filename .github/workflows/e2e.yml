@@ -66,32 +66,43 @@ jobs:
 
       - name: Start backend server (background)
         run: |
-          npm run start:prod --workspace=@boilerplate/backend &
+          npm run start:prod --workspace=@boilerplate/backend > backend.log 2>&1 &
           echo $! > backend.pid
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/boilerplate_test
           JWT_SECRET: test-secret-key-for-ci
           JWT_REFRESH_SECRET: test-refresh-secret-for-ci
+          REFRESH_TOKEN_SECRET: test-refresh-secret-for-ci
           PORT: 3000
-          NODE_ENV: test
+          NODE_ENV: production
+          FRONTEND_URL: http://localhost:4173
 
       - name: Start frontend server (background)
         run: |
-          npm run preview --workspace=@boilerplate/frontend &
+          npm run preview --workspace=@boilerplate/frontend > frontend.log 2>&1 &
           echo $! > frontend.pid
         env:
           VITE_API_URL: http://localhost:3000
 
       - name: Wait for backend health
         run: |
-          for i in {1..30}; do
+          for i in {1..60}; do
             if curl -f http://localhost:3000/health; then
               echo "✅ Backend is ready"
               break
             fi
-            echo "⏳ Waiting for backend... ($i/30)"
+            echo "⏳ Waiting for backend... ($i/60)"
+            if [ $i -eq 30 ]; then
+              echo "📋 Backend logs:"
+              cat backend.log || echo "No backend logs"
+            fi
             sleep 2
           done
+          if ! curl -f http://localhost:3000/health; then
+            echo "❌ Backend failed to start"
+            cat backend.log || echo "No backend logs"
+            exit 1
+          fi
 
       - name: Wait for frontend
         run: |
