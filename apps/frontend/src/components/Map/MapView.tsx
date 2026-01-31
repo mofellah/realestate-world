@@ -25,6 +25,7 @@ interface MapViewProps {
   zoom?: number;
   onMapReady?: (map: Map) => void;
   properties?: Property[];
+  onPropertyClick?: (property: Property) => void;
 }
 
 export default function MapView({
@@ -32,6 +33,7 @@ export default function MapView({
   zoom = 12,
   onMapReady,
   properties = [],
+  onPropertyClick,
 }: MapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<Map | null>(null);
@@ -94,6 +96,24 @@ export default function MapView({
     setMap(mapInstance);
     onMapReadyRef.current?.(mapInstance);
 
+    // Add click handler for markers
+    mapInstance.on("click", (evt) => {
+      const feature = mapInstance.forEachFeatureAtPixel(evt.pixel, (feat) => feat);
+      if (feature && onPropertyClick) {
+        const propertyData = feature.get("property");
+        if (propertyData) {
+          onPropertyClick(propertyData);
+        }
+      }
+    });
+
+    // Change cursor on hover
+    mapInstance.on("pointermove", (evt) => {
+      const pixel = mapInstance.getEventPixel(evt.originalEvent);
+      const hit = mapInstance.hasFeatureAtPixel(pixel);
+      mapInstance.getTargetElement().style.cursor = hit ? "pointer" : "";
+    });
+
     // Cleanup on unmount
     return () => {
       mapInstance.setTarget(undefined);
@@ -119,28 +139,57 @@ export default function MapView({
     // Clear existing markers
     source.clear();
 
+    console.log(`[MapView] Adding ${properties.length} properties to map`);
+
     // Add markers for properties that have location data
     const features = properties
       .filter((property) => {
-        // Check if address has coordinates
+        // Check if address has coordinates (supports both direct and nested geoObject)
         if (typeof property.address === "object" && property.address) {
-          return property.address.longitude != null && property.address.latitude != null;
+          // Check direct coordinates
+          if (property.address.longitude != null && property.address.latitude != null) {
+            return true;
+          }
+          // Check nested geoObject coordinates
+          if (
+            property.address.geoObject &&
+            property.address.geoObject.longitude != null &&
+            property.address.geoObject.latitude != null
+          ) {
+            return true;
+          }
         }
         return false;
       })
       .map((property) => {
         const address = property.address as {
-          longitude: number;
-          latitude: number;
+          longitude?: number;
+          latitude?: number;
+          geoObject?: {
+            longitude: number;
+            latitude: number;
+          };
           [key: string]: any;
         };
+
+        // Use geoObject coordinates if available, otherwise use direct coordinates
+        const longitude = address.geoObject?.longitude ?? address.longitude;
+        const latitude = address.geoObject?.latitude ?? address.latitude;
+
+        if (!longitude || !latitude) {
+          console.warn(`[MapView] Property ${property.id} missing coordinates`);
+          return null;
+        }
+
         const feature = new Feature({
-          geometry: new Point(fromLonLat([address.longitude, address.latitude])),
+          geometry: new Point(fromLonLat([longitude!, latitude!])),
           property: property,
         });
         return feature;
-      });
+      })
+      .filter((f) => f !== null) as Feature<Point>[];
 
+    console.log(`[MapView] Added ${features.length} markers to map`);
     source.addFeatures(features);
   }, [propertyMarkersLayer, properties]);
 

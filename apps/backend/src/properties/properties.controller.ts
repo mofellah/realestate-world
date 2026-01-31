@@ -21,8 +21,11 @@ import {
   ApiQuery,
 } from "@nestjs/swagger";
 import { PropertiesService } from "./properties.service";
+import { PropertyUseCasesService } from "../use-cases/property.use-cases.service";
+import { OwnerContactUseCasesService } from "../use-cases/owner-contact.use-cases.service";
 import { JwtGuard } from "../auth/guards/jwt.guard";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
+import { ContactOwnerDto } from "./dto/contact-owner.dto";
 import { Public } from "../auth/decorators/auth.decorators";
 import { JwtPayload } from "@boilerplate/types";
 import { CreatePropertyDto, UpdatePropertyDto } from "./dto/property.dto";
@@ -33,7 +36,11 @@ import { SearchPropertiesDto } from "./dto/search-properties.dto";
 @UseGuards(JwtGuard)
 @ApiBearerAuth("JWT-auth")
 export class PropertiesController {
-  constructor(private propertiesService: PropertiesService) {}
+  constructor(
+    private propertiesService: PropertiesService,
+    private propertyUseCases: PropertyUseCasesService,
+    private ownerContactUseCases: OwnerContactUseCasesService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -42,7 +49,7 @@ export class PropertiesController {
   @ApiResponse({ status: 400, description: "Invalid input data" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   async create(@Body() dto: CreatePropertyDto, @CurrentUser() user: JwtPayload) {
-    return this.propertiesService.create(user.sub, dto);
+    return this.propertyUseCases.create(user.sub, dto);
   }
 
   @Get("search")
@@ -52,7 +59,22 @@ export class PropertiesController {
   @ApiResponse({ status: 200, description: "Properties retrieved successfully" })
   @ApiResponse({ status: 429, description: "Too many search requests" })
   async search(@Query() filters: SearchPropertiesDto) {
-    return this.propertiesService.search(filters);
+    return this.propertyUseCases.search(filters);
+  }
+
+  @Post(":id/contact")
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: "Contact property owner" })
+  @ApiParam({ name: "id", description: "Property ID" })
+  @ApiResponse({ status: 201, description: "Message sent successfully" })
+  @ApiResponse({ status: 400, description: "Invalid input data" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async contactOwner(
+    @Param("id") id: string,
+    @Body() dto: ContactOwnerDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.ownerContactUseCases.contactOwner(user.sub, id, dto);
   }
 
   @Get()

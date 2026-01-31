@@ -52,7 +52,7 @@ describe("ListingsService", () => {
 
       const result = await listingsService.createListing({
         propertyId: "prop-1",
-        type: "rent",
+        type: "rental",
       });
 
       expect(result.id).toBeDefined();
@@ -94,30 +94,30 @@ describe("ListingsService", () => {
   describe("getMyListings", () => {
     it("should make GET request for user listings", async () => {
       const mockListings = [mockListing, { ...mockListing, id: "listing-2" }];
-      (apiClient.get as jest.Mock).mockResolvedValue(mockListings);
+      (apiClient.get as jest.Mock).mockResolvedValue({ listings: mockListings, total: 2 });
 
       const result = await listingsService.getMyListings();
 
       expect(apiClient.get).toHaveBeenCalledWith("/listings");
-      expect(result).toEqual(mockListings);
+      expect(result).toEqual({ listings: mockListings, total: 2 });
     });
 
-    it("should return array of listings", async () => {
+    it("should return listings list", async () => {
       const mockListings = [mockListing, { ...mockListing, id: "listing-2" }];
-      (apiClient.get as jest.Mock).mockResolvedValue(mockListings);
+      (apiClient.get as jest.Mock).mockResolvedValue({ listings: mockListings, total: 2 });
 
       const result = await listingsService.getMyListings();
 
-      expect(Array.isArray(result)).toBe(true);
-      expect(result.length).toBe(2);
+      expect(Array.isArray(result.listings)).toBe(true);
+      expect(result.listings.length).toBe(2);
     });
 
-    it("should return empty array when user has no listings", async () => {
-      (apiClient.get as jest.Mock).mockResolvedValue([]);
+    it("should return empty list when user has no listings", async () => {
+      (apiClient.get as jest.Mock).mockResolvedValue({ listings: [], total: 0 });
 
       const result = await listingsService.getMyListings();
 
-      expect(result).toEqual([]);
+      expect(result).toEqual({ listings: [], total: 0 });
     });
 
     it("should throw error when API fails", async () => {
@@ -322,17 +322,17 @@ describe("ListingsService", () => {
     it("should handle multiple listings in getMyListings", async () => {
       const listings = [
         mockListing,
-        { ...mockListing, id: "listing-2", type: "rent" },
-        { ...mockListing, id: "listing-3", type: "airbnb" },
+        { ...mockListing, id: "listing-2", type: "rental" },
+        { ...mockListing, id: "listing-3", type: "short_term" },
       ];
-      (apiClient.get as jest.Mock).mockResolvedValue(listings);
+      (apiClient.get as jest.Mock).mockResolvedValue({ listings, total: 3 });
 
       const result = await listingsService.getMyListings();
 
-      expect(result.length).toBe(3);
-      expect(result[0].type).toBe("sale");
-      expect(result[1].type).toBe("rent");
-      expect(result[2].type).toBe("airbnb");
+      expect(result.listings.length).toBe(3);
+      expect(result.listings[0].type).toBe("sale");
+      expect(result.listings[1].type).toBe("rental");
+      expect(result.listings[2].type).toBe("short_term");
     });
   });
 });

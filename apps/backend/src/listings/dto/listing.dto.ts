@@ -3,7 +3,17 @@
  */
 
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsDateString, IsArray } from "class-validator";
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsDateString,
+  IsArray,
+  IsNumber,
+  Min,
+} from "class-validator";
+import { Type } from "class-transformer";
 
 enum ListingType {
   Sale = "sale",
@@ -36,13 +46,40 @@ export class CreateListingDto {
   @IsNotEmpty()
   type!: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: "Payment terms ID",
     example: "cm123payment456",
   })
   @IsString()
-  @IsNotEmpty()
-  paymentTermsId!: string;
+  @IsOptional()
+  paymentTermsId?: string;
+
+  @ApiPropertyOptional({
+    description: "Price (onetime or per period)",
+    example: 1200,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  @IsOptional()
+  price?: number;
+
+  @ApiPropertyOptional({
+    description: "Currency code",
+    example: "EUR",
+    default: "EUR",
+  })
+  @IsString()
+  @IsOptional()
+  currency?: string;
+
+  @ApiPropertyOptional({
+    description: "Period type for recurring payments",
+    example: "monthly",
+  })
+  @IsString()
+  @IsOptional()
+  periodType?: string;
 
   @ApiPropertyOptional({
     description: "Listing status",

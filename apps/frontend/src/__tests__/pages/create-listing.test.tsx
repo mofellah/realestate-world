@@ -119,8 +119,8 @@ describe("CreateListingPage", () => {
         const listingTypeSelect = screen.getByTestId("listing-type-select");
         expect(listingTypeSelect).toBeInTheDocument();
         expect(screen.getByText("Sale")).toBeInTheDocument();
-        expect(screen.getByText("Rent")).toBeInTheDocument();
-        expect(screen.getByText("Airbnb")).toBeInTheDocument();
+        expect(screen.getByText("Rental")).toBeInTheDocument();
+        expect(screen.getByText("Short term")).toBeInTheDocument();
         expect(screen.getByText("Lease")).toBeInTheDocument();
       });
     });
@@ -211,6 +211,12 @@ describe("CreateListingPage", () => {
         target: { value: "sale" },
       });
 
+      // Enter price
+      const priceInput = screen.getByTestId("listing-price-input");
+      fireEvent.change(priceInput, {
+        target: { value: "250000" },
+      });
+
       // Submit form
       const form = screen.getByTestId("create-listing-form").querySelector("form")!;
       fireEvent.submit(form);
@@ -221,6 +227,7 @@ describe("CreateListingPage", () => {
             propertyId: "prop-1",
             type: "sale",
             status: "draft",
+            price: 250000,
           }),
         );
       });
@@ -241,6 +248,11 @@ describe("CreateListingPage", () => {
       const propertySelect = screen.getAllByRole("combobox")[0];
       fireEvent.change(propertySelect, {
         target: { value: "prop-1" },
+      });
+
+      const priceInput = screen.getByTestId("listing-price-input");
+      fireEvent.change(priceInput, {
+        target: { value: "1200" },
       });
 
       const submitButton = screen.getByRole("button", { name: /create/i });
@@ -270,6 +282,11 @@ describe("CreateListingPage", () => {
       const propertySelect = screen.getAllByRole("combobox")[0];
       fireEvent.change(propertySelect, {
         target: { value: "prop-1" },
+      });
+
+      const priceInput = screen.getByTestId("listing-price-input");
+      fireEvent.change(priceInput, {
+        target: { value: "1200" },
       });
 
       const form = screen.getByTestId("create-listing-form").querySelector("form")!;

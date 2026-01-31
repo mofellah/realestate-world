@@ -7,10 +7,14 @@ import { apiClient } from "./api-client";
 
 export interface CreateListingDto {
   propertyId: string;
-  type: "sale" | "rent" | "airbnb" | "lease";
+  type: "sale" | "rental" | "short_term" | "lease";
   status?: "draft" | "published" | "archived";
   publishedAt?: Date;
   expiresAt?: Date;
+  paymentTermsId?: string;
+  price?: number;
+  currency?: string;
+  periodType?: string;
 }
 
 export interface Listing {
@@ -24,6 +28,11 @@ export interface Listing {
   updatedAt: string;
 }
 
+export interface ListingListResponse {
+  listings: Listing[];
+  total: number;
+}
+
 class ListingsService {
   /**
    * Create listing
@@ -35,8 +44,8 @@ class ListingsService {
   /**
    * Get user's listings
    */
-  async getMyListings(): Promise<Listing[]> {
-    return apiClient.get<Listing[]>("/listings");
+  async getMyListings(): Promise<ListingListResponse> {
+    return apiClient.get<ListingListResponse>("/listings");
   }
 
   /**

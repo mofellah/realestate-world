@@ -3,6 +3,7 @@
  */
 import { ListingsController } from "../listings.controller";
 import { ListingsService } from "../listings.service";
+import { ListingUseCasesService } from "../../use-cases/listing.use-cases.service";
 
 const makeService = () => ({
   create: jest.fn(),
@@ -15,20 +16,27 @@ const makeService = () => ({
 describe("ListingsController", () => {
   let controller: ListingsController;
   let service: ReturnType<typeof makeService>;
+  let listingUseCases: { create: jest.Mock };
 
   beforeEach(() => {
     service = makeService();
-    controller = new ListingsController(service as unknown as ListingsService);
+    listingUseCases = {
+      create: jest.fn(),
+    };
+    controller = new ListingsController(
+      service as unknown as ListingsService,
+      listingUseCases as unknown as ListingUseCasesService,
+    );
   });
 
   it("should create listing", async () => {
     const dto = { propertyId: "prop-1", type: "sale" } as any;
     const user = { sub: "user-1" } as any;
-    service.create.mockResolvedValue({ id: "listing-1" });
+    listingUseCases.create.mockResolvedValue({ id: "listing-1" });
 
     await controller.create(dto, user);
 
-    expect(service.create).toHaveBeenCalledWith("user-1", dto);
+    expect(listingUseCases.create).toHaveBeenCalledWith("user-1", dto);
   });
 
   it("should find all listings for user", async () => {

@@ -48,6 +48,9 @@ export function useMapSearch() {
       // Build query params
       const params = new URLSearchParams();
 
+      // Request all properties (up to 100)
+      params.append("take", "100");
+
       if (filters.priceMin) params.append("priceMin", filters.priceMin.toString());
       if (filters.priceMax) params.append("priceMax", filters.priceMax.toString());
       if (filters.propertyType) params.append("type", filters.propertyType);

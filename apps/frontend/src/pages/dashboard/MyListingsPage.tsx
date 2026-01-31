@@ -15,11 +15,14 @@ export default function MyListingsPage() {
   const fetchListings = async () => {
     try {
       setLoading(true);
+      console.log("[MyListings] Loading listings...");
       const data = await listingsService.getMyListings();
-      setListings(data);
+      console.log("[MyListings] Response:", data);
+      setListings(data.listings || []);
     } catch (err) {
       console.error("[MyListings] Failed to load:", err);
-      setError("Failed to load listings");
+      const errorMsg = err instanceof Error ? err.message : "Failed to load listings";
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

@@ -25,11 +25,14 @@ export default function MyPropertiesPage() {
     const loadProperties = async () => {
       try {
         setLoading(true);
+        console.log("[MyProperties] Loading properties...");
         const data = await propertiesService.getAllProperties(0, 100);
+        console.log("[MyProperties] Response:", data);
         setProperties(data.properties || []);
       } catch (err) {
         console.error("[MyProperties] Failed to load:", err);
-        setError("Failed to load properties");
+        const errorMsg = err instanceof Error ? err.message : "Failed to load properties";
+        setError(errorMsg);
       } finally {
         setLoading(false);
       }

@@ -32,8 +32,8 @@ export class ListingsService {
 
     try {
       // Validate required fields first
-      if (!data.propertyId || !data.type || !data.paymentTermsId) {
-        throw new BadRequestException("propertyId, type, and paymentTermsId required");
+      if (!data.propertyId || !data.type) {
+        throw new BadRequestException("propertyId and type required");
       }
 
       // Validate property exists
@@ -47,12 +47,49 @@ export class ListingsService {
         throw new ForbiddenException("Not owner of property");
       }
 
+      // Create payment terms if not provided
+      let paymentTermsId = data.paymentTermsId as string | undefined;
+      if (!paymentTermsId) {
+        if (data.price === undefined || data.price === null) {
+          throw new BadRequestException("paymentTermsId or price required");
+        }
+
+        const currency = data.currency || "EUR";
+        const isOnetime = data.type === "sale";
+        const termType = isOnetime ? "onetime" : "periodic";
+
+        const paymentTerms = await this.prisma.paymentTerms.create({
+          data: {
+            termType,
+            currency,
+            onetimePayment: isOnetime
+              ? {
+                  create: {
+                    amount: Number(data.price),
+                  },
+                }
+              : undefined,
+            periodicPayment: !isOnetime
+              ? {
+                  create: {
+                    amountPerPeriod: Number(data.price),
+                    periodType:
+                      data.periodType || (data.type === "short_term" ? "per_night" : "monthly"),
+                  },
+                }
+              : undefined,
+          },
+        });
+
+        paymentTermsId = paymentTerms.id;
+      }
+
       const listing = await this.prisma.listing.create({
         data: {
           type: data.type,
           propertyId: data.propertyId,
           createdBy: userId,
-          paymentTermsId: data.paymentTermsId,
+          paymentTermsId,
           status: data.status || "draft",
           visibilityStart: data.visibilityStart || null,
           visibilityEnd: data.visibilityEnd || null,

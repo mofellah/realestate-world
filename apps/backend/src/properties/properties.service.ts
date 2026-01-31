@@ -20,6 +20,7 @@ import {
 
 // PropertyType enum matching Prisma schema
 enum PropertyType {
+  studio = "studio",
   house = "house",
   apartment = "apartment",
   villa = "villa",

@@ -10,7 +10,7 @@ interface PropertyFormData {
   title: string;
   description: string;
   propertyType: string;
-  listingType: "sale" | "rent";
+  listingType: "sale" | "rental";
   price: string;
 
   // Location
@@ -207,7 +207,7 @@ export default function CreatePropertyPage() {
                       value="sale"
                       checked={formData.listingType === "sale"}
                       onChange={(e) =>
-                        updateFormData({ listingType: e.target.value as "sale" | "rent" })
+                        updateFormData({ listingType: e.target.value as "sale" | "rental" })
                       }
                       className="mr-2"
                     />
@@ -216,10 +216,10 @@ export default function CreatePropertyPage() {
                   <label className="flex items-center">
                     <input
                       type="radio"
-                      value="rent"
-                      checked={formData.listingType === "rent"}
+                      value="rental"
+                      checked={formData.listingType === "rental"}
                       onChange={(e) =>
-                        updateFormData({ listingType: e.target.value as "sale" | "rent" })
+                        updateFormData({ listingType: e.target.value as "sale" | "rental" })
                       }
                       className="mr-2"
                     />
@@ -231,7 +231,7 @@ export default function CreatePropertyPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price ({formData.listingType === "rent" ? "per month" : ""}) *
+                Price ({formData.listingType === "rental" ? "per month" : ""}) *
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-2 text-gray-500">$</span>
@@ -516,7 +516,7 @@ export default function CreatePropertyPage() {
                   <span className="text-sm font-medium text-gray-600">Price:</span>
                   <p className="text-gray-900">
                     ${formData.price ? Number(formData.price).toLocaleString() : "0"}
-                    {formData.listingType === "rent" ? "/month" : ""}
+                    {formData.listingType === "rental" ? "/month" : ""}
                   </p>
                 </div>
 
