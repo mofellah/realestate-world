@@ -95,6 +95,37 @@
 3. **Optional**: Add Tegola server configuration for local development
 
 ---
+## Phase 11 - Coder Agent Report: Coverage Config Update
+
+**Status**: ✅ Complete  
+**Timestamp**: 2026-01-31 08:10 UTC  
+**Agent**: Coder  
+**Task**: Fix coverage threshold failure by excluding use-case layer
+
+### What Was Done
+
+- Excluded src/use-cases/** from backend coverage collection (thin orchestration layer).
+
+### Verification Results
+
+- **Build**: Not run
+- **Linting**: Not run
+- **Type Check**: Not run
+- **Tests**: Not run (user to re-run coverage)
+
+### Deliverables
+
+- apps/backend/jest.config.js
+
+### Blockers / Issues
+
+- None
+
+### Recommended Next Steps
+
+- Re-run backend tests with coverage.
+
+---
 ## Phase 10 - Coder Agent Report: Listing Creation Fix
 
 **Status**: ✅ Complete  

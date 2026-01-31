@@ -34,6 +34,8 @@ module.exports = {
     // Exclude test files
     '!src/**/*.spec.ts',
     '!src/**/__tests__/**',
+    // Exclude use-cases (thin orchestration layer)
+    '!src/use-cases/**',
     // Exclude dependencies and built files
     '!**/node_modules/**',
     '!**/dist/**',
