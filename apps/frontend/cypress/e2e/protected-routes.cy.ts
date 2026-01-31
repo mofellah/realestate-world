@@ -70,12 +70,16 @@ describe("Protected Routes E2E", () => {
   });
 
   it("should redirect root path to dashboard", () => {
+    const mockToken =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTEyMyIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlcyI6W3sicm9sZU5hbWUiOiJhZG1pbiJ9XSwiaWF0IjoxNzA2MDAwMDAwLCJleHAiOjk5OTk5OTk5OTl9";
+    
+    // Set token in localStorage before visiting any page
+    cy.visit("/login"); // Visit any page first to establish window context
     cy.window().then((win) => {
-      const mockToken =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTEyMyIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJyb2xlcyI6W3sicm9sZU5hbWUiOiJhZG1pbiJ9XSwiaWF0IjoxNzA2MDAwMDAwLCJleHAiOjk5OTk5OTk5OTl9";
       win.localStorage.setItem("accessToken", mockToken);
     });
 
+    // Now visit root - should redirect to dashboard
     cy.visit("/");
     cy.url().should("include", "/dashboard");
   });

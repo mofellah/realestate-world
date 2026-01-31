@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import { usePropertyStore } from "./stores/propertyStore";
-import { useAuth } from "./contexts/AuthContext";
 
 // Theme Provider
 import { ThemeProvider } from "./contexts/ThemeContext";
