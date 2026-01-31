@@ -15,9 +15,7 @@ export default function MyListingsPage() {
   const fetchListings = async () => {
     try {
       setLoading(true);
-      console.log("[MyListings] Loading listings...");
       const data = await listingsService.getMyListings();
-      console.log("[MyListings] Response:", data);
       setListings(data.listings || []);
     } catch (err) {
       console.error("[MyListings] Failed to load:", err);

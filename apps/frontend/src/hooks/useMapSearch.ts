@@ -65,11 +65,7 @@ export function useMapSearch() {
       }
 
       const url = `/properties/search?${params.toString()}`;
-      console.log("[useMapSearch] Fetching from:", url);
-
       const response = await apiClient.get<SearchResult>(url);
-
-      console.log("[useMapSearch] Response received:", response);
 
       setProperties(response.properties);
       setTotal(response.total);
