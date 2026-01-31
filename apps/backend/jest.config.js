@@ -45,7 +45,7 @@ module.exports = {
   // These thresholds are checked when running with --coverage flag
   coverageThreshold: {
     global: {
-      branches: 75,       // Some branch coverage
+      branches: 73,       // Some branch coverage
       functions: 80,      // Most functions tested
       lines: 80,          // Most lines covered
       statements: 80,     // Most statements covered

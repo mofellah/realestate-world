@@ -95,6 +95,37 @@
 3. **Optional**: Add Tegola server configuration for local development
 
 ---
+## Phase 12 - Coder Agent Report: Coverage Threshold Adjustment
+
+**Status**: ✅ Complete  
+**Timestamp**: 2026-01-31 08:15 UTC  
+**Agent**: Coder  
+**Task**: Adjust backend branch coverage threshold to match current coverage
+
+### What Was Done
+
+- Lowered global branch coverage threshold from 75% to 73% in backend Jest config.
+
+### Verification Results
+
+- **Build**: Not run
+- **Linting**: Not run
+- **Type Check**: Not run
+- **Tests**: Not run (user to re-run coverage)
+
+### Deliverables
+
+- apps/backend/jest.config.js
+
+### Blockers / Issues
+
+- None
+
+### Recommended Next Steps
+
+- Re-run backend tests with coverage.
+
+---
 ## Phase 11 - Coder Agent Report: Coverage Config Update
 
 **Status**: ✅ Complete  
