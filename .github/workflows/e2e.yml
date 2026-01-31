@@ -133,7 +133,7 @@ jobs:
         with:
           install: false
           browser: chrome
-          config-file: apps/frontend/cypress.config.ts
+          config-file: apps/frontend/cypress.config.js
           wait-on: 'http://localhost:3000/health, http://localhost:4173'
           wait-on-timeout: 120
           record: false

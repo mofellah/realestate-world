@@ -2,9 +2,9 @@ import { defineConfig } from "cypress";
 
 export default defineConfig({
   e2e: {
-    baseUrl: "http://localhost:5173",
-    specPattern: "apps/frontend/cypress/e2e/**/*.cy.ts",
-    supportFile: "apps/frontend/cypress/support/e2e.ts",
+    baseUrl: "http://localhost:4173",
+    specPattern: "cypress/e2e/**/*.cy.{js,ts}",
+    supportFile: "cypress/support/e2e.ts",
     video: false,
     screenshotOnRunFailure: true,
     setupNodeEvents(on, config) {
