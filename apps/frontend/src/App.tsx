@@ -43,8 +43,9 @@ import "./styles/layout.scss";
 
 // Root redirect component
 function RootRedirect() {
-  const { user } = useAuth();
-  return <Navigate to={user ? "/dashboard" : "/login"} replace />;
+  // Check localStorage directly to avoid race condition with auth context initialization
+  const hasToken = !!localStorage.getItem("accessToken");
+  return <Navigate to={hasToken ? "/dashboard" : "/login"} replace />;
 }
 
 export default function App() {
