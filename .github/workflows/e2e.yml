@@ -61,8 +61,8 @@ jobs:
       - name: Build backend
         run: |
           npm run build --workspace=@boilerplate/backend
-          if [ ! -f "apps/backend/dist/main.js" ]; then
-            echo "❌ Backend build failed - dist/main.js not found"
+          if [ ! -f "apps/backend/dist/apps/backend/src/main.js" ]; then
+            echo "❌ Backend build failed - dist/apps/backend/src/main.js not found"
             ls -la apps/backend/dist/ || echo "dist/ directory doesn't exist"
             exit 1
           fi
