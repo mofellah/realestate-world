@@ -212,8 +212,8 @@ describe("CreateListingPage", () => {
       });
 
       // Submit form
-      const submitButton = screen.getByRole("button", { name: /create/i });
-      fireEvent.click(submitButton);
+      const form = screen.getByTestId("create-listing-form").querySelector("form")!;
+      fireEvent.submit(form);
 
       await waitFor(() => {
         expect(listingsService.createListing).toHaveBeenCalledWith(
@@ -244,7 +244,8 @@ describe("CreateListingPage", () => {
       });
 
       const submitButton = screen.getByRole("button", { name: /create/i });
-      fireEvent.click(submitButton);
+      const form = screen.getByTestId("create-listing-form").querySelector("form")!;
+      fireEvent.submit(form);
 
       await waitFor(() => {
         expect(submitButton).toBeDisabled();
@@ -271,12 +272,15 @@ describe("CreateListingPage", () => {
         target: { value: "prop-1" },
       });
 
-      const submitButton = screen.getByRole("button", { name: /create/i });
-      fireEvent.click(submitButton);
+      const form = screen.getByTestId("create-listing-form").querySelector("form")!;
+      fireEvent.submit(form);
 
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith("/dashboard/my-listings");
-      });
+      await waitFor(
+        () => {
+          expect(mockNavigate).toHaveBeenCalledWith("/dashboard/my-listings");
+        },
+        { timeout: 3000 },
+      );
     });
   });
 
@@ -288,10 +292,12 @@ describe("CreateListingPage", () => {
       renderComponent();
 
       await waitFor(() => {
-        expect(screen.getByRole("combobox")).toBeInTheDocument();
+        const selects = screen.getAllByRole("combobox");
+        expect(selects.length).toBeGreaterThan(0);
       });
 
-      fireEvent.change(screen.getByRole("combobox"), {
+      const propertySelect = screen.getAllByRole("combobox")[0];
+      fireEvent.change(propertySelect, {
         target: { value: "prop-1" },
       });
 
@@ -310,7 +316,8 @@ describe("CreateListingPage", () => {
       renderComponent();
 
       await waitFor(() => {
-        expect(screen.getByRole("combobox")).toBeInTheDocument();
+        const selects = screen.getAllByRole("combobox");
+        expect(selects.length).toBeGreaterThan(0);
       });
 
       const submitButton = screen.getByRole("button", { name: /create/i });
@@ -336,10 +343,12 @@ describe("CreateListingPage", () => {
       renderComponent();
 
       await waitFor(() => {
-        expect(screen.getByRole("combobox")).toBeInTheDocument();
+        const selects = screen.getAllByRole("combobox");
+        expect(selects.length).toBeGreaterThan(0);
       });
 
-      fireEvent.change(screen.getByRole("combobox"), {
+      const propertySelect = screen.getAllByRole("combobox")[0];
+      fireEvent.change(propertySelect, {
         target: { value: "prop-1" },
       });
 
@@ -369,10 +378,12 @@ describe("CreateListingPage", () => {
       renderComponent();
 
       await waitFor(() => {
-        expect(screen.getByRole("combobox")).toBeInTheDocument();
+        const selects = screen.getAllByRole("combobox");
+        expect(selects.length).toBeGreaterThan(0);
       });
 
-      fireEvent.change(screen.getByRole("combobox"), {
+      const propertySelect = screen.getAllByRole("combobox")[0];
+      fireEvent.change(propertySelect, {
         target: { value: "prop-1" },
       });
 

@@ -211,7 +211,7 @@ describe("FilterPanel Component", () => {
 
       expect(mockOnChange).toHaveBeenCalledWith({
         priceMin: 100000,
-        propertyType: "house",
+        type: "house",
         bedrooms: 3,
       });
     });
