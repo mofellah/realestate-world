@@ -147,6 +147,26 @@ class AgenciesService {
     const agency = await this.getAgency(agencyId);
     return agency.employees || [];
   }
+
+  /**
+   * Invite agent to agency by email
+   */
+  async inviteAgent(agencyId: string, email: string): Promise<{ status: string; message: string }> {
+    return apiClient.post(`/agencies/${agencyId}/agents/invite`, { email });
+  }
+
+  /**
+   * Get agency metrics (dashboard statistics)
+   */
+  async getMetrics(agencyId: string): Promise<{
+    totalAgents: number;
+    activeListings: number;
+    totalSales: number;
+    monthlyRevenue: number;
+    pendingInquiries: number;
+  }> {
+    return apiClient.get(`/agencies/${agencyId}/metrics`);
+  }
 }
 
 export const agenciesService = new AgenciesService();
