@@ -39,10 +39,51 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          "react-vendor": ["react", "react-dom", "react-router-dom"],
-          map: ["ol"],
-          utils: ["axios", "zod", "zustand"],
+        manualChunks(id) {
+          // React vendor bundle (shared across all pages)
+          if (id.includes("node_modules/react") || 
+              id.includes("node_modules/react-dom") || 
+              id.includes("node_modules/react-router")) {
+            return "react-vendor";
+          }
+          
+          // Map library (only loaded on map pages)
+          if (id.includes("node_modules/ol") || id.includes("MapView")) {
+            return "map";
+          }
+          
+          // Dashboard routes share chunk
+          if (id.includes("pages/dashboard") && !id.includes("node_modules")) {
+            return "dashboard";
+          }
+          
+          // Agency routes share chunk
+          if (id.includes("pages/agency") && !id.includes("node_modules")) {
+            return "agency";
+          }
+          
+          // Admin routes share chunk
+          if (id.includes("pages/admin") && !id.includes("node_modules")) {
+            return "admin";
+          }
+          
+          // Auth routes share chunk
+          if ((id.includes("pages/login") || id.includes("pages/register")) && 
+              !id.includes("node_modules")) {
+            return "auth";
+          }
+          
+          // Utilities
+          if (id.includes("node_modules/axios") || 
+              id.includes("node_modules/zod") || 
+              id.includes("node_modules/zustand")) {
+            return "utils";
+          }
+          
+          // Other vendor dependencies
+          if (id.includes("node_modules")) {
+            return "vendor";
+          }
         },
       },
     },

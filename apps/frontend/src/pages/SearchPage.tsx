@@ -4,7 +4,7 @@ import MapView from "@/components/Map/MapView";
 import FilterPanel, { PropertyFilters } from "@/components/Map/FilterPanel";
 import { useMapSearch } from "@/hooks/useMapSearch";
 import { PropertyCardSkeleton } from "@/components/Skeleton";
-import { ErrorBoundary, MapErrorFallback, SearchErrorFallback } from "@/components/ErrorBoundary";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export default function SearchPage() {
   const navigate = useNavigate();
@@ -109,7 +109,19 @@ export default function SearchPage() {
             )}
 
             {!loading && viewMode === "map" && (
-              <ErrorBoundary fallback={<MapErrorFallback />}>
+              <ErrorBoundary
+                fallback={() => (
+                  <div className="bg-white rounded-lg shadow-md p-8 text-center" style={{ height: "600px" }}>
+                    <p className="text-red-600 mb-2">Map failed to load</p>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Reload page
+                    </button>
+                  </div>
+                )}
+              >
                 <div
                   className="bg-white rounded-lg shadow-md overflow-hidden"
                   style={{ height: "600px" }}
@@ -125,7 +137,19 @@ export default function SearchPage() {
             )}
 
             {!loading && viewMode === "list" && (
-              <ErrorBoundary fallback={<SearchErrorFallback />}>
+              <ErrorBoundary
+                fallback={() => (
+                  <div className="col-span-full text-center py-8">
+                    <p className="text-red-600 mb-2">Failed to load search results</p>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Reload page
+                    </button>
+                  </div>
+                )}
+              >
                 <div
                   data-testid="listing-grid"
                   className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
