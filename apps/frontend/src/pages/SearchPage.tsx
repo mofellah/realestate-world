@@ -136,48 +136,51 @@ export default function SearchPage() {
                     </div>
                   ) : (
                     properties.map((property) => (
-                    <Link
-                      key={property.id}
-                      to={`/property/${property.id}`}
-                      data-testid="listing-card"
-                      className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
-                    >
-                      <div className="aspect-video bg-gray-200">
-                        <div className="h-full flex items-center justify-center text-gray-400">
-                          No Image
+                      <Link
+                        key={property.id}
+                        to={`/property/${property.id}`}
+                        data-testid="listing-card"
+                        className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
+                      >
+                        <div className="aspect-video bg-gray-200">
+                          <div className="h-full flex items-center justify-center text-gray-400">
+                            No Image
+                          </div>
                         </div>
-                      </div>
-                      <div className="p-4">
-                        <h3 className="font-semibold text-lg mb-2">{property.title}</h3>
-                        <p
-                          data-testid="property-type"
-                          className="text-gray-500 text-xs uppercase mb-1"
-                        >
-                          {property.type || "N/A"}
-                        </p>
-                        <p data-testid="property-address" className="text-gray-600 text-sm mb-2">
-                          {typeof property.address === "string"
-                            ? property.address
-                            : property.address?.city || "No location"}
-                        </p>
-                        <p data-testid="property-price" className="text-xl font-bold text-blue-600">
-                          ${property.price?.toLocaleString() ?? "N/A"}
-                        </p>
-                        <div className="flex space-x-4 mt-2 text-sm text-gray-500">
-                          {property.bedrooms && (
-                            <span data-testid="property-bedrooms">🛏️ {property.bedrooms}</span>
-                          )}
-                          {property.bathrooms && <span>🚿 {property.bathrooms}</span>}
-                          {property.areaSquareMeters && (
-                            <span>📏 {property.areaSquareMeters}m²</span>
-                          )}
+                        <div className="p-4">
+                          <h3 className="font-semibold text-lg mb-2">{property.title}</h3>
+                          <p
+                            data-testid="property-type"
+                            className="text-gray-500 text-xs uppercase mb-1"
+                          >
+                            {property.type || "N/A"}
+                          </p>
+                          <p data-testid="property-address" className="text-gray-600 text-sm mb-2">
+                            {typeof property.address === "string"
+                              ? property.address
+                              : property.address?.city || "No location"}
+                          </p>
+                          <p
+                            data-testid="property-price"
+                            className="text-xl font-bold text-blue-600"
+                          >
+                            ${property.price?.toLocaleString() ?? "N/A"}
+                          </p>
+                          <div className="flex space-x-4 mt-2 text-sm text-gray-500">
+                            {property.bedrooms && (
+                              <span data-testid="property-bedrooms">🛏️ {property.bedrooms}</span>
+                            )}
+                            {property.bathrooms && <span>🚿 {property.bathrooms}</span>}
+                            {property.areaSquareMeters && (
+                              <span>📏 {property.areaSquareMeters}m²</span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </Link>
-                  ))
-                )}
-              </div>
-            </ErrorBoundary>
+                      </Link>
+                    ))
+                  )}
+                </div>
+              </ErrorBoundary>
             )}
           </main>
         </div>
