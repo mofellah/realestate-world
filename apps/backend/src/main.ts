@@ -1,4 +1,18 @@
-import "./setup-env";
+// Load environment variables at module load time (must be before other imports)
+import fs from "fs";
+import path from "path";
+import dotenv from "dotenv";
+
+const candidates = [
+  path.resolve(process.cwd(), ".env"),
+  path.resolve(process.cwd(), "..", "..", ".env"),
+];
+
+const envPath = candidates.find((candidate) => fs.existsSync(candidate));
+if (envPath) {
+  dotenv.config({ path: envPath });
+}
+
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
