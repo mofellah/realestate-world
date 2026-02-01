@@ -4,6 +4,7 @@ import { propertiesService } from "../services/properties-service";
 import { messagesService } from "../services/messages-service";
 import { useAuthStore } from "../stores/authStore";
 import { PropertyDetailSkeleton } from "../components/Skeleton";
+import ContactModal from "../components/ContactModal";
 
 interface PropertyDetail {
   id: string;
@@ -39,7 +40,7 @@ export default function PropertyDetailPage() {
   const [property, setProperty] = useState<PropertyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [contactMessage, setContactMessage] = useState("");
+  const [showContactModal, setShowContactModal] = useState(false);
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
@@ -82,15 +83,18 @@ export default function PropertyDetailPage() {
     return "Price on request";
   }, [property]);
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleContactSubmit = async (data: {
+    name: string;
+    email: string;
+    phone: string;
+    message: string;
+  }) => {
     if (!user) {
       navigate("/login");
       return;
     }
 
-    if (!property?.ownerPerson?.email || !contactMessage.trim()) {
+    if (!property?.ownerPerson?.email || !data.message.trim()) {
       setError("Please fill in your message");
       return;
     }
@@ -100,14 +104,13 @@ export default function PropertyDetailPage() {
       await messagesService.sendMessage({
         recipientId: property.user?.id || "",
         subject_line: `Inquiry about ${property.type} in ${property.address.city}`,
-        body: contactMessage,
+        body: data.message,
         messageType: "inquiry",
         subjectId: property.id,
       });
-      setContactMessage("");
+      setShowContactModal(false);
       alert("Message sent successfully!");
     } catch (err) {
-      console.error("Failed to send message:", err);
       setError("Failed to send message. Please try again.");
     } finally {
       setSending(false);
@@ -299,22 +302,12 @@ export default function PropertyDetailPage() {
                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                   Send a message to schedule a visit or ask a question.
                 </p>
-                <form onSubmit={handleContactSubmit} className="space-y-3">
-                  <textarea
-                    value={contactMessage}
-                    onChange={(e) => setContactMessage(e.target.value)}
-                    placeholder="Your message..."
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                    rows={3}
-                  />
-                  <button
-                    type="submit"
-                    disabled={sending}
-                    className="w-full bg-blue-600 dark:bg-blue-700 text-white px-6 py-2 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50"
-                  >
-                    {sending ? "Sending..." : "Send Message"}
-                  </button>
-                </form>
+                <button
+                  onClick={() => setShowContactModal(true)}
+                  className="w-full bg-blue-600 dark:bg-blue-700 text-white px-6 py-3 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 font-semibold"
+                >
+                  Contact Owner
+                </button>
               </div>
 
               {error && <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>}
@@ -322,6 +315,19 @@ export default function PropertyDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Contact Modal */}
+      <ContactModal
+        open={showContactModal}
+        title={`Contact about ${property.type} in ${property.address.city}`}
+        loading={sending}
+        error={error}
+        onClose={() => {
+          setShowContactModal(false);
+          setError(null);
+        }}
+        onSubmit={handleContactSubmit}
+      />
     </div>
   );
 }

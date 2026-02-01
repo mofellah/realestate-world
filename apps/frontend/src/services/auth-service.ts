@@ -65,7 +65,7 @@ class AuthService {
     try {
       await apiClient.post("/auth/logout", {});
     } catch (error) {
-      console.warn("Logout API call failed, clearing tokens anyway:", error);
+      // Silently handle logout API failures - clear tokens anyway
     } finally {
       tokenStorage.clearTokens();
     }

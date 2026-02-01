@@ -45,8 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           setUser(userData);
         } catch (error) {
-          // Token invalid or expired, clear it
-          console.warn("Session validation failed, clearing tokens");
+          // Token invalid or expired, clear it silently
           tokenStorage.clearTokens();
         }
       }
