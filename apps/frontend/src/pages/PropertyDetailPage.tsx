@@ -5,6 +5,7 @@ import { messagesService } from "../services/messages-service";
 import { useAuthStore } from "../stores/authStore";
 import { PropertyDetailSkeleton } from "../components/Skeleton";
 import ContactModal from "../components/ContactModal";
+import { ErrorBoundary, MapErrorFallback } from "../components/ErrorBoundary";
 
 interface PropertyDetail {
   id: string;

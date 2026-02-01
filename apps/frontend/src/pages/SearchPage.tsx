@@ -4,6 +4,7 @@ import MapView from "@/components/Map/MapView";
 import FilterPanel, { PropertyFilters } from "@/components/Map/FilterPanel";
 import { useMapSearch } from "@/hooks/useMapSearch";
 import { PropertyCardSkeleton } from "@/components/Skeleton";
+import { ErrorBoundary, MapErrorFallback, SearchErrorFallback } from "@/components/ErrorBoundary";
 
 export default function SearchPage() {
   const navigate = useNavigate();
@@ -108,30 +109,33 @@ export default function SearchPage() {
             )}
 
             {!loading && viewMode === "map" && (
-              <div
-                className="bg-white rounded-lg shadow-md overflow-hidden"
-                style={{ height: "600px" }}
-              >
-                <MapView
-                  center={center}
-                  zoom={12}
-                  properties={properties}
-                  onPropertyClick={handlePropertyClick}
-                />
-              </div>
+              <ErrorBoundary fallback={<MapErrorFallback />}>
+                <div
+                  className="bg-white rounded-lg shadow-md overflow-hidden"
+                  style={{ height: "600px" }}
+                >
+                  <MapView
+                    center={center}
+                    zoom={12}
+                    properties={properties}
+                    onPropertyClick={handlePropertyClick}
+                  />
+                </div>
+              </ErrorBoundary>
             )}
 
             {!loading && viewMode === "list" && (
-              <div
-                data-testid="listing-grid"
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              >
-                {properties.length === 0 ? (
-                  <div className="col-span-full text-center py-8 text-gray-500">
-                    No properties found. Try adjusting your filters.
-                  </div>
-                ) : (
-                  properties.map((property) => (
+              <ErrorBoundary fallback={<SearchErrorFallback />}>
+                <div
+                  data-testid="listing-grid"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                  {properties.length === 0 ? (
+                    <div className="col-span-full text-center py-8 text-gray-500">
+                      No properties found. Try adjusting your filters.
+                    </div>
+                  ) : (
+                    properties.map((property) => (
                     <Link
                       key={property.id}
                       to={`/property/${property.id}`}
@@ -173,6 +177,7 @@ export default function SearchPage() {
                   ))
                 )}
               </div>
+            </ErrorBoundary>
             )}
           </main>
         </div>
