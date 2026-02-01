@@ -39,6 +39,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "axios": "^1.6.7",
     "@nestjs/cli": "^10.3.1",
     "@nestjs/schematics": "^10.1.0",
     "@nestjs/testing": "^10.3.2",
