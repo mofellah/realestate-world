@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { propertiesService } from "../../services/properties-service";
+import { PropertyCardSkeleton } from "../../components/Skeleton";
 
 interface Property {
   id: string;
@@ -80,15 +81,8 @@ export default function MyPropertiesPage() {
       {/* Properties Grid */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white rounded-lg shadow animate-pulse">
-              <div className="h-48 bg-gray-300 rounded-t-lg"></div>
-              <div className="p-4">
-                <div className="h-6 bg-gray-300 rounded mb-2"></div>
-                <div className="h-4 bg-gray-300 rounded w-2/3 mb-2"></div>
-                <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-              </div>
-            </div>
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <PropertyCardSkeleton key={i} />
           ))}
         </div>
       ) : filteredProperties.length === 0 ? (

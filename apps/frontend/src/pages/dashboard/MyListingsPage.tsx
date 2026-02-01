@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { listingsService, Listing } from "../../services/listings-service";
+import { ListingCardSkeleton } from "../../components/Skeleton";
 
 export default function MyListingsPage() {
   const [listings, setListings] = useState<Listing[]>([]);
@@ -60,9 +61,9 @@ export default function MyListingsPage() {
   if (loading) {
     return (
       <div className="p-8">
-        <div className="animate-pulse space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-24 bg-gray-200 rounded-lg" />
+        <div className="space-y-4">
+          {[1, 2, 3, 4].map((i) => (
+            <ListingCardSkeleton key={i} />
           ))}
         </div>
       </div>

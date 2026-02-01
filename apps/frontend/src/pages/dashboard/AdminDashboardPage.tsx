@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/admin-service";
+import { DashboardMetricsSkeleton } from "../../components/Skeleton";
 
 interface SystemMetrics {
   totalUsers: number;
@@ -59,7 +60,12 @@ export default function AdminDashboardPage() {
   };
 
   if (loading) {
-    return <div className="p-8">Loading metrics...</div>;
+    return (
+      <div className="p-6">
+        <div className="h-8 w-64 bg-gray-200 rounded mb-6 animate-pulse"></div>
+        <DashboardMetricsSkeleton />
+      </div>
+    );
   }
 
   return (
