@@ -44,7 +44,12 @@ export default function AgencyDashboardPage() {
   };
 
   if (loading) {
-    return <div className="p-8">Loading...</div>;
+    return (
+      <div className="p-6">
+        <div className="h-8 w-64 bg-gray-200 rounded mb-6 animate-pulse"></div>
+        <DashboardMetricsSkeleton />
+      </div>
+    );
   }
 
   return (

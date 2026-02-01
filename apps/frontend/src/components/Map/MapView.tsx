@@ -175,7 +175,7 @@ export default function MapView({
         const latitude = address.geoObject?.latitude ?? address.latitude;
 
         if (!longitude || !latitude) {
-          console.warn(`[MapView] Property ${property.id} missing coordinates`);
+          // Skip properties with missing coordinates
           return null;
         }
 

@@ -48,3 +48,4 @@ cypress/videos
 # Temp files
 *.tmp
 *.temp
+apps/frontend/linting.txt

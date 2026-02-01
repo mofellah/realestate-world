@@ -4,6 +4,7 @@ import MapView from "@/components/Map/MapView";
 import FilterPanel, { PropertyFilters } from "@/components/Map/FilterPanel";
 import { useMapSearch } from "@/hooks/useMapSearch";
 import { PropertyCardSkeleton } from "@/components/Skeleton";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export default function SearchPage() {
   const navigate = useNavigate();
@@ -14,9 +15,8 @@ export default function SearchPage() {
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
 
   useEffect(() => {
-    // Initial search
+    // Initial search - run only once on mount
     search(filters, center);
-    // eslint-disable-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -108,71 +108,105 @@ export default function SearchPage() {
             )}
 
             {!loading && viewMode === "map" && (
-              <div
-                className="bg-white rounded-lg shadow-md overflow-hidden"
-                style={{ height: "600px" }}
+              <ErrorBoundary
+                fallback={() => (
+                  <div
+                    className="bg-white rounded-lg shadow-md p-8 text-center"
+                    style={{ height: "600px" }}
+                  >
+                    <p className="text-red-600 mb-2">Map failed to load</p>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Reload page
+                    </button>
+                  </div>
+                )}
               >
-                <MapView
-                  center={center}
-                  zoom={12}
-                  properties={properties}
-                  onPropertyClick={handlePropertyClick}
-                />
-              </div>
+                <div
+                  className="bg-white rounded-lg shadow-md overflow-hidden"
+                  style={{ height: "600px" }}
+                >
+                  <MapView
+                    center={center}
+                    zoom={12}
+                    properties={properties}
+                    onPropertyClick={handlePropertyClick}
+                  />
+                </div>
+              </ErrorBoundary>
             )}
 
             {!loading && viewMode === "list" && (
-              <div
-                data-testid="listing-grid"
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              >
-                {properties.length === 0 ? (
-                  <div className="col-span-full text-center py-8 text-gray-500">
-                    No properties found. Try adjusting your filters.
-                  </div>
-                ) : (
-                  properties.map((property) => (
-                    <Link
-                      key={property.id}
-                      to={`/property/${property.id}`}
-                      data-testid="listing-card"
-                      className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
+              <ErrorBoundary
+                fallback={() => (
+                  <div className="col-span-full text-center py-8">
+                    <p className="text-red-600 mb-2">Failed to load search results</p>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="text-blue-600 hover:underline"
                     >
-                      <div className="aspect-video bg-gray-200">
-                        <div className="h-full flex items-center justify-center text-gray-400">
-                          No Image
-                        </div>
-                      </div>
-                      <div className="p-4">
-                        <h3 className="font-semibold text-lg mb-2">{property.title}</h3>
-                        <p
-                          data-testid="property-type"
-                          className="text-gray-500 text-xs uppercase mb-1"
-                        >
-                          {property.type || "N/A"}
-                        </p>
-                        <p data-testid="property-address" className="text-gray-600 text-sm mb-2">
-                          {typeof property.address === "string"
-                            ? property.address
-                            : property.address?.city || "No location"}
-                        </p>
-                        <p data-testid="property-price" className="text-xl font-bold text-blue-600">
-                          ${property.price?.toLocaleString() ?? "N/A"}
-                        </p>
-                        <div className="flex space-x-4 mt-2 text-sm text-gray-500">
-                          {property.bedrooms && (
-                            <span data-testid="property-bedrooms">🛏️ {property.bedrooms}</span>
-                          )}
-                          {property.bathrooms && <span>🚿 {property.bathrooms}</span>}
-                          {property.areaSquareMeters && (
-                            <span>📏 {property.areaSquareMeters}m²</span>
-                          )}
-                        </div>
-                      </div>
-                    </Link>
-                  ))
+                      Reload page
+                    </button>
+                  </div>
                 )}
-              </div>
+              >
+                <div
+                  data-testid="listing-grid"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                  {properties.length === 0 ? (
+                    <div className="col-span-full text-center py-8 text-gray-500">
+                      No properties found. Try adjusting your filters.
+                    </div>
+                  ) : (
+                    properties.map((property) => (
+                      <Link
+                        key={property.id}
+                        to={`/property/${property.id}`}
+                        data-testid="listing-card"
+                        className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden"
+                      >
+                        <div className="aspect-video bg-gray-200">
+                          <div className="h-full flex items-center justify-center text-gray-400">
+                            No Image
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <h3 className="font-semibold text-lg mb-2">{property.title}</h3>
+                          <p
+                            data-testid="property-type"
+                            className="text-gray-500 text-xs uppercase mb-1"
+                          >
+                            {property.type || "N/A"}
+                          </p>
+                          <p data-testid="property-address" className="text-gray-600 text-sm mb-2">
+                            {typeof property.address === "string"
+                              ? property.address
+                              : property.address?.city || "No location"}
+                          </p>
+                          <p
+                            data-testid="property-price"
+                            className="text-xl font-bold text-blue-600"
+                          >
+                            ${property.price?.toLocaleString() ?? "N/A"}
+                          </p>
+                          <div className="flex space-x-4 mt-2 text-sm text-gray-500">
+                            {property.bedrooms && (
+                              <span data-testid="property-bedrooms">🛏️ {property.bedrooms}</span>
+                            )}
+                            {property.bathrooms && <span>🚿 {property.bathrooms}</span>}
+                            {property.areaSquareMeters && (
+                              <span>📏 {property.areaSquareMeters}m²</span>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    ))
+                  )}
+                </div>
+              </ErrorBoundary>
             )}
           </main>
         </div>
