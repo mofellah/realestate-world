@@ -31,7 +31,7 @@ export default function RegisterPage() {
     if (/[A-Z]/.test(password)) strength++;
     if (/[a-z]/.test(password)) strength++;
     if (/[0-9]/.test(password)) strength++;
-    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) strength++;
+    if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) strength++;
     return Math.min(strength, 5);
   }, [password]);
 
@@ -63,12 +63,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
 
-    // Client-side validation
-    if (!acceptTerms) {
-      setError("You must accept the terms and conditions");
-      return;
-    }
-
+    // Client-side validation - check passwords first
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -77,6 +72,11 @@ export default function RegisterPage() {
     const passwordError = validatePassword(password);
     if (passwordError) {
       setError(passwordError);
+      return;
+    }
+
+    if (!acceptTerms) {
+      setError("You must accept the terms and conditions");
       return;
     }
 

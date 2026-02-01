@@ -15,9 +15,8 @@ export default function SearchPage() {
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
 
   useEffect(() => {
-    // Initial search
+    // Initial search - run only once on mount
     search(filters, center);
-    // eslint-disable-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

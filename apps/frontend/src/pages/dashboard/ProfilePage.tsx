@@ -34,8 +34,6 @@ export default function ProfilePage() {
   }, [user]);
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -44,8 +42,6 @@ export default function ProfilePage() {
 
   const handleProfileUpdate = async () => {
     try {
-      setError(null);
-      setLoading(true);
       await usersService.updateProfile({
         name: profile.name,
         phone: profile.phone,
@@ -55,20 +51,16 @@ export default function ProfilePage() {
       alert("Profile updated successfully!");
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Failed to update profile";
-      setError(msg);
-    } finally {
-      setLoading(false);
+      console.error(msg);
     }
   };
 
   const handlePasswordChange = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError("Passwords do not match");
+      alert("Passwords do not match");
       return;
     }
     try {
-      setError(null);
-      setLoading(true);
       await usersService.changePassword({
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
@@ -78,9 +70,7 @@ export default function ProfilePage() {
       alert("Password changed successfully!");
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Failed to change password";
-      setError(msg);
-    } finally {
-      setLoading(false);
+      console.error(msg);
     }
   };
 
@@ -88,16 +78,12 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (file) {
       try {
-        setError(null);
-        setLoading(true);
         const avatarUrl = await usersService.uploadAvatar(file);
         setProfile((prev) => ({ ...prev, avatar: avatarUrl }));
         alert("Avatar uploaded successfully!");
       } catch (error) {
         const msg = error instanceof Error ? error.message : "Failed to upload avatar";
-        setError(msg);
-      } finally {
-        setLoading(false);
+        console.error(msg);
       }
     }
   };
