@@ -26,7 +26,7 @@ export default function AgencyTeamPage() {
 
   const fetchAgents = async () => {
     if (!user?.id) return;
-    
+
     setLoading(true);
     setError(null);
     try {
@@ -139,7 +139,9 @@ export default function AgencyTeamPage() {
                   <tr key={agent.userId}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="font-medium text-gray-900">{agent.user?.email || "Unknown"}</div>
+                        <div className="font-medium text-gray-900">
+                          {agent.user?.email || "Unknown"}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -148,8 +150,8 @@ export default function AgencyTeamPage() {
                           agent.role === "owner"
                             ? "bg-purple-100 text-purple-800"
                             : agent.role === "manager"
-                            ? "bg-indigo-100 text-indigo-800"
-                            : "bg-blue-100 text-blue-800"
+                              ? "bg-indigo-100 text-indigo-800"
+                              : "bg-blue-100 text-blue-800"
                         }`}
                       >
                         {agent.role}
@@ -178,3 +180,4 @@ export default function AgencyTeamPage() {
       )}
     </div>
   );
+}
