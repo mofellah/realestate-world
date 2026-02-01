@@ -143,7 +143,9 @@ describe("UsersService", () => {
     it("should call findUnique with correct where clause", async () => {
       // Arrange
       const userId = "specific-user-id";
-      jest.spyOn(prismaService.user, "findUnique").mockResolvedValue(fixtures.mockUserWithAdminRole as any);
+      jest
+        .spyOn(prismaService.user, "findUnique")
+        .mockResolvedValue(fixtures.mockUserWithAdminRole as any);
 
       // Act
       await service.getUserById(userId);
