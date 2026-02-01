@@ -15,7 +15,7 @@ import { ThemeProvider } from "../contexts/ThemeContext";
 const AllProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <ThemeProvider>
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AuthProvider>{children}</AuthProvider>
       </MemoryRouter>
     </ThemeProvider>
@@ -29,7 +29,9 @@ const AllProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 const RoutingOnly: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <ThemeProvider>
-      <MemoryRouter>{children}</MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        {children}
+      </MemoryRouter>
     </ThemeProvider>
   );
 };

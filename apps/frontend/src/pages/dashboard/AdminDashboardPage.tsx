@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { adminService } from "../../services/admin-service";
 
 interface SystemMetrics {
   totalUsers: number;
@@ -36,14 +37,8 @@ export default function AdminDashboardPage() {
       // API call to /api/admin/metrics
       // const data = await adminService.getMetrics();
       // setMetrics(data);
-      const mockMetrics = {
-        totalUsers: 1247,
-        totalProperties: 3582,
-        totalListings: 892,
-        activeListings: 657,
-        revenue: 45600,
-      };
-      setMetrics(mockMetrics);
+      const data = await adminService.getMetrics();
+      setMetrics(data);
       setLoading(false);
     } catch (error) {
       console.error("[AdminDashboard] Failed to load metrics:", error);
@@ -56,27 +51,8 @@ export default function AdminDashboardPage() {
       // API call to /api/admin/activity
       // const data = await adminService.getActivity();
       // setActivity(data);
-      const mockActivity: RecentActivity[] = [
-        {
-          id: "1",
-          type: "user_registered",
-          description: "New user: john@example.com",
-          timestamp: "2 min ago",
-        },
-        {
-          id: "2",
-          type: "listing_published",
-          description: "Listing published: Modern Family Home",
-          timestamp: "15 min ago",
-        },
-        {
-          id: "3",
-          type: "property_created",
-          description: "Property created: Downtown Apartment",
-          timestamp: "1 hour ago",
-        },
-      ];
-      setActivity(mockActivity);
+      const data = await adminService.getActivity(10);
+      setActivity(data);
     } catch (error) {
       console.error("[AdminDashboard] Failed to load activity:", error);
     }
