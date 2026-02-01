@@ -25,7 +25,7 @@ export class AdminService {
         }),
       ]);
 
-    const revenue = paymentTerms.reduce((sum, term) => {
+    const revenue = paymentTerms.reduce((sum: number, term: any) => {
       if (term.periodicPayment?.amountPerPeriod) {
         return sum + term.periodicPayment.amountPerPeriod;
       }
@@ -64,19 +64,19 @@ export class AdminService {
     ]);
 
     const events = [
-      ...users.map((user) => ({
+      ...users.map((user: any) => ({
         id: user.id,
         type: "user_registered",
         description: `New user: ${user.email}`,
         timestamp: user.createdAt,
       })),
-      ...properties.map((property) => ({
+      ...properties.map((property: any) => ({
         id: property.id,
         type: "property_created",
         description: `Property created: ${property.propertyType}`,
         timestamp: property.createdAt,
       })),
-      ...listings.map((listing) => ({
+      ...listings.map((listing: any) => ({
         id: listing.id,
         type: "listing_published",
         description: `Listing created: ${listing.type}`,
