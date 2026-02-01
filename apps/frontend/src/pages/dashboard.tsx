@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { DashboardMetricsSkeleton } from "@/components/Skeleton";
 import "../styles/dashboard.scss";
 
 export default function DashboardPage() {
@@ -20,7 +21,9 @@ export default function DashboardPage() {
   if (loading)
     return (
       <div className="dashboard-container">
-        <p>Loading...</p>
+        <div className="p-6">
+          <DashboardMetricsSkeleton />
+        </div>
       </div>
     );
   if (error)
