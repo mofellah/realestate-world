@@ -21,6 +21,7 @@ const SearchPage = lazy(() => import("./pages/SearchPage"));
 const PropertyDetailPage = lazy(() => import("./pages/PropertyDetailPage"));
 const LoginPage = lazy(() => import("./pages/login"));
 const RegisterPage = lazy(() => import("./pages/register"));
+const ForgotPasswordPage = lazy(() => import("./pages/forgot-password"));
 
 // Dashboard Pages
 const DashboardPage = lazy(() => import("./pages/dashboard"));
@@ -76,6 +77,7 @@ export default function App() {
             {/* Auth Routes (no layout) */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
             {/* Protected Dashboard Routes */}
             <Route

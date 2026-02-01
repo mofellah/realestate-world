@@ -9,6 +9,7 @@ export default function LoginPage() {
   const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -22,6 +23,12 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
+      // Store remember me preference
+      if (rememberMe) {
+        localStorage.setItem("rememberMe", JSON.stringify({ email, timestamp: Date.now() }));
+      } else {
+        localStorage.removeItem("rememberMe");
+      }
       // Navigate to the page they tried to visit, or dashboard
       navigate(from, { replace: true });
     } catch (err: any) {
@@ -66,6 +73,19 @@ export default function LoginPage() {
               autoComplete="current-password"
               disabled={loading}
             />
+          </div>
+          <div className="form-group checkbox-group">
+            <input
+              id="remember-me"
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              disabled={loading}
+            />
+            <label htmlFor="remember-me">Remember me</label>
+          </div>
+          <div className="form-links">
+            <Link to="/forgot-password" className="link-text">Forgot password?</Link>
           </div>
           <button
             type="submit"
