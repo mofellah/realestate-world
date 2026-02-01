@@ -85,7 +85,9 @@ export default function LoginPage() {
             <label htmlFor="remember-me">Remember me</label>
           </div>
           <div className="form-links">
-            <Link to="/forgot-password" className="link-text">Forgot password?</Link>
+            <Link to="/forgot-password" className="link-text">
+              Forgot password?
+            </Link>
           </div>
           <button
             type="submit"

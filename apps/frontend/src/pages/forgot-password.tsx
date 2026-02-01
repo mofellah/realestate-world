@@ -40,17 +40,25 @@ export default function ForgotPasswordPage() {
         <div className="auth-form">
           <h1>Check Your Email</h1>
           <div className="success-message">
-            <p>We&apos;ve sent a password reset link to <strong>{email}</strong></p>
-            <p>Click the link in the email to reset your password. The link will expire in 24 hours.</p>
-            <p>Didn&apos;t receive the email? Check your spam folder or <button
-              onClick={() => {
-                setSubmitted(false);
-                setEmail("");
-              }}
-              className="link-button"
-            >
-              try again
-            </button>.</p>
+            <p>
+              We&apos;ve sent a password reset link to <strong>{email}</strong>
+            </p>
+            <p>
+              Click the link in the email to reset your password. The link will expire in 24 hours.
+            </p>
+            <p>
+              Didn&apos;t receive the email? Check your spam folder or{" "}
+              <button
+                onClick={() => {
+                  setSubmitted(false);
+                  setEmail("");
+                }}
+                className="link-button"
+              >
+                try again
+              </button>
+              .
+            </p>
           </div>
           <Link to="/login" className="btn-secondary">
             Back to Login

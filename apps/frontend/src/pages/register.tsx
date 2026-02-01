@@ -37,25 +37,35 @@ export default function RegisterPage() {
 
   const getPasswordStrengthLabel = () => {
     switch (passwordStrength) {
-      case 0: return "Weak";
-      case 1: return "Fair";
+      case 0:
+        return "Weak";
+      case 1:
+        return "Fair";
       case 2:
-      case 3: return "Good";
-      case 4: return "Strong";
-      case 5: return "Very Strong";
-      default: return "";
+      case 3:
+        return "Good";
+      case 4:
+        return "Strong";
+      case 5:
+        return "Very Strong";
+      default:
+        return "";
     }
   };
 
   const getPasswordStrengthColor = () => {
     switch (passwordStrength) {
       case 0:
-      case 1: return "red";
+      case 1:
+        return "red";
       case 2:
-      case 3: return "yellow";
+      case 3:
+        return "yellow";
       case 4:
-      case 5: return "green";
-      default: return "gray";
+      case 5:
+        return "green";
+      default:
+        return "gray";
     }
   };
 
@@ -155,7 +165,10 @@ export default function RegisterPage() {
                   ></div>
                 </div>
                 <small className="strength-label">
-                  Strength: <span style={{ color: getPasswordStrengthColor() }}>{getPasswordStrengthLabel()}</span>
+                  Strength:{" "}
+                  <span style={{ color: getPasswordStrengthColor() }}>
+                    {getPasswordStrengthLabel()}
+                  </span>
                 </small>
               </div>
             )}
@@ -187,7 +200,10 @@ export default function RegisterPage() {
               required
             />
             <label htmlFor="accept-terms">
-              I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer">Terms and Conditions</a>
+              I agree to the{" "}
+              <a href="/terms" target="_blank" rel="noopener noreferrer">
+                Terms and Conditions
+              </a>
             </label>
           </div>
           <button type="submit" disabled={loading} className="btn-primary">

@@ -110,7 +110,10 @@ export default function SearchPage() {
             {!loading && viewMode === "map" && (
               <ErrorBoundary
                 fallback={() => (
-                  <div className="bg-white rounded-lg shadow-md p-8 text-center" style={{ height: "600px" }}>
+                  <div
+                    className="bg-white rounded-lg shadow-md p-8 text-center"
+                    style={{ height: "600px" }}
+                  >
                     <p className="text-red-600 mb-2">Map failed to load</p>
                     <button
                       onClick={() => window.location.reload()}
