@@ -10,7 +10,6 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
-  const [userType, setUserType] = useState<"owner" | "agent" | "searcher">("owner");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -89,7 +88,6 @@ export default function RegisterPage() {
         password,
         passwordConfirmation: confirmPassword,
         name: name || undefined,
-        userType,
       });
       // Navigate happens in AuthContext after successful registration
     } catch (err: any) {
@@ -130,20 +128,6 @@ export default function RegisterPage() {
               autoComplete="email"
               disabled={loading}
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="user-type">Account Type</label>
-            <select
-              id="user-type"
-              value={userType}
-              onChange={(e) => setUserType(e.target.value as "owner" | "agent" | "searcher")}
-              disabled={loading}
-              required
-            >
-              <option value="owner">Property Owner</option>
-              <option value="agent">Real Estate Agent</option>
-              <option value="searcher">Buyer/Renter</option>
-            </select>
           </div>
           <div className="form-group">
             <label htmlFor="password">Password</label>
