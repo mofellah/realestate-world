@@ -7,19 +7,19 @@
     "migrate:dev": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
     "migrate:reset": "prisma migrate reset",
-    "generate": "prisma generate",
+    "generate": "node ./scripts/ensure-prisma-client.js && prisma generate",
     "seed": "ts-node seeds/seed.ts",
     "db:push": "prisma db push"
   },
   "dependencies": {
-    "@prisma/client": "^5.9.1",
-    "@boilerplate/utils": "*"
+    "@boilerplate/utils": "*",
+    "@prisma/client": "^5.22.0"
   },
   "devDependencies": {
+    "@types/node": "^20.11.19",
     "prisma": "^5.9.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3",
-    "@types/node": "^20.11.19"
+    "typescript": "^5.3.3"
   },
   "prisma": {
     "seed": "ts-node seeds/seed.ts"

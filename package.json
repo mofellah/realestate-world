@@ -43,6 +43,7 @@
     "docker:prod:down": "docker compose -f ops/compose/docker-compose.prod.yml down"
   },
   "devDependencies": {
+    "@prisma/client": "^5.22.0",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.19",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
