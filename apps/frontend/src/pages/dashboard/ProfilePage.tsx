@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usersService } from "@/services/users-service";
 
 interface UserProfile {
   id: string;
@@ -33,6 +34,8 @@ export default function ProfilePage() {
   }, [user]);
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -42,44 +45,60 @@ export default function ProfilePage() {
   const handleProfileUpdate = async () => {
     try {
       setError(null);
-      // API call to update profile
-      // await usersService.updateProfile(profile);
+      setLoading(true);
+      await usersService.updateProfile({
+        name: profile.name,
+        phone: profile.phone,
+        bio: profile.bio,
+      });
       setIsEditing(false);
+      alert("Profile updated successfully!");
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Failed to update profile";
       setError(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handlePasswordChange = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match");
       return;
     }
     try {
       setError(null);
-      // API call to change password
-      // await usersService.changePassword(passwordData.currentPassword, passwordData.newPassword);
+      setLoading(true);
+      await usersService.changePassword({
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      });
       setShowPasswordForm(false);
       setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      alert("Password changed successfully!");
     } catch (error) {
-      console.error("Error changing password:", error);
+      const msg = error instanceof Error ? error.message : "Failed to change password";
+      setError(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setError(null);
-      // TODO: Upload to server and get URL
-      // const formData = new FormData();
-      // formData.append('file', file);
-      // const result = await usersService.uploadAvatar(formData);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfile((prev) => ({ ...prev, avatar: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      try {
+        setError(null);
+        setLoading(true);
+        const avatarUrl = await usersService.uploadAvatar(file);
+        setProfile((prev) => ({ ...prev, avatar: avatarUrl }));
+        alert("Avatar uploaded successfully!");
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : "Failed to upload avatar";
+        setError(msg);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
