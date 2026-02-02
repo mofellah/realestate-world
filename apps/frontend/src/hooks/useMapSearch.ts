@@ -53,9 +53,17 @@ export function useMapSearch() {
 
       if (filters.priceMin) params.append("priceMin", filters.priceMin.toString());
       if (filters.priceMax) params.append("priceMax", filters.priceMax.toString());
-      if (filters.propertyType) params.append("type", filters.propertyType);
+      if (filters.type) params.append("type", filters.type);
       if (filters.bedrooms) params.append("bedrooms", filters.bedrooms.toString());
       if (filters.bathrooms) params.append("bathrooms", filters.bathrooms.toString());
+
+      if (filters.amenities && filters.amenities.length > 0) {
+        params.append("amenities", filters.amenities.join(","));
+      }
+
+      if (filters.distanceMetric) {
+        params.append("distanceMetric", filters.distanceMetric);
+      }
 
       // Spatial filter (PostGIS ST_DWithin)
       if (filters.radius && center) {

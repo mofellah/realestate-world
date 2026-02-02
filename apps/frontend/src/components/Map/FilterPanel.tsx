@@ -12,6 +12,8 @@ export interface PropertyFilters {
   bedrooms?: number;
   bathrooms?: number;
   radius?: number; // km for spatial search (ST_DWithin)
+  amenities?: string[];
+  distanceMetric?: "walking" | "driving" | "direct";
 }
 
 interface PropertyFiltersProps {
@@ -28,6 +30,27 @@ export default function FilterPanel({ filters, onChange, onApply }: PropertyFilt
     setLocalFilters(updated);
     onChange(updated);
   };
+
+  const handleAmenityToggle = (amenity: string, checked: boolean) => {
+    const current = localFilters.amenities || [];
+    const updatedAmenities = checked
+      ? Array.from(new Set([...current, amenity]))
+      : current.filter((item) => item !== amenity);
+
+    const updated = { ...localFilters, amenities: updatedAmenities };
+    setLocalFilters(updated);
+    onChange(updated);
+  };
+
+  const amenityOptions = [
+    { id: "schools", label: "Schools" },
+    { id: "hospitals", label: "Hospitals" },
+    { id: "parks", label: "Parks" },
+    { id: "transit", label: "Public Transit" },
+    { id: "supermarkets", label: "Supermarkets" },
+    { id: "gyms", label: "Gyms" },
+    { id: "restaurants", label: "Restaurants" },
+  ];
 
   return (
     <div data-testid="filter-panel" className="bg-white p-4 rounded-lg shadow-md space-y-4">
@@ -158,6 +181,39 @@ export default function FilterPanel({ filters, onChange, onApply }: PropertyFilt
           <option value="5">Within 5 km</option>
           <option value="10">Within 10 km</option>
           <option value="20">Within 20 km</option>
+        </select>
+      </div>
+
+      {/* Amenity Filters */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Nearby Amenities</label>
+        <div className="grid grid-cols-1 gap-2">
+          {amenityOptions.map((amenity) => (
+            <label key={amenity.id} className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={localFilters.amenities?.includes(amenity.id) || false}
+                onChange={(e) => handleAmenityToggle(amenity.id, e.target.checked)}
+              />
+              {amenity.label}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Distance Metric */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Distance Type</label>
+        <select
+          value={localFilters.distanceMetric || "walking"}
+          onChange={(e) =>
+            handleChange("distanceMetric", e.target.value as PropertyFilters["distanceMetric"])
+          }
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="walking">Walking distance</option>
+          <option value="driving">Driving distance</option>
+          <option value="direct">Direct distance</option>
         </select>
       </div>
 

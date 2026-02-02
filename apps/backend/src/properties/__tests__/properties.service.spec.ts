@@ -443,4 +443,77 @@ describe("PropertiesService", () => {
       );
     });
   });
+
+  describe("search with amenities", () => {
+    it("should search properties with amenity filter", async () => {
+      const filters = {
+        amenities: ["hospital", "school"],
+        latitude: 50.5,
+        longitude: 4.5,
+        radius: 5000,
+      };
+
+      const amenityPropertyIds = [{ property_id: "prop-001" }, { property_id: "prop-002" }];
+      mockPrismaService.$queryRaw.mockResolvedValue(amenityPropertyIds);
+      mockPrismaService.property.findMany.mockResolvedValue([mockProperty]);
+      mockPrismaService.property.count.mockResolvedValue(1);
+
+      const result = await service.search(filters);
+
+      expect(result.properties).toHaveLength(1);
+      expect(mockPrismaService.$queryRaw).toHaveBeenCalled();
+    });
+
+    it("should return empty properties when no amenities found in radius", async () => {
+      const filters = {
+        amenities: ["hospital"],
+        latitude: 50.5,
+        longitude: 4.5,
+        radius: 1000,
+      };
+
+      mockPrismaService.$queryRaw.mockResolvedValue([]);
+
+      const result = await service.search(filters);
+
+      expect(result.properties).toHaveLength(0);
+      expect(result.total).toEqual(0);
+    });
+
+    it("should combine amenity filter with property type filter", async () => {
+      const filters = {
+        amenities: ["park", "supermarket"],
+        propertyType: "apartment",
+        latitude: 50.5,
+        longitude: 4.5,
+        radius: 3000,
+      };
+
+      const amenityPropertyIds = [{ property_id: "prop-001" }];
+      mockPrismaService.$queryRaw.mockResolvedValue(amenityPropertyIds);
+      mockPrismaService.property.findMany.mockResolvedValue([
+        { ...mockProperty, propertyType: "apartment" },
+      ]);
+      mockPrismaService.property.count.mockResolvedValue(1);
+
+      const result = await service.search(filters);
+
+      expect(result.properties).toHaveLength(1);
+      expect(result.properties[0].propertyType).toEqual("apartment");
+    });
+
+    it("should return empty array when no properties match filters", async () => {
+      const filters = {
+        propertyType: "villa",
+      } as any;
+
+      mockPrismaService.property.findMany.mockResolvedValue([]);
+      mockPrismaService.property.count.mockResolvedValue(0);
+
+      const result = await service.search(filters);
+
+      expect(result.properties).toHaveLength(0);
+      expect(result.total).toEqual(0);
+    });
+  });
 });

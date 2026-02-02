@@ -1,10 +1,11 @@
 /**
  * Search Properties DTO
  * Query parameters for property search with spatial filtering
+ * Supports both user-friendly names (type, bedrooms) and schema names (propertyType, minBedrooms)
  */
 
-import { IsOptional, IsString, IsNumber, Min, Max, IsIn } from "class-validator";
-import { Type } from "class-transformer";
+import { IsOptional, IsString, IsNumber, Min, Max, IsIn, IsArray } from "class-validator";
+import { Type, Transform } from "class-transformer";
 import { ApiPropertyOptional } from "@nestjs/swagger";
 
 export class SearchPropertiesDto {
@@ -14,16 +15,16 @@ export class SearchPropertiesDto {
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  priceMin?: number;
+  minPrice?: number;
 
   @ApiPropertyOptional({ description: "Maximum price", minimum: 0 })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  priceMax?: number;
+  maxPrice?: number;
 
-  // Property type filter
+  // Property type filter (supports both 'type' and 'propertyType')
   @ApiPropertyOptional({
     description: "Property type",
     enum: ["studio", "house", "apartment", "villa", "land", "room", "commercial", "other"],
@@ -31,22 +32,84 @@ export class SearchPropertiesDto {
   @IsOptional()
   @IsString()
   @IsIn(["studio", "house", "apartment", "villa", "land", "room", "commercial", "other"])
+  propertyType?: string;
+
+  // Also accept 'type' as alias for backward compatibility
+  @IsOptional()
+  @IsString()
+  @Transform(({ obj, value }) => {
+    // If 'type' is provided and propertyType isn't, copy it
+    if (value && !obj.propertyType) {
+      obj.propertyType = value;
+    }
+  })
   type?: string;
 
-  // Bedrooms/Bathrooms filter
-  @ApiPropertyOptional({ description: "Minimum bedrooms", minimum: 0 })
+  // Bedrooms filters (supports both 'bedrooms' and 'minBedrooms')
+  @ApiPropertyOptional({
+    description: "Minimum bedrooms",
+    minimum: 0,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
+  minBedrooms?: number;
+
+  // Also accept 'bedrooms' as alias
+  @IsOptional()
+  @Type(() => Number)
+  @Transform(({ obj, value }) => {
+    // If 'bedrooms' is provided and minBedrooms isn't, copy it
+    if (value !== undefined && obj.minBedrooms === undefined) {
+      obj.minBedrooms = value;
+    }
+  })
   bedrooms?: number;
 
-  @ApiPropertyOptional({ description: "Minimum bathrooms", minimum: 0 })
+  // Max bedrooms filter
+  @ApiPropertyOptional({
+    description: "Maximum bedrooms",
+    minimum: 0,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)
+  maxBedrooms?: number;
+
+  // Bathrooms filters (supports both 'bathrooms' and 'minBathrooms')
+  @ApiPropertyOptional({
+    description: "Minimum bathrooms",
+    minimum: 0,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  minBathrooms?: number;
+
+  // Also accept 'bathrooms' as alias
+  @IsOptional()
+  @Type(() => Number)
+  @Transform(({ obj, value }) => {
+    // If 'bathrooms' is provided and minBathrooms isn't, copy it
+    if (value !== undefined && obj.minBathrooms === undefined) {
+      obj.minBathrooms = value;
+    }
+  })
   bathrooms?: number;
+
+  // Max bathrooms filter
+  @ApiPropertyOptional({
+    description: "Maximum bathrooms",
+    minimum: 0,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  maxBathrooms?: number;
 
   // Spatial filters (PostGIS ST_DWithin)
   @ApiPropertyOptional({
@@ -80,16 +143,35 @@ export class SearchPropertiesDto {
   @Min(0)
   radius?: number;
 
-  // Location filters
-  @ApiPropertyOptional({ description: "City name" })
+  // Distance metric for spatial queries
+  @ApiPropertyOptional({
+    description: "Distance metric for spatial search",
+    enum: ["walking", "driving", "direct"],
+  })
   @IsOptional()
   @IsString()
-  city?: string;
+  @IsIn(["walking", "driving", "direct"])
+  distanceMetric?: string;
 
-  @ApiPropertyOptional({ description: "Country code (ISO 3166-1 alpha-2)", maxLength: 2 })
+  // Amenities filter (comma-separated or array)
+  @ApiPropertyOptional({
+    description: "Amenities to filter by (comma-separated: schools,parks,restaurants)",
+    example: "schools,parks",
+  })
   @IsOptional()
-  @IsString()
-  country?: string;
+  @Transform(({ value }) => {
+    if (!value) return undefined;
+    if (Array.isArray(value)) return value;
+    if (typeof value === "string") {
+      return value
+        .split(",")
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+    }
+    return value;
+  })
+  @IsArray()
+  amenities?: string[];
 
   // Pagination
   @ApiPropertyOptional({ description: "Skip N records", minimum: 0, default: 0 })

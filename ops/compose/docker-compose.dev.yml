@@ -52,7 +52,7 @@ services:
       - ../../apps/backend/src:/app/apps/backend/src
       # Preserve node_modules to prevent conflicts
       - backend_node_modules:/app/node_modules
-    command: sh -c "npx prisma migrate deploy --schema=./db/schema.prisma && cd apps/backend && npx nest start --watch --preserveWatchOutput"
+    command: sh -c "npm rebuild bcrypt --build-from-source --workspace=@boilerplate/utils && npm run prisma:migrate:deploy && cd apps/backend && npm run dev"
     networks:
       - realestate_dev
     restart: unless-stopped
@@ -82,8 +82,6 @@ services:
       - ../../apps/frontend/vite.config.ts:/app/apps/frontend/vite.config.ts
       - ../../apps/frontend/tailwind.config.js:/app/apps/frontend/tailwind.config.js
       - ../../apps/frontend/postcss.config.js:/app/apps/frontend/postcss.config.js
-      # Preserve node_modules
-      - frontend_node_modules:/app/node_modules
     networks:
       - realestate_dev
     restart: unless-stopped
@@ -118,7 +116,6 @@ volumes:
   postgres_data_dev:
   backend_node_modules:
   backend_dist:
-  frontend_node_modules:
 
 networks:
   realestate_dev:

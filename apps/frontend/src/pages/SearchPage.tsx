@@ -32,6 +32,10 @@ export default function SearchPage() {
     if (filters.priceMax) params.set("priceMax", filters.priceMax.toString());
     if (filters.type) params.set("type", filters.type);
     if (filters.bedrooms) params.set("bedrooms", filters.bedrooms.toString());
+    if (filters.radius) params.set("radius", filters.radius.toString());
+    if (filters.distanceMetric) params.set("distanceMetric", filters.distanceMetric);
+    if (filters.amenities && filters.amenities.length > 0)
+      params.set("amenities", filters.amenities.join(","));
 
     window.history.pushState({}, "", `?${params.toString()}`);
   };

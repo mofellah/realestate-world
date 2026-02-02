@@ -1,35 +1,47 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { propertiesService } from "../services/properties-service";
-import { messagesService } from "../services/messages-service";
 import { useAuthStore } from "../stores/authStore";
 import { PropertyDetailSkeleton } from "../components/Skeleton";
 import ContactModal from "../components/ContactModal";
 
 interface PropertyDetail {
   id: string;
+  title?: string;
+  description?: string;
   type: string;
+  propertyType?: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  surfaceArea?: number;
+  images?: string[];
   address: {
+    id?: string;
     street?: string;
     city: string;
+    state?: string;
+    postalCode?: string;
     country: string;
     latitude?: number;
     longitude?: number;
   };
   listings: Array<{
+    id?: string;
     type: string;
     status: string;
-    paymentTerms: Array<{
-      type: string;
-      currency: string;
+    paymentTerms?: Array<{
+      id?: string;
+      type?: string;
+      termType?: string;
+      currency?: string;
       amount?: number;
       amountPerPeriod?: number;
     }>;
   }>;
   views?: Array<{ id: string; userId: string; viewedAt: string }>;
-  ownerPerson?: { email: string; phone?: string };
+  ownerPerson?: { id?: string; email: string; phone?: string };
   user?: { id: string; email: string };
-  agency?: { id: string; personId: string };
+  agency?: { id: string; personId?: string };
 }
 
 export default function PropertyDetailPage() {
@@ -74,12 +86,16 @@ export default function PropertyDetailPage() {
     const term = firstListing.paymentTerms[0];
     if (!term) return "N/A";
 
-    if (term.type === "onetime" && term.amount) {
+    // Use the flat amount/amountPerPeriod values
+    if (term.termType === "onetime" && term.amount) {
       return `€${term.amount.toLocaleString()}`;
     }
-    if (term.type === "periodic" && term.amountPerPeriod) {
+    if ((term.termType || term.type) === "periodic" && term.amountPerPeriod) {
       return `€${term.amountPerPeriod.toLocaleString()}/mo`;
     }
+    // Fallback to checking type field
+    if (term.amount) return `€${term.amount.toLocaleString()}`;
+    if (term.amountPerPeriod) return `€${term.amountPerPeriod.toLocaleString()}/mo`;
     return "Price on request";
   }, [property]);
 
@@ -101,12 +117,19 @@ export default function PropertyDetailPage() {
 
     try {
       setSending(true);
-      await messagesService.sendMessage({
-        recipientId: property.user?.id || "",
-        subject_line: `Inquiry about ${property.type} in ${property.address.city}`,
-        body: data.message,
-        messageType: "inquiry",
-        subjectId: property.id,
+      const contactHeader = [
+        data.name?.trim() ? `Name: ${data.name.trim()}` : null,
+        data.email?.trim() ? `Email: ${data.email.trim()}` : null,
+        data.phone?.trim() ? `Phone: ${data.phone.trim()}` : null,
+      ]
+        .filter(Boolean)
+        .join(" | ");
+
+      const body = contactHeader ? `${contactHeader}\n\n${data.message}` : data.message;
+
+      await propertiesService.contactOwner(property.id, {
+        subjectLine: `Inquiry about ${property.type} in ${property.address.city}`,
+        body,
       });
       setShowContactModal(false);
       alert("Message sent successfully!");
@@ -129,7 +152,7 @@ export default function PropertyDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error || "Property not found"}</p>
+          <p className="text-red-600 mb-4">{String(error || "Property not found")}</p>
           <button
             onClick={() => navigate("/search")}
             className="text-blue-600 hover:text-blue-800 underline"
@@ -141,12 +164,6 @@ export default function PropertyDetailPage() {
     );
   }
 
-  const images = [
-    "https://via.placeholder.com/1200x800",
-    "https://via.placeholder.com/400x300",
-    "https://via.placeholder.com/400x300",
-  ];
-
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 bg-white dark:bg-gray-900">
       <button
@@ -157,39 +174,24 @@ export default function PropertyDetailPage() {
       </button>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-        {/* Photo Gallery */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 bg-gray-100 dark:bg-gray-700 p-2">
-          <div className="md:col-span-2">
-            <img
-              src={images[0]}
-              alt={`${property.type} in ${property.address.city}`}
-              className="w-full h-96 object-cover rounded-md"
-            />
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-1 gap-2">
-            {images.slice(1, 3).map((src: string, index: number) => (
-              <img
-                key={index}
-                src={src}
-                alt={`Property ${index + 2}`}
-                className="w-full h-44 object-cover rounded-md"
-              />
-            ))}
-          </div>
+        {/* Photo Gallery - Temporarily disabled for debugging */}
+        <div className="bg-gray-100 dark:bg-gray-700 p-8 text-center">
+          <p className="text-gray-600">Photo Gallery</p>
         </div>
 
-        {/* Property Details */}
         <div className="p-8">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
-                {property.propertyType?.toUpperCase() || "PROPERTY"}
+                {String(
+                  property.title || property.propertyType || property.type || "PROPERTY",
+                ).toUpperCase()}
               </h1>
               <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
                 <span>
-                  {property.address.city}, {property.address.country}
+                  {String(property.address?.city || "")}, {String(property.address?.country || "")}
                 </span>
-                {property.views && property.views.length > 0 && (
+                {property.views && Array.isArray(property.views) && property.views.length > 0 && (
                   <span className="text-sm text-gray-500 dark:text-gray-500">
                     👁️ {property.views.length} {property.views.length === 1 ? "view" : "views"}
                   </span>
@@ -199,52 +201,65 @@ export default function PropertyDetailPage() {
             <div className="text-right">
               <p className="text-gray-500 dark:text-gray-400">Price</p>
               <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{priceLabel}</p>
-              {property.listings && property.listings.length > 0 && (
-                <span className="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full uppercase">
-                  {property.listings[0].type}
-                </span>
-              )}
+              {property.listings &&
+                Array.isArray(property.listings) &&
+                property.listings.length > 0 && (
+                  <span className="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full uppercase">
+                    {String(property.listings[0]?.type || "")}
+                  </span>
+                )}
             </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
             <div>
               <p className="text-gray-500 dark:text-gray-400 text-sm">Type</p>
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">{property.type}</p>
-            </div>
-            <div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Location</p>
               <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                {property.address.city}
+                {String(property.type || "")}
               </p>
             </div>
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Views</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Bedrooms</p>
               <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                {property.views?.length ?? 0}
+                {property.bedrooms || 0}
               </p>
             </div>
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Listings</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Bathrooms</p>
               <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                {property.listings?.length ?? 0}
+                {property.bathrooms || 0}
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Surface</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                {property.surfaceArea ? `${property.surfaceArea}m²` : "N/A"}
               </p>
             </div>
           </div>
 
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
+              {property.description && (
+                <div>
+                  <h2 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">
+                    Description
+                  </h2>
+                  <p className="text-gray-700 dark:text-gray-300">{String(property.description)}</p>
+                </div>
+              )}
+
               <div>
                 <h2 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">
                   Property Details
                 </h2>
                 <p className="text-gray-700 dark:text-gray-300">
-                  {property.address.street && `${property.address.street}, `}
-                  {property.address.city}, {property.address.country}
-                  {property.address.latitude && property.address.longitude && (
+                  {property.address?.street && `${String(property.address.street)}, `}
+                  {String(property.address?.city || "")}, {String(property.address?.country || "")}
+                  {property.address?.latitude && property.address?.longitude && (
                     <>
                       {" "}
-                      ({property.address.latitude}, {property.address.longitude})
+                      (Coordinates: {property.address.latitude}, {property.address.longitude})
                     </>
                   )}
                 </p>
@@ -252,29 +267,36 @@ export default function PropertyDetailPage() {
 
               <div>
                 <h2 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Listings</h2>
-                {property.listings && property.listings.length > 0 ? (
+                {property.listings &&
+                Array.isArray(property.listings) &&
+                property.listings.length > 0 ? (
                   <div className="space-y-3">
                     {property.listings.map((listing, idx) => (
                       <div
-                        key={idx}
+                        key={listing.id || idx}
                         className="border border-gray-200 dark:border-gray-700 rounded p-3 bg-white dark:bg-gray-800"
                       >
                         <div className="flex justify-between items-center">
                           <span className="font-medium capitalize text-gray-900 dark:text-white">
-                            {listing.type}
+                            {String(listing.type || "")}
                           </span>
                           <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
-                            {listing.status}
+                            {String(listing.status || "")}
                           </span>
                         </div>
-                        {listing.paymentTerms && listing.paymentTerms.length > 0 && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                            €
-                            {listing.paymentTerms[0].amount ||
-                              listing.paymentTerms[0].amountPerPeriod}{" "}
-                            {listing.paymentTerms[0].currency}
-                          </p>
-                        )}
+                        {listing.paymentTerms &&
+                          Array.isArray(listing.paymentTerms) &&
+                          listing.paymentTerms.length > 0 && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                              €
+                              {(() => {
+                                const term = listing.paymentTerms[0];
+                                const amount = term?.amount || term?.amountPerPeriod;
+                                return typeof amount === "number" ? amount.toLocaleString() : "N/A";
+                              })()}{" "}
+                              {String(listing.paymentTerms[0]?.currency || "EUR")}
+                            </p>
+                          )}
                       </div>
                     ))}
                   </div>
@@ -290,7 +312,7 @@ export default function PropertyDetailPage() {
                   Owner / Agency
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300 font-medium">
-                  {property.ownerPerson?.email || "Verified Owner"}
+                  {String(property.ownerPerson?.email || "Verified Owner")}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Response time: under 24h</p>
               </div>
@@ -310,24 +332,30 @@ export default function PropertyDetailPage() {
                 </button>
               </div>
 
-              {error && <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>}
+              {error && <p className="text-red-600 dark:text-red-400 text-sm">{String(error)}</p>}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Contact Modal */}
-      <ContactModal
-        open={showContactModal}
-        title={`Contact about ${property.type} in ${property.address.city}`}
-        loading={sending}
-        error={error}
-        onClose={() => {
-          setShowContactModal(false);
-          setError(null);
-        }}
-        onSubmit={handleContactSubmit}
-      />
+      {showContactModal && (
+        <ContactModal
+          open={showContactModal}
+          title="Contact Property Owner"
+          initialValues={{
+            name: "",
+            email: "",
+            phone: "",
+          }}
+          loading={sending}
+          error={error ? String(error) : null}
+          onClose={() => {
+            setShowContactModal(false);
+            setError(null);
+          }}
+          onSubmit={handleContactSubmit}
+        />
+      )}
     </div>
   );
 }

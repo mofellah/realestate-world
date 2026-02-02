@@ -163,26 +163,39 @@ export class UpdateListingDto {
 }
 
 export class PublishListingDto {
-  @ApiProperty({
-    description: "Set status to published",
-    example: "published",
-    enum: ["published"],
-  })
-  @IsEnum(["published"])
-  @IsNotEmpty()
-  status!: string;
-
   @ApiPropertyOptional({
-    description: "Start date for visibility",
+    description: "Start date for visibility (ISO 8601)",
   })
   @IsDateString()
   @IsOptional()
   startDate?: string;
 
   @ApiPropertyOptional({
-    description: "End date for visibility",
+    description: "End date for visibility (ISO 8601)",
   })
   @IsDateString()
   @IsOptional()
   endDate?: string;
+
+  @ApiPropertyOptional({
+    description: "Optional publish duration in days",
+    example: 30,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  @IsOptional()
+  durationDays?: number;
+}
+
+export class RenewListingDto {
+  @ApiPropertyOptional({
+    description: "Optional renewal duration in days",
+    example: 30,
+  })
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  @IsOptional()
+  durationDays?: number;
 }

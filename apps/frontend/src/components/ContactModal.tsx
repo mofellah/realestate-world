@@ -3,11 +3,17 @@
  * Collects contact details and message for property inquiries.
  */
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface ContactModalProps {
   open: boolean;
   title: string;
+  initialValues?: Partial<{
+    name: string;
+    email: string;
+    phone: string;
+    message: string;
+  }>;
   loading?: boolean;
   error?: string | null;
   onClose: () => void;
@@ -22,17 +28,34 @@ interface ContactModalProps {
 export default function ContactModal({
   open,
   title,
+  initialValues,
   loading = false,
   error,
   onClose,
   onSubmit,
 }: ContactModalProps) {
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
+    name: initialValues?.name || "",
+    email: initialValues?.email || "",
+    phone: initialValues?.phone || "",
+    message: initialValues?.message || "",
   });
+
+  useEffect(() => {
+    if (!open) return;
+    setForm({
+      name: initialValues?.name || "",
+      email: initialValues?.email || "",
+      phone: initialValues?.phone || "",
+      message: initialValues?.message || "",
+    });
+  }, [
+    open,
+    initialValues?.name,
+    initialValues?.email,
+    initialValues?.phone,
+    initialValues?.message,
+  ]);
 
   if (!open) return null;
 
