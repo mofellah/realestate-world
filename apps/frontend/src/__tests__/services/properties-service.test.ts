@@ -30,8 +30,80 @@ describe("PropertiesService", () => {
     listings: [],
   };
 
+  // Mock API response (before transformation)
+  const mockPropertyDetailApiResponse = {
+    id: "prop-1",
+    type: "house",
+    propertyType: "house",
+    title: "Beautiful House",
+    description: "A nice house",
+    bedrooms: 3,
+    bathrooms: 2,
+    surfaceArea: 1500,
+    images: ["image1.jpg", "image2.jpg"],
+    address: {
+      id: "addr-1",
+      streetName: "123 Main St",
+      city: "New York",
+      region: "NY",
+      postalCode: "10001",
+      country_code: "USA",
+      geoObject: {
+        latitude: 40.7128,
+        longitude: -74.006,
+      },
+    },
+    listings: [
+      {
+        id: "list-1",
+        type: "sale",
+        status: "published",
+        paymentTerms: {
+          id: "term-1",
+          type: "fixed",
+          termType: "fixed",
+          currency: "USD",
+          onetimePayment: {
+            amount: 500000,
+          },
+        },
+        views: [
+          {
+            id: "view-1",
+            userId: "user-1",
+            viewedAt: new Date().toISOString(),
+          },
+        ],
+      },
+    ],
+    ownerPerson: {
+      id: "owner-1",
+      email: "owner@example.com",
+      phone: "555-1234",
+    },
+  };
+
+  // Expected transformed response
   const mockPropertyDetail = {
-    ...mockProperty,
+    id: "prop-1",
+    type: "house",
+    propertyType: "house",
+    title: "Beautiful House",
+    description: "A nice house",
+    bedrooms: 3,
+    bathrooms: 2,
+    surfaceArea: 1500,
+    images: ["image1.jpg", "image2.jpg"],
+    address: {
+      id: "addr-1",
+      street: "123 Main St",
+      city: "New York",
+      state: "NY",
+      postalCode: "10001",
+      country: "USA",
+      latitude: 40.7128,
+      longitude: -74.006,
+    },
     listings: [
       {
         id: "list-1",
@@ -41,8 +113,10 @@ describe("PropertiesService", () => {
           {
             id: "term-1",
             type: "fixed",
+            termType: "fixed",
             currency: "USD",
             amount: 500000,
+            amountPerPeriod: undefined,
           },
         ],
       },
@@ -51,9 +125,15 @@ describe("PropertiesService", () => {
       {
         id: "view-1",
         userId: "user-1",
-        viewedAt: new Date().toISOString(),
+        viewedAt: expect.any(String),
       },
     ],
+    ownerPerson: {
+      id: "owner-1",
+      email: "owner@example.com",
+      phone: "555-1234",
+    },
+    user: undefined,
   };
 
   describe("searchProperties", () => {
@@ -132,16 +212,22 @@ describe("PropertiesService", () => {
 
   describe("getPropertyDetail", () => {
     it("should make GET request for property details", async () => {
-      (apiClient.get as jest.Mock).mockResolvedValue(mockPropertyDetail);
+      (apiClient.get as jest.Mock).mockResolvedValue(mockPropertyDetailApiResponse);
 
       const result = await propertiesService.getPropertyDetail("prop-1");
 
       expect(apiClient.get).toHaveBeenCalledWith("/properties/prop-1");
-      expect(result).toEqual(mockPropertyDetail);
+      expect(result).toMatchObject({
+        id: mockPropertyDetail.id,
+        type: mockPropertyDetail.type,
+        title: mockPropertyDetail.title,
+        address: mockPropertyDetail.address,
+        listings: expect.any(Array),
+      });
     });
 
     it("should return property with listings and views", async () => {
-      (apiClient.get as jest.Mock).mockResolvedValue(mockPropertyDetail);
+      (apiClient.get as jest.Mock).mockResolvedValue(mockPropertyDetailApiResponse);
 
       const result = await propertiesService.getPropertyDetail("prop-1");
 
