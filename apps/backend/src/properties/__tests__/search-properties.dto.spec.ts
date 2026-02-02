@@ -89,12 +89,14 @@ describe("SearchPropertiesDto", () => {
         propertyType: "apartment",
       });
       const errors = await validate(dto);
+      expect(errors.length).toBe(0);
       expect(dto.propertyType).toBe("apartment");
     });
 
     it("should not transform when type is not provided", async () => {
       const dto = plainToInstance(SearchPropertiesDto, {});
       const errors = await validate(dto);
+      expect(errors.length).toBe(0);
       expect(dto.propertyType).toBeUndefined();
       expect(dto.type).toBeUndefined();
     });
@@ -138,6 +140,7 @@ describe("SearchPropertiesDto", () => {
     it("should prefer minBedrooms over bedrooms when both provided", async () => {
       const dto = plainToInstance(SearchPropertiesDto, { bedrooms: "3", minBedrooms: "2" });
       const errors = await validate(dto);
+      expect(errors.length).toBe(0);
       expect(dto.minBedrooms).toBe(2);
     });
 
@@ -152,6 +155,7 @@ describe("SearchPropertiesDto", () => {
     it("should not transform when bedrooms is not provided", async () => {
       const dto = plainToInstance(SearchPropertiesDto, {});
       const errors = await validate(dto);
+      expect(errors.length).toBe(0);
       expect(dto.minBedrooms).toBeUndefined();
       expect(dto.bedrooms).toBeUndefined();
     });
@@ -195,6 +199,7 @@ describe("SearchPropertiesDto", () => {
     it("should prefer minBathrooms over bathrooms when both provided", async () => {
       const dto = plainToInstance(SearchPropertiesDto, { bathrooms: "3", minBathrooms: "1" });
       const errors = await validate(dto);
+      expect(errors.length).toBe(0);
       expect(dto.minBathrooms).toBe(1);
     });
 
@@ -209,6 +214,7 @@ describe("SearchPropertiesDto", () => {
     it("should not transform when bathrooms is not provided", async () => {
       const dto = plainToInstance(SearchPropertiesDto, {});
       const errors = await validate(dto);
+      expect(errors.length).toBe(0);
       expect(dto.minBathrooms).toBeUndefined();
       expect(dto.bathrooms).toBeUndefined();
     });
@@ -341,12 +347,14 @@ describe("SearchPropertiesDto", () => {
     it("should return undefined for empty string", async () => {
       const dto = plainToInstance(SearchPropertiesDto, { amenities: "" });
       const errors = await validate(dto);
+      expect(errors.length).toBe(0);
       expect(dto.amenities).toBeUndefined();
     });
 
     it("should return undefined for null", async () => {
       const dto = plainToInstance(SearchPropertiesDto, { amenities: null });
       const errors = await validate(dto);
+      expect(errors.length).toBe(0);
       expect(dto.amenities).toBeUndefined();
     });
 
