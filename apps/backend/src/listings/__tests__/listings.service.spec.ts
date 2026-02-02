@@ -321,4 +321,86 @@ describe("ListingsService", () => {
       await expect(service.delete("listing-001", "user-001")).rejects.toThrow(ForbiddenException);
     });
   });
+
+  describe("publish", () => {
+    it("should publish a listing with custom duration", async () => {
+      const publishData = { durationDays: 60 };
+      const publishedListing = { ...mockListing, status: "published", publishedAt: new Date() };
+
+      mockPrismaService.listing.findUnique.mockResolvedValue(mockListing);
+      mockPrismaService.listing.update.mockResolvedValue(publishedListing);
+
+      const result = await service.publish("listing-001", "user-001", publishData);
+
+      expect(result.status).toEqual("published");
+      expect(mockPrismaService.listing.update).toHaveBeenCalled();
+    });
+
+    it("should publish a listing with custom date range", async () => {
+      const startDate = new Date().toISOString();
+      const endDate = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
+      const publishData = { startDate, endDate };
+      const publishedListing = { ...mockListing, status: "published" };
+
+      mockPrismaService.listing.findUnique.mockResolvedValue(mockListing);
+      mockPrismaService.listing.update.mockResolvedValue(publishedListing);
+
+      const result = await service.publish("listing-001", "user-001", publishData);
+
+      expect(result.status).toEqual("published");
+    });
+
+    it("should throw ForbiddenException if user doesn't own listing", async () => {
+      const otherUserListing = { ...mockListing, createdBy: "user-002" };
+      mockPrismaService.listing.findUnique.mockResolvedValue(otherUserListing);
+
+      await expect(
+        service.publish("listing-001", "user-001", { durationDays: 30 }),
+      ).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  describe("pause", () => {
+    it("should pause an active listing", async () => {
+      const pausedListing = { ...mockListing, status: "paused" };
+      mockPrismaService.listing.findUnique.mockResolvedValue(mockListing);
+      mockPrismaService.listing.update.mockResolvedValue(pausedListing);
+
+      const result = await service.pause("listing-001", "user-001");
+
+      expect(result.status).toEqual("paused");
+      expect(mockPrismaService.listing.update).toHaveBeenCalled();
+    });
+
+    it("should throw ForbiddenException if user doesn't own listing", async () => {
+      const otherUserListing = { ...mockListing, createdBy: "user-002" };
+      mockPrismaService.listing.findUnique.mockResolvedValue(otherUserListing);
+
+      await expect(service.pause("listing-001", "user-001")).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  describe("renew", () => {
+    it("should renew a paused listing", async () => {
+      const pausedListing = { ...mockListing, status: "paused" };
+      const renewedListing = { ...mockListing, status: "published", publishedAt: new Date() };
+
+      mockPrismaService.listing.findUnique.mockResolvedValue(pausedListing);
+      mockPrismaService.listing.update.mockResolvedValue(renewedListing);
+
+      const result = await service.renew("listing-001", "user-001", { durationDays: 30 });
+
+      expect(result.status).toEqual("published");
+      expect(mockPrismaService.listing.update).toHaveBeenCalled();
+    });
+
+    it("should throw ForbiddenException if user doesn't own listing", async () => {
+      const otherUserListing = { ...mockListing, createdBy: "user-002" };
+      mockPrismaService.listing.findUnique.mockResolvedValue(otherUserListing);
+
+      await expect(service.renew("listing-001", "user-001", { durationDays: 30 })).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+  });
 });

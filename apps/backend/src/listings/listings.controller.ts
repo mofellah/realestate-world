@@ -24,7 +24,12 @@ import { ListingUseCasesService } from "../use-cases/listing.use-cases.service";
 import { JwtGuard } from "../auth/guards/jwt.guard";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { JwtPayload } from "@boilerplate/types";
-import { CreateListingDto, UpdateListingDto } from "./dto/listing.dto";
+import {
+  CreateListingDto,
+  UpdateListingDto,
+  PublishListingDto,
+  RenewListingDto,
+} from "./dto/listing.dto";
 
 @ApiTags("Listings")
 @Controller("listings")
@@ -80,6 +85,44 @@ export class ListingsController {
     @CurrentUser() user: JwtPayload,
   ) {
     return this.listingsService.update(id, user.sub, dto);
+  }
+
+  @Patch(":id/publish")
+  @ApiOperation({ summary: "Publish a listing" })
+  @ApiParam({ name: "id", description: "Listing ID" })
+  @ApiResponse({ status: 200, description: "Listing published successfully" })
+  @ApiResponse({ status: 403, description: "Not the listing creator" })
+  @ApiResponse({ status: 404, description: "Listing not found" })
+  async publish(
+    @Param("id") id: string,
+    @Body() dto: PublishListingDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.listingUseCases.publish(user.sub, id, dto);
+  }
+
+  @Patch(":id/pause")
+  @ApiOperation({ summary: "Pause a listing" })
+  @ApiParam({ name: "id", description: "Listing ID" })
+  @ApiResponse({ status: 200, description: "Listing paused successfully" })
+  @ApiResponse({ status: 403, description: "Not the listing creator" })
+  @ApiResponse({ status: 404, description: "Listing not found" })
+  async pause(@Param("id") id: string, @CurrentUser() user: JwtPayload) {
+    return this.listingUseCases.pause(user.sub, id);
+  }
+
+  @Patch(":id/renew")
+  @ApiOperation({ summary: "Renew a listing" })
+  @ApiParam({ name: "id", description: "Listing ID" })
+  @ApiResponse({ status: 200, description: "Listing renewed successfully" })
+  @ApiResponse({ status: 403, description: "Not the listing creator" })
+  @ApiResponse({ status: 404, description: "Listing not found" })
+  async renew(
+    @Param("id") id: string,
+    @Body() dto: RenewListingDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.listingUseCases.renew(user.sub, id, dto);
   }
 
   @Delete(":id")

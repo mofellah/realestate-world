@@ -438,6 +438,8 @@ export class PropertiesService {
     radius?: number; // meters
     city?: string;
     country?: string;
+    amenities?: string[]; // Array of amenity type names
+    distanceMetric?: string; // walking, driving, direct
     skip?: number;
     take?: number;
   }) {
@@ -459,7 +461,7 @@ export class PropertiesService {
         throw zodError;
       }
 
-      const { skip = 0, take = 20, latitude, longitude, radius } = validatedFilters;
+      const { skip = 0, take = 20, latitude, longitude, radius, amenities } = validatedFilters;
 
       // Build WHERE clause
       const where: any = {
@@ -476,6 +478,12 @@ export class PropertiesService {
       if (validatedFilters.maxBedrooms !== undefined) {
         where.bedrooms = { ...where.bedrooms, lte: validatedFilters.maxBedrooms };
       }
+      if (validatedFilters.minBathrooms !== undefined) {
+        where.bathrooms = { gte: validatedFilters.minBathrooms };
+      }
+      if (validatedFilters.maxBathrooms !== undefined) {
+        where.bathrooms = { ...where.bathrooms, lte: validatedFilters.maxBathrooms };
+      }
 
       // Location filters (via address)
       const addressWhere: any = {};
@@ -485,14 +493,15 @@ export class PropertiesService {
       // Spatial filter (PostGIS ST_DWithin)
       if (latitude !== undefined && longitude !== undefined && radius !== undefined) {
         // Use raw SQL for PostGIS spatial query
+        // Convert JSONB geo_json to geography by casting through text -> geometry -> geography
         const spatialProperties = await this.prisma.$queryRaw<Array<{ id: string }>>`
           SELECT DISTINCT p.id
-          FROM properties p
-          INNER JOIN addresses a ON p.address_id = a.id
-          INNER JOIN geo_objects g ON a.geo_object_id = g.id
-          WHERE p.is_available = true
+          FROM "properties" p
+          INNER JOIN "addresses" a ON p."addressId" = a.id
+          INNER JOIN "geo_objects" g ON a."geoObjectId" = g.id
+          WHERE p."isAvailable" = true
             AND ST_DWithin(
-              g.geo_json::geography,
+              ST_GeomFromGeoJSON(g."geoJson"::text)::geography,
               ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography,
               ${radius}
             )
@@ -506,6 +515,40 @@ export class PropertiesService {
         }
 
         where.id = { in: spatialIds };
+      }
+
+      // Amenity filter (find properties near requested amenities)
+      if (amenities && amenities.length > 0) {
+        // Query: Find amenities matching requested types, then find properties near those amenities
+        const amenitiesInRadius = await this.prisma.$queryRaw<Array<{ property_id: string }>>`
+          SELECT DISTINCT p.id as property_id
+          FROM "properties" p
+          INNER JOIN "addresses" a ON p."addressId" = a.id
+          INNER JOIN "geo_objects" p_geo ON a."geoObjectId" = p_geo.id
+          INNER JOIN "amenities" am ON true
+          INNER JOIN "geo_objects" am_geo ON am."geoObjectId" = am_geo.id
+          WHERE am.type = ANY(${amenities}::"AmenityTypeEnum"[])
+            AND ST_DWithin(
+              ST_GeomFromGeoJSON(am_geo."geoJson"::text)::geography,
+              ST_GeomFromGeoJSON(p_geo."geoJson"::text)::geography,
+              ${radius || 1000}
+            )
+        `;
+
+        const amenityPropertyIds = amenitiesInRadius.map(
+          (p: { property_id: string }) => p.property_id,
+        );
+
+        if (amenityPropertyIds.length === 0) {
+          return { properties: [], total: 0 };
+        }
+
+        // Filter to only properties with nearby amenities
+        if (where.id && where.id.in) {
+          where.id.in = where.id.in.filter((id: string) => amenityPropertyIds.includes(id));
+        } else {
+          where.id = { in: amenityPropertyIds };
+        }
       }
 
       // Apply address filters if any

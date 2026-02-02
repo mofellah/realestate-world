@@ -12,16 +12,16 @@ export class PropertyUseCasesService {
   constructor(private readonly propertiesService: PropertiesService) {}
 
   async search(filters: {
-    priceMin?: number;
-    priceMax?: number;
-    type?: string;
-    bedrooms?: number;
-    bathrooms?: number;
+    minPrice?: number;
+    maxPrice?: number;
+    propertyType?: string;
+    minBedrooms?: number;
+    maxBedrooms?: number;
     latitude?: number;
     longitude?: number;
     radius?: number;
-    city?: string;
-    country?: string;
+    amenities?: string[];
+    distanceMetric?: string;
     skip?: number;
     take?: number;
   }) {

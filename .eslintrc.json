@@ -6,7 +6,9 @@
     "sourceType": "module",
     "ecmaFeatures": {
       "jsx": true
-    }
+    },
+    "warnOnUnsupportedTypeScriptVersion": false,
+    "project": null
   },
   "extends": [
     "eslint:recommended",

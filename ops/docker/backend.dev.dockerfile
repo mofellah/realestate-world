@@ -13,6 +13,11 @@ RUN apt-get update \
     openssl \
     ca-certificates \
     curl \
+    python3 \
+    build-essential \
+    gcc \
+    g++ \
+    make \
   && rm -rf /var/lib/apt/lists/*
 
 # Copy root package files
@@ -28,13 +33,16 @@ COPY db/package*.json ./db/
 # First install root dependencies, then all workspaces
 RUN npm ci --include-workspace-root
 
+# Rebuild native modules for Linux
+RUN npm rebuild bcrypt --build-from-source
+
 # Copy source code
 COPY apps/backend/ ./apps/backend/
 COPY packages/ ./packages/
 COPY db/ ./db/
 
-# Generate Prisma client
-RUN npx prisma generate --schema=./db/schema.prisma
+# Generate Prisma client using workspace-scoped prisma binary
+RUN cd /app/db && node ./scripts/ensure-prisma-client.js && node_modules/.bin/prisma generate --schema=./schema.prisma
 
 # Expose backend port
 EXPOSE 3000

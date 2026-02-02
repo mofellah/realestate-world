@@ -138,15 +138,23 @@ export const SearchPropertiesSchema = z
 
     maxBedrooms: z.number().int().min(0).optional(),
 
+    minBathrooms: z.number().int().min(0).optional(),
+
+    maxBathrooms: z.number().int().min(0).optional(),
+
     minPrice: z.number().min(0).optional(),
 
     maxPrice: z.number().min(0).optional(),
+
+    amenities: z.array(z.string()).optional(),
+
+    distanceMetric: z.enum(["walking", "driving", "direct"]).optional(),
 
     skip: z.number().int().min(0).optional().default(0),
 
     take: z.number().int().min(1).max(100).optional().default(10),
   })
-  .strict();
+  .strip(); // Allow extra properties but remove them
 
 // Export types for use in services/controllers
 export type CreatePropertyInput = z.infer<typeof CreatePropertySchema>;

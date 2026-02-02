@@ -20,8 +20,8 @@ COPY apps/backend/package*.json ./apps/backend/
 COPY packages/*/package*.json ./packages/
 COPY db/package*.json ./db/
 
-# Install all dependencies (including devDependencies needed for TypeScript compilation)
-RUN npm ci --include-workspace-root
+# Install all dependencies (including devDependencies needed for build)
+RUN npm ci --include-workspace-root --verbose
 
 # Copy source code
 COPY tsconfig.json ./
@@ -30,7 +30,7 @@ COPY packages/ ./packages/
 COPY db/ ./db/
 
 # Generate Prisma client
-RUN npx prisma generate --schema=./db/schema.prisma
+RUN cd /app && npm run prisma:generate
 
 # Build the backend application
 RUN npm run build --workspace=@boilerplate/backend

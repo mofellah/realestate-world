@@ -199,6 +199,151 @@ export class ListingsService {
     }
   }
 
+  private resolvePublishWindow(
+    listing: { visibilityStart?: Date | null; visibilityEnd?: Date | null },
+    durationDays?: number,
+    startDate?: string,
+    endDate?: string,
+  ) {
+    const now = new Date();
+    const start = startDate ? new Date(startDate) : now;
+
+    if (endDate) {
+      return { visibilityStart: start, visibilityEnd: new Date(endDate) };
+    }
+
+    if (durationDays && durationDays > 0) {
+      const end = new Date(start);
+      end.setDate(end.getDate() + durationDays);
+      return { visibilityStart: start, visibilityEnd: end };
+    }
+
+    if (listing.visibilityStart && listing.visibilityEnd) {
+      const previousDurationMs =
+        listing.visibilityEnd.getTime() - listing.visibilityStart.getTime();
+      if (previousDurationMs > 0) {
+        const end = new Date(start.getTime() + previousDurationMs);
+        return { visibilityStart: start, visibilityEnd: end };
+      }
+    }
+
+    const fallbackEnd = new Date(start);
+    fallbackEnd.setDate(fallbackEnd.getDate() + 30);
+    return { visibilityStart: start, visibilityEnd: fallbackEnd };
+  }
+
+  /**
+   * Publish listing (owner only)
+   */
+  async publish(
+    id: string,
+    userId: string,
+    data: { startDate?: string; endDate?: string; durationDays?: number },
+  ) {
+    const correlationId = this.getCorrelationId();
+    this.logger.setCorrelationId(correlationId);
+
+    try {
+      const listing = await this.prisma.listing.findUnique({ where: { id } });
+      if (!listing) throw new NotFoundException("Listing not found");
+      if (listing.createdBy !== userId) throw new ForbiddenException("Not owner");
+
+      const { visibilityStart, visibilityEnd } = this.resolvePublishWindow(
+        listing,
+        data.durationDays,
+        data.startDate,
+        data.endDate,
+      );
+
+      const updated = await this.prisma.listing.update({
+        where: { id },
+        data: {
+          status: "published",
+          visibilityStart,
+          visibilityEnd,
+          publishedAt: new Date(),
+        },
+        include: { property: true, creator: true, paymentTerms: true },
+      });
+
+      this.logger.info(`Listing ${id} published by ${userId}`);
+      return updated;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Unknown";
+      this.logger.error(`Listing publish failed: ${msg}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Pause listing (owner only)
+   */
+  async pause(id: string, userId: string) {
+    const correlationId = this.getCorrelationId();
+    this.logger.setCorrelationId(correlationId);
+
+    try {
+      const listing = await this.prisma.listing.findUnique({ where: { id } });
+      if (!listing) throw new NotFoundException("Listing not found");
+      if (listing.createdBy !== userId) throw new ForbiddenException("Not owner");
+
+      const updated = await this.prisma.listing.update({
+        where: { id },
+        data: {
+          status: "paused",
+          visibilityEnd: new Date(),
+        },
+        include: { property: true, creator: true, paymentTerms: true },
+      });
+
+      this.logger.info(`Listing ${id} paused by ${userId}`);
+      return updated;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Unknown";
+      this.logger.error(`Listing pause failed: ${msg}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Renew listing (owner only)
+   */
+  async renew(id: string, userId: string, data: { durationDays?: number }) {
+    const correlationId = this.getCorrelationId();
+    this.logger.setCorrelationId(correlationId);
+
+    try {
+      const listing = await this.prisma.listing.findUnique({ where: { id } });
+      if (!listing) throw new NotFoundException("Listing not found");
+      if (listing.createdBy !== userId) throw new ForbiddenException("Not owner");
+
+      const { visibilityStart, visibilityEnd } = this.resolvePublishWindow(
+        listing,
+        data.durationDays,
+        undefined,
+        undefined,
+      );
+
+      const updated = await this.prisma.listing.update({
+        where: { id },
+        data: {
+          status: "published",
+          visibilityStart,
+          visibilityEnd,
+          publishedAt: new Date(),
+        },
+        include: { property: true, creator: true, paymentTerms: true },
+      });
+
+      this.logger.info(`Listing ${id} renewed by ${userId}`);
+      return updated;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Unknown";
+      this.logger.error(`Listing renew failed: ${msg}`);
+      throw error;
+    }
+  }
+
   /**
    * Delete listing (owner only)
    */

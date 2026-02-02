@@ -124,8 +124,9 @@ describe("DashboardPage Component", () => {
       logout: mockLogout,
     });
 
-    renderWithRouter(<DashboardPage />);
-    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+    const { container } = renderWithRouter(<DashboardPage />);
+    const skeletons = container.querySelectorAll(".animate-pulse");
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   it("should not show user info when user is null", async () => {

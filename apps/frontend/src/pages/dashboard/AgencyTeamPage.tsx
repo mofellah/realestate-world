@@ -1,63 +1,66 @@
 import React, { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { agenciesService } from "@/services/agencies-service";
 
 interface Agent {
-  id: string;
-  name: string;
-  email: string;
-  role: "agent" | "manager";
-  activeListings: number;
-  sales: number;
-  joinedAt: string;
+  userId: string;
+  email?: string;
+  role: "owner" | "manager" | "agent" | "sales_manager" | "support_agent";
+  user?: {
+    id: string;
+    email: string;
+  };
 }
 
 export default function AgencyTeamPage() {
+  const { user } = useAuth();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAgents();
-  }, []);
+  }, [user]);
 
   const fetchAgents = async () => {
+    if (!user?.id) return;
+
+    setLoading(true);
+    setError(null);
     try {
-      // API call to fetch agents
-      // const data = await agencyService.getAgents();
-      // setAgents(data);
-      const mockAgents: Agent[] = [
-        {
-          id: "1",
-          name: "John Doe",
-          email: "john@agency.com",
-          role: "manager",
-          activeListings: 12,
-          sales: 5,
-          joinedAt: "2023-01-15",
-        },
-        {
-          id: "2",
-          name: "Jane Smith",
-          email: "jane@agency.com",
-          role: "agent",
-          activeListings: 8,
-          sales: 3,
-          joinedAt: "2023-03-20",
-        },
-      ];
-      setAgents(mockAgents);
-    } catch (error) {
-      console.error("[AgencyTeam] Failed to load agents:", error);
+      const data = await agenciesService.getTeam(user.id);
+      setAgents(data || []);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to load agents";
+      setError(msg);
+      console.error("[AgencyTeam] Failed to load agents:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleInvite = async () => {
+    if (!user?.id || !inviteEmail.trim()) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
     try {
-      // API call to invite agent
-      // await agencyService.inviteAgent(inviteEmail);
+      await agenciesService.inviteAgent(user.id, inviteEmail);
       setInviteEmail("");
       setShowInviteForm(false);
-    } catch (error) {
-      console.error("[AgencyTeam] Failed to invite agent:", error);
+      await fetchAgents();
+      alert("Invitation sent successfully!");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to invite agent";
+      setError(msg);
+      console.error("[AgencyTeam] Failed to invite agent:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,10 +71,17 @@ export default function AgencyTeamPage() {
         <button
           onClick={() => setShowInviteForm(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          disabled={loading}
         >
           Invite Agent
         </button>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          {error}
+        </div>
+      )}
 
       {showInviteForm && (
         <div className="bg-white rounded-lg shadow p-6 mb-6">
@@ -83,16 +93,19 @@ export default function AgencyTeamPage() {
               onChange={(e) => setInviteEmail(e.target.value)}
               placeholder="agent@example.com"
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
+              disabled={loading}
             />
             <button
               onClick={handleInvite}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              disabled={loading}
             >
-              Send Invite
+              {loading ? "Sending..." : "Send Invite"}
             </button>
             <button
               onClick={() => setShowInviteForm(false)}
               className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              disabled={loading}
             >
               Cancel
             </button>
@@ -100,66 +113,71 @@ export default function AgencyTeamPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Agent
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Role
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Active Listings
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Sales
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Joined
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {agents.map((agent) => (
-              <tr key={agent.id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div>
-                    <div className="font-medium text-gray-900">{agent.name}</div>
-                    <div className="text-sm text-gray-500">{agent.email}</div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      agent.role === "manager"
-                        ? "bg-purple-100 text-purple-800"
-                        : "bg-blue-100 text-blue-800"
-                    }`}
-                  >
-                    {agent.role}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {agent.activeListings}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{agent.sales}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(agent.joinedAt).toLocaleDateString()}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                  <button className="text-blue-600 hover:text-blue-900">Edit</button>
-                  <button className="text-red-600 hover:text-red-900">Remove</button>
-                </td>
+      {loading && !agents.length ? (
+        <div className="bg-white rounded-lg shadow p-6 text-center">
+          <p className="text-gray-600">Loading agents...</p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Agent
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Role
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {agents.length > 0 ? (
+                agents.map((agent) => (
+                  <tr key={agent.userId}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {agent.user?.email || "Unknown"}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          agent.role === "owner"
+                            ? "bg-purple-100 text-purple-800"
+                            : agent.role === "manager"
+                              ? "bg-indigo-100 text-indigo-800"
+                              : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
+                        {agent.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                      {agent.role !== "owner" && (
+                        <>
+                          <button className="text-blue-600 hover:text-blue-900">Edit</button>
+                          <button className="text-red-600 hover:text-red-900">Remove</button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={3} className="px-6 py-4 text-center text-gray-500">
+                    No agents found. Invite your first agent!
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

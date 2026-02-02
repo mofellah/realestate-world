@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { agenciesService } from "@/services/agencies-service";
 import { DashboardMetricsSkeleton } from "../../components/Skeleton";
 
 interface AgencyMetrics {
@@ -10,6 +12,7 @@ interface AgencyMetrics {
 }
 
 export default function AgencyDashboardPage() {
+  const { user } = useAuth();
   const [metrics, setMetrics] = useState<AgencyMetrics>({
     totalAgents: 0,
     activeListings: 0,
@@ -18,27 +21,25 @@ export default function AgencyDashboardPage() {
     pendingInquiries: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchMetrics();
-  }, []);
+  }, [user]);
 
   const fetchMetrics = async () => {
+    if (!user?.id) return;
+
+    setLoading(true);
+    setError(null);
     try {
-      // API call to /api/agencies/:id/metrics
-      // const data = await agencyService.getMetrics();
-      // setMetrics(data);
-      const mockMetrics = {
-        totalAgents: 12,
-        activeListings: 47,
-        totalSales: 23,
-        monthlyRevenue: 156000,
-        pendingInquiries: 8,
-      };
-      setMetrics(mockMetrics);
-      setLoading(false);
-    } catch (error) {
-      console.error("[AgencyDashboard] Failed to load metrics:", error);
+      const data = await agenciesService.getMetrics(user.id);
+      setMetrics(data);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to load metrics";
+      setError(msg);
+      console.error("[AgencyDashboard] Failed to load metrics:", err);
+    } finally {
       setLoading(false);
     }
   };
@@ -56,35 +57,37 @@ export default function AgencyDashboardPage() {
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Agency Dashboard</h1>
 
-      {/* Metrics */}
-      {loading ? (
-        <DashboardMetricsSkeleton />
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-gray-600 text-sm font-medium">Total Agents</div>
-            <div className="text-3xl font-bold text-gray-900 mt-2">{metrics.totalAgents}</div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-gray-600 text-sm font-medium">Active Listings</div>
-            <div className="text-3xl font-bold text-gray-900 mt-2">{metrics.activeListings}</div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-gray-600 text-sm font-medium">Sales (MTD)</div>
-            <div className="text-3xl font-bold text-gray-900 mt-2">{metrics.totalSales}</div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-gray-600 text-sm font-medium">Revenue (MTD)</div>
-            <div className="text-3xl font-bold text-gray-900 mt-2">
-              ${(metrics.monthlyRevenue / 1000).toFixed(0)}k
-            </div>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-gray-600 text-sm font-medium">Pending Inquiries</div>
-            <div className="text-3xl font-bold text-gray-900 mt-2">{metrics.pendingInquiries}</div>
-          </div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          {error}
         </div>
       )}
+
+      {/* Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="text-gray-600 text-sm font-medium">Total Agents</div>
+          <div className="text-3xl font-bold text-gray-900 mt-2">{metrics.totalAgents}</div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="text-gray-600 text-sm font-medium">Active Listings</div>
+          <div className="text-3xl font-bold text-gray-900 mt-2">{metrics.activeListings}</div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="text-gray-600 text-sm font-medium">Sales (MTD)</div>
+          <div className="text-3xl font-bold text-gray-900 mt-2">{metrics.totalSales}</div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="text-gray-600 text-sm font-medium">Revenue (MTD)</div>
+          <div className="text-3xl font-bold text-gray-900 mt-2">
+            ${(metrics.monthlyRevenue / 1000).toFixed(0)}k
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <div className="text-gray-600 text-sm font-medium">Pending Inquiries</div>
+          <div className="text-3xl font-bold text-gray-900 mt-2">{metrics.pendingInquiries}</div>
+        </div>
+      </div>
 
       {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow p-6">

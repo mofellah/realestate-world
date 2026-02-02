@@ -102,7 +102,7 @@ describe("FilterPanel Component", () => {
       renderFilterPanel();
 
       const selects = screen.getAllByRole("combobox");
-      expect(selects).toHaveLength(4); // PropertyType, Bedrooms, Bathrooms, Radius
+      expect(selects).toHaveLength(5); // PropertyType, Bedrooms, Bathrooms, Radius, Distance Metric
     });
 
     it("should handle property type changes", () => {
