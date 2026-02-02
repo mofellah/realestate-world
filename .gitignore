@@ -49,3 +49,4 @@ cypress/videos
 *.tmp
 *.temp
 apps/frontend/linting.txt
+data/belgium-latest.osm.pbf

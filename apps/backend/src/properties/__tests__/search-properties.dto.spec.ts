@@ -47,7 +47,16 @@ describe("SearchPropertiesDto", () => {
   });
 
   describe("Property Type Filter", () => {
-    const validTypes = ["studio", "house", "apartment", "villa", "land", "room", "commercial", "other"];
+    const validTypes = [
+      "studio",
+      "house",
+      "apartment",
+      "villa",
+      "land",
+      "room",
+      "commercial",
+      "other",
+    ];
 
     validTypes.forEach((type) => {
       it(`should accept valid propertyType: ${type}`, async () => {
@@ -75,7 +84,10 @@ describe("SearchPropertiesDto", () => {
     });
 
     it("should prefer propertyType over type when both provided", async () => {
-      const dto = plainToInstance(SearchPropertiesDto, { type: "house", propertyType: "apartment" });
+      const dto = plainToInstance(SearchPropertiesDto, {
+        type: "house",
+        propertyType: "apartment",
+      });
       const errors = await validate(dto);
       expect(dto.propertyType).toBe("apartment");
     });
@@ -302,14 +314,18 @@ describe("SearchPropertiesDto", () => {
     });
 
     it("should trim whitespace from amenities", async () => {
-      const dto = plainToInstance(SearchPropertiesDto, { amenities: " schools , parks , restaurants " });
+      const dto = plainToInstance(SearchPropertiesDto, {
+        amenities: " schools , parks , restaurants ",
+      });
       const errors = await validate(dto);
       expect(errors.length).toBe(0);
       expect(dto.amenities).toEqual(["schools", "parks", "restaurants"]);
     });
 
     it("should filter out empty strings", async () => {
-      const dto = plainToInstance(SearchPropertiesDto, { amenities: "schools,,parks,,,restaurants" });
+      const dto = plainToInstance(SearchPropertiesDto, {
+        amenities: "schools,,parks,,,restaurants",
+      });
       const errors = await validate(dto);
       expect(errors.length).toBe(0);
       expect(dto.amenities).toEqual(["schools", "parks", "restaurants"]);

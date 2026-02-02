@@ -3,16 +3,7 @@
  * Endpoints for login, refresh, logout
  */
 
-import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-  Req,
-  BadRequestException,
-} from "@nestjs/common";
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Req } from "@nestjs/common";
 import { Throttle } from "@nestjs/throttler";
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
