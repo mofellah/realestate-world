@@ -19,6 +19,7 @@ import {
   ApiBearerAuth,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from "@nestjs/swagger";
 import { PropertiesService } from "./properties.service";
 import { PropertyUseCasesService } from "../use-cases/property.use-cases.service";
@@ -52,13 +53,16 @@ export class PropertiesController {
     return this.propertyUseCases.create(user.sub, dto);
   }
 
-  @Get("search")
+  @Post("search")
   @Public()
+  @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 30, ttl: 60 * 1000 } })
-  @ApiOperation({ summary: "Search properties with filters (PUBLIC)" })
+  @ApiOperation({
+    summary: "Search properties with complex filters (PUBLIC, POST for arrays/objects)",
+  })
   @ApiResponse({ status: 200, description: "Properties retrieved successfully" })
   @ApiResponse({ status: 429, description: "Too many search requests" })
-  async search(@Query() filters: SearchPropertiesDto) {
+  async search(@Body() filters: SearchPropertiesDto) {
     return this.propertyUseCases.search(filters);
   }
 

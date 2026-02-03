@@ -1,0 +1,47 @@
+# osm2pgsql style file for boundary extraction
+# This is a minimal style that processes boundary polygons and places
+
+# OGR_FID column is always created
+
+# node,way,area defines which OSM types to process
+# point,line,polygon define which geometry types to create
+
+# columns: osm_type, tags, geometry
+
+# Flags:
+#   polygon - create geometry as polygon
+#   linear  - create geometry as linestring
+#   delete  - don't output this tag
+#   nocache - don't cache this for ways
+
+# Boundaries (administrative, postal codes, etc.)
+node,way    boundary    text    polygon
+node,way    admin_level text    linear
+node,way    postal_code text    polygon
+
+# Names
+node,way    name        text    linear
+node,way    name:en     text    linear
+node,way    name:fr     text    linear
+node,way    name:nl     text    linear
+node,way    name:de     text    linear
+node,way    official_name text  linear
+node,way    alt_name    text    linear
+node,way    old_name    text    linear
+
+# Places (cities, towns, villages)
+node,way    place       text    polygon
+node,way    population  text    linear
+
+# Reference codes
+node,way    ref         text    linear
+node,way    ref:INS     text    linear
+node,way    ISO3166-1:alpha2 text linear
+node,way    ISO3166-2   text    linear
+
+# Metadata
+node,way    wikidata    text    linear
+node,way    wikipedia   text    linear
+
+# Area calculation
+way         area        text    linear

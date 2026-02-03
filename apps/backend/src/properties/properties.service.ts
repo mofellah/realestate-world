@@ -428,18 +428,19 @@ export class PropertiesService {
    * ✅ Validates input with Zod schemas before query
    */
   async search(filters: {
-    priceMin?: number;
-    priceMax?: number;
-    type?: string;
-    bedrooms?: number;
-    bathrooms?: number;
+    minPrice?: number;
+    maxPrice?: number;
+    propertyType?: string;
+    minBedrooms?: number;
+    maxBedrooms?: number;
+    minBathrooms?: number;
+    maxBathrooms?: number;
     latitude?: number;
     longitude?: number;
     radius?: number; // meters
-    city?: string;
-    country?: string;
     amenities?: string[]; // Array of amenity type names
     distanceMetric?: string; // walking, driving, direct
+    boundaries?: string[]; // Array of boundary IDs
     skip?: number;
     take?: number;
   }) {
@@ -451,6 +452,17 @@ export class PropertiesService {
       let validatedFilters;
       try {
         validatedFilters = SearchPropertiesSchema.parse(filters);
+
+        // Log filters for debugging
+        this.logger.debug(
+          `Property search filters: ${JSON.stringify({
+            boundaries: validatedFilters.boundaries,
+            propertyType: validatedFilters.propertyType,
+            minPrice: validatedFilters.minPrice,
+            maxPrice: validatedFilters.maxPrice,
+          })}`,
+          { correlationId },
+        );
       } catch (zodError) {
         if (zodError instanceof ZodError) {
           const messages = zodError.errors
@@ -468,6 +480,15 @@ export class PropertiesService {
         isAvailable: true, // Only show available properties
       };
 
+      // Price filters (via active listings)
+      // NOTE: Price is stored in PaymentTerms (onetimePayment/periodicPayment), not directly on Listing
+      // For MVP, price filtering is done on frontend after fetching results
+      // TODO: Implement server-side price filtering via PaymentTerms join
+      const listingsWhere: any = { status: "published" };
+      
+      // For now, just ensure we have published listings
+      where.listings = { some: listingsWhere };
+
       // Property filters
       if (validatedFilters.propertyType) {
         where.propertyType = validatedFilters.propertyType;
@@ -483,6 +504,37 @@ export class PropertiesService {
       }
       if (validatedFilters.maxBathrooms !== undefined) {
         where.bathrooms = { ...where.bathrooms, lte: validatedFilters.maxBathrooms };
+      }
+
+      // Boundary filter (properties within selected boundaries)
+      if (validatedFilters.boundaries && validatedFilters.boundaries.length > 0) {
+        // Use spatial query with PostGIS to find properties within boundary geometries
+        // boundaries.geometry is now native PostGIS geometry(MultiPolygon, 4326) with GIST index
+        const propertiesInBoundaries = await this.prisma.$queryRaw<Array<{ id: string }>>`
+          SELECT DISTINCT p.id
+          FROM "properties" p
+          INNER JOIN "addresses" a ON p."addressId" = a.id
+          INNER JOIN "geo_objects" p_geo ON a."geoObjectId" = p_geo.id
+          INNER JOIN "boundaries" b ON b.id = ANY(${validatedFilters.boundaries})
+          WHERE p_geo."geoJson" IS NOT NULL
+            AND b.geometry IS NOT NULL
+            AND ST_Within(
+              ST_GeomFromGeoJSON(p_geo."geoJson"::text)::geometry,
+              b.geometry
+            )
+        `;
+
+        const boundaryPropertyIds = propertiesInBoundaries.map((p: { id: string }) => p.id);
+
+        if (boundaryPropertyIds.length === 0) {
+          this.logger.warn(`No properties found within selected boundaries`, { correlationId });
+          return { properties: [], total: 0 };
+        }
+
+        this.logger.debug(`Found ${boundaryPropertyIds.length} properties in boundaries`, {
+          correlationId,
+        });
+        where.id = { in: boundaryPropertyIds };
       }
 
       // Location filters (via address)
@@ -560,6 +612,11 @@ export class PropertiesService {
       // For MVP, we'll include all published listings and filter on frontend
       // A more complex implementation would need raw SQL to filter by payment terms
       const listingWhere: any = { status: "published" };
+
+      // Listing type filter
+      if (validatedFilters.listingType) {
+        listingWhere.type = validatedFilters.listingType;
+      }
 
       // TODO: Price filtering requires complex query because price is in polymorphic paymentTerms
       // For now, returning all published listings - frontend can filter by price

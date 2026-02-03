@@ -515,5 +515,55 @@ describe("PropertiesService", () => {
       expect(result.properties).toHaveLength(0);
       expect(result.total).toEqual(0);
     });
+
+    it("should filter by listing type", async () => {
+      const filters = {
+        listingType: "rental",
+      } as any;
+
+      mockPrismaService.property.findMany.mockResolvedValue([mockProperty]);
+      mockPrismaService.property.count.mockResolvedValue(1);
+
+      const result = await service.search(filters);
+
+      expect(result.properties).toHaveLength(1);
+      expect(mockPrismaService.property.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          include: expect.objectContaining({
+            listings: expect.objectContaining({
+              where: expect.objectContaining({
+                status: "published",
+                type: "rental",
+              }),
+            }),
+          }),
+        }),
+      );
+    });
+
+    it("should filter by listing type (sale)", async () => {
+      const filters = {
+        listingType: "sale",
+      } as any;
+
+      mockPrismaService.property.findMany.mockResolvedValue([mockProperty]);
+      mockPrismaService.property.count.mockResolvedValue(1);
+
+      const result = await service.search(filters);
+
+      expect(result.properties).toHaveLength(1);
+      expect(mockPrismaService.property.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          include: expect.objectContaining({
+            listings: expect.objectContaining({
+              where: expect.objectContaining({
+                status: "published",
+                type: "sale",
+              }),
+            }),
+          }),
+        }),
+      );
+    });
   });
 });

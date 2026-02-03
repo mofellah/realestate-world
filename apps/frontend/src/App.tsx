@@ -22,6 +22,7 @@ const PropertyDetailPage = lazy(() => import("./pages/PropertyDetailPage"));
 const LoginPage = lazy(() => import("./pages/login"));
 const RegisterPage = lazy(() => import("./pages/register"));
 const ForgotPasswordPage = lazy(() => import("./pages/forgot-password"));
+const BoundarySearchDemo = lazy(() => import("./pages/BoundarySearchDemo"));
 
 // Dashboard Pages
 const DashboardPage = lazy(() => import("./pages/dashboard"));
@@ -72,6 +73,7 @@ export default function App() {
               <Route path="/home" element={<HomePage />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/property/:id" element={<PropertyDetailPage />} />
+              <Route path="/boundary-search-demo" element={<BoundarySearchDemo />} />
             </Route>
 
             {/* Auth Routes (no layout) */}

@@ -24,6 +24,11 @@ async function bootstrap() {
     logger: ["log", "error", "warn", "debug"],
   });
 
+  // Set global prefix for all routes except health check
+  app.setGlobalPrefix("api", {
+    exclude: ["health"],
+  });
+
   // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({

@@ -1,0 +1,21 @@
+
+> @boilerplate/backend@0.0.0 test:cov
+> jest --coverage
+
+  ÔùÅ  process.exit called with "1"
+
+      92 | bootstrap().catch((err) => {
+      93 |   logger.error("Failed to start backend", err);
+    > 94 |   process.exit(1);
+         |           ^
+      95 | });
+      96 |
+
+      at exit (src/main.ts:94:11)
+npm error Lifecycle script `test:cov` failed with error:
+npm error code 1
+npm error path C:\Users\fella\Desktop\projects\realestate-world\apps\backend
+npm error workspace @boilerplate/backend@0.0.0
+npm error location C:\Users\fella\Desktop\projects\realestate-world\apps\backend
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c jest --coverage

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Search Test (POST)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        h2 { color: #0066cc; margin-top: 0; }
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0052a3; }
+        .status { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .filter-group {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        label {
+            display: inline-block;
+            width: 140px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 5px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏠 Property Search Test (POST)</h1>
+    
+    <div class="test-section">
+        <h2>Filter Configuration</h2>
+        <div class="filter-group">
+            <label>Price Range:</label>
+            <input type="number" id="minPrice" placeholder="Min Price" value="100000">
+            <input type="number" id="maxPrice" placeholder="Max Price" value="500000">
+        </div>
+        <div class="filter-group">
+            <label>Property Type:</label>
+            <select id="propertyType">
+                <option value="">Any</option>
+                <option value="house">House</option>
+                <option value="apartment" selected>Apartment</option>
+                <option value="condo">Condo</option>
+                <option value="land">Land</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Bedrooms:</label>
+            <input type="number" id="minBedrooms" placeholder="Min" value="2">
+            <input type="number" id="maxBedrooms" placeholder="Max" value="4">
+        </div>
+        <div class="filter-group">
+            <label>Bathrooms:</label>
+            <input type="number" id="minBathrooms" placeholder="Min" value="1">
+            <input type="number" id="maxBathrooms" placeholder="Max" value="3">
+        </div>
+        <div class="filter-group">
+            <label>Location (Brussels):</label>
+            <input type="number" id="latitude" placeholder="Latitude" value="50.8503" step="0.0001">
+            <input type="number" id="longitude" placeholder="Longitude" value="4.3517" step="0.0001">
+            <input type="number" id="radius" placeholder="Radius (m)" value="5000">
+        </div>
+        <div class="filter-group">
+            <label>Amenities:</label>
+            <input type="text" id="amenities" placeholder="Comma-separated" value="schools,parks">
+        </div>
+        <div class="filter-group">
+            <label>Pagination:</label>
+            <input type="number" id="skip" placeholder="Skip" value="0">
+            <input type="number" id="take" placeholder="Take" value="20">
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Actions</h2>
+        <button onclick="testFullSearch()">🔍 Test Full Search (All Filters)</button>
+        <button onclick="testPriceOnly()">💰 Test Price Filters Only</button>
+        <button onclick="testSpatialOnly()">📍 Test Spatial Search Only</button>
+        <button onclick="testMinimal()">📝 Test Minimal (No Filters)</button>
+        <button onclick="clearResults()">🗑️ Clear Results</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Request Details</h2>
+        <div id="requestInfo" class="status info">Ready to test...</div>
+        <pre id="requestBody"></pre>
+    </div>
+
+    <div class="test-section">
+        <h2>Response</h2>
+        <div id="responseStatus"></div>
+        <pre id="responseBody"></pre>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api/properties/search';
+
+        function getFilterValues() {
+            const amenitiesStr = document.getElementById('amenities').value.trim();
+            return {
+                minPrice: parseInt(document.getElementById('minPrice').value) || undefined,
+                maxPrice: parseInt(document.getElementById('maxPrice').value) || undefined,
+                propertyType: document.getElementById('propertyType').value || undefined,
+                minBedrooms: parseInt(document.getElementById('minBedrooms').value) || undefined,
+                maxBedrooms: parseInt(document.getElementById('maxBedrooms').value) || undefined,
+                minBathrooms: parseInt(document.getElementById('minBathrooms').value) || undefined,
+                maxBathrooms: parseInt(document.getElementById('maxBathrooms').value) || undefined,
+                latitude: parseFloat(document.getElementById('latitude').value) || undefined,
+                longitude: parseFloat(document.getElementById('longitude').value) || undefined,
+                radius: parseInt(document.getElementById('radius').value) || undefined,
+                amenities: amenitiesStr ? amenitiesStr.split(',').map(s => s.trim()) : undefined,
+                skip: parseInt(document.getElementById('skip').value) || 0,
+                take: parseInt(document.getElementById('take').value) || 20,
+            };
+        }
+
+        async function executeSearch(filters, testName) {
+            const cleanFilters = Object.fromEntries(
+                Object.entries(filters).filter(([_, v]) => v !== undefined)
+            );
+
+            document.getElementById('requestInfo').className = 'status info';
+            document.getElementById('requestInfo').textContent = `Testing: ${testName}`;
+            document.getElementById('requestBody').textContent = JSON.stringify(cleanFilters, null, 2);
+            document.getElementById('responseStatus').textContent = 'Loading...';
+            document.getElementById('responseBody').textContent = '';
+
+            try {
+                const startTime = Date.now();
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(cleanFilters)
+                });
+
+                const duration = Date.now() - startTime;
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('responseStatus').className = 'status success';
+                    document.getElementById('responseStatus').textContent = 
+                        `✅ Success! Status: ${response.status} | Time: ${duration}ms | Results: ${data.data?.length || 0}`;
+                } else {
+                    document.getElementById('responseStatus').className = 'status error';
+                    document.getElementById('responseStatus').textContent = 
+                        `❌ Error! Status: ${response.status} | Time: ${duration}ms`;
+                }
+
+                document.getElementById('responseBody').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('responseStatus').className = 'status error';
+                document.getElementById('responseStatus').textContent = `❌ Network Error: ${error.message}`;
+                document.getElementById('responseBody').textContent = error.stack;
+            }
+        }
+
+        async function testFullSearch() {
+            const filters = getFilterValues();
+            await executeSearch(filters, 'Full Search with All Filters');
+        }
+
+        async function testPriceOnly() {
+            const filters = {
+                minPrice: parseInt(document.getElementById('minPrice').value) || undefined,
+                maxPrice: parseInt(document.getElementById('maxPrice').value) || undefined,
+                skip: 0,
+                take: 20
+            };
+            await executeSearch(filters, 'Price Filters Only');
+        }
+
+        async function testSpatialOnly() {
+            const filters = {
+                latitude: parseFloat(document.getElementById('latitude').value) || undefined,
+                longitude: parseFloat(document.getElementById('longitude').value) || undefined,
+                radius: parseInt(document.getElementById('radius').value) || undefined,
+                skip: 0,
+                take: 20
+            };
+            await executeSearch(filters, 'Spatial Search Only (Brussels 5km)');
+        }
+
+        async function testMinimal() {
+            const filters = {
+                skip: 0,
+                take: 20
+            };
+            await executeSearch(filters, 'Minimal Search (No Filters)');
+        }
+
+        function clearResults() {
+            document.getElementById('requestInfo').className = 'status info';
+            document.getElementById('requestInfo').textContent = 'Ready to test...';
+            document.getElementById('requestBody').textContent = '';
+            document.getElementById('responseStatus').textContent = '';
+            document.getElementById('responseBody').textContent = '';
+        }
+    </script>
+</body>
+</html>

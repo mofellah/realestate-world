@@ -78,24 +78,31 @@ export default function PropertyDetailPage() {
   }, [id]);
 
   const priceLabel = useMemo(() => {
-    if (!property?.listings || property.listings.length === 0) return "N/A";
+    if (!property?.listings || property.listings.length === 0) return "Price on request";
 
     const firstListing = property.listings[0];
-    if (!firstListing?.paymentTerms || firstListing.paymentTerms.length === 0) return "N/A";
+    if (!firstListing?.paymentTerms || firstListing.paymentTerms.length === 0) return "Price on request";
 
     const term = firstListing.paymentTerms[0];
-    if (!term) return "N/A";
+    if (!term) return "Price on request";
+
+    const currency = term.currency || "EUR";
+    const currencySymbol = currency === "EUR" ? "€" : currency === "USD" ? "$" : currency;
 
     // Use the flat amount/amountPerPeriod values
     if (term.termType === "onetime" && term.amount) {
-      return `€${term.amount.toLocaleString()}`;
+      return `${term.amount.toLocaleString("en-US")} ${currencySymbol}`;
     }
     if ((term.termType || term.type) === "periodic" && term.amountPerPeriod) {
-      return `€${term.amountPerPeriod.toLocaleString()}/mo`;
+      const period = term.periodType || "month";
+      return `${term.amountPerPeriod.toLocaleString("en-US")} ${currencySymbol} / ${period}`;
     }
     // Fallback to checking type field
-    if (term.amount) return `€${term.amount.toLocaleString()}`;
-    if (term.amountPerPeriod) return `€${term.amountPerPeriod.toLocaleString()}/mo`;
+    if (term.amount) return `${term.amount.toLocaleString("en-US")} ${currencySymbol}`;
+    if (term.amountPerPeriod) {
+      const period = term.periodType || "month";
+      return `${term.amountPerPeriod.toLocaleString("en-US")} ${currencySymbol} / ${period}`;
+    }
     return "Price on request";
   }, [property]);
 

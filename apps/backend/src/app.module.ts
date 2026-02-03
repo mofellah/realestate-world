@@ -12,6 +12,9 @@ import { PropertiesModule } from "./properties/properties.module";
 import { ListingsModule } from "./listings/listings.module";
 import { MessagesModule } from "./messages/messages.module";
 import { AgenciesModule } from "./agencies/agencies.module";
+// import { NeighborhoodsModule } from "./neighborhoods/neighborhoods.module"; // Disabled - replaced by BoundariesModule
+import { BoundariesModule } from "./boundaries/boundaries.module";
+import { AmenitiesModule } from "./amenities/amenities.module";
 import { PrismaService } from "./prisma/prisma.service";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -36,6 +39,9 @@ import { CorrelationIdMiddleware } from "./common/middleware/correlation-id.midd
     ListingsModule,
     MessagesModule,
     AgenciesModule,
+    // NeighborhoodsModule, // Disabled - replaced by BoundariesModule
+    BoundariesModule,
+    AmenitiesModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

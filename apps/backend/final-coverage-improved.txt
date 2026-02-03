@@ -1,0 +1,893 @@
+
+> @boilerplate/backend@0.0.0 test:cov
+> jest --coverage
+
+PASS src/boundaries/__tests__/boundaries.service.spec.ts
+PASS src/auth/__tests__/auth.controller.spec.ts
+  ÔùÅ Console
+
+    console.log
+      12:47:12 warn [46427e7f] [POST] /auth/login Invalid credentials {
+        "service": "GlobalErrorFilter",
+        "statusCode": 401,
+        "error": "Unauthorized"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:12 warn [5b1531cd] [POST] /auth/login email should not be empty,email must be an email {
+        "service": "GlobalErrorFilter",
+        "statusCode": 400,
+        "error": "Bad Request"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:12 warn [bf9c0b0d] [POST] /auth/login password must be longer than or equal to 8 characters,password should not be empty,password must be a string {
+        "service": "GlobalErrorFilter",
+        "statusCode": 400,
+        "error": "Bad Request"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:12 warn [40f4ca99] [POST] /auth/login email must be an email {
+        "service": "GlobalErrorFilter",
+        "statusCode": 400,
+        "error": "Bad Request"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:12 warn [56d46b06] [POST] /auth/refresh Invalid or expired refresh token {
+        "service": "GlobalErrorFilter",
+        "statusCode": 401,
+        "error": "Unauthorized"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:12 warn [30aa2ed0] [POST] /auth/refresh refreshToken should not be empty,refreshToken must be a string {
+        "service": "GlobalErrorFilter",
+        "statusCode": 400,
+        "error": "Bad Request"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:12 warn [unknown] [POST] /auth/logout Invalid or missing JWT token {
+        "service": "GlobalErrorFilter",
+        "statusCode": 401,
+        "error": "UNAUTHORIZED"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:12 warn [unknown] [POST] /auth/logout Invalid or missing JWT token {
+        "service": "GlobalErrorFilter",
+        "statusCode": 401,
+        "error": "UNAUTHORIZED"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:12 warn [unknown] [POST] /auth/logout Invalid or missing JWT token {
+        "service": "GlobalErrorFilter",
+        "statusCode": 401,
+        "error": "UNAUTHORIZED"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/boundaries/__tests__/boundaries.controller.spec.ts
+PASS src/auth/__tests__/auth.register.spec.ts
+  ÔùÅ Console
+
+    console.log
+      12:47:13 info [correlat] User registration successful {
+        "service": "AuthService",
+        "userId": "new-user-id",
+        "email": "newuser@example.com"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:13 info [correlat] User registration successful {
+        "service": "AuthService",
+        "userId": "user-id",
+        "email": "testuser@example.com"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:13 warn [correlat] Registration validation failed {
+        "service": "AuthService",
+        "errors": "passwordConfirmation: Passwords do not match"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:13 warn [correlat] Registration validation failed {
+        "service": "AuthService",
+        "errors": "password: Password must be at least 8 characters; passwordConfirmation: Password confirmation must match"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:13 warn [correlat] Registration validation failed {
+        "service": "AuthService",
+        "errors": "password: Password must contain uppercase, lowercase, and numbers"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:13 warn [correlat] Registration validation failed {
+        "service": "AuthService",
+        "errors": "password: Password must contain uppercase, lowercase, and numbers"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:13 warn [correlat] Registration failed: email already in use {
+        "service": "AuthService",
+        "email": "existing@example.com"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:13 info [correlat] User registration successful {
+        "service": "AuthService",
+        "userId": "user-id",
+        "email": "noname@example.com"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:13 info [correlat] User registration successful {
+        "service": "AuthService",
+        "userId": "user-id",
+        "email": "secure@example.com"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/__tests__/app.module.spec.ts
+PASS src/users/__tests__/users.controller.spec.ts
+  ÔùÅ Console
+
+    console.log
+      12:47:14 warn [unknown] [GET] /users/me Missing or malformed Authorization header {
+        "service": "GlobalErrorFilter",
+        "statusCode": 401,
+        "error": "Unauthorized"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:14 warn [unknown] [GET] /users/me Invalid token {
+        "service": "GlobalErrorFilter",
+        "statusCode": 401,
+        "error": "Unauthorized"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:14 warn [unknown] [GET] /users/me Missing or malformed Authorization header {
+        "service": "GlobalErrorFilter",
+        "statusCode": 401,
+        "error": "Unauthorized"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:14 warn [d9d9a050] [GET] /users/me User not found {
+        "service": "GlobalErrorFilter",
+        "statusCode": 404,
+        "error": "Not Found"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/health/__tests__/health.controller.spec.ts
+PASS src/properties/__tests__/properties.controller.spec.ts
+PASS src/agencies/__tests__/agencies.controller.spec.ts
+PASS src/listings/__tests__/listings.service.spec.ts
+  ÔùÅ Console
+
+    console.log
+      12:47:15 info [6168c1cd] Listing listing-001 created by user-001 {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:15 error [eb0447e1] Listing create failed: Property not found {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:15 error [b2a29aa5] Listing create failed: FK error {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:15 error [5875abf8] Listing create failed: Not owner of property {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:15 error [536202f5] Listing create failed: propertyId and type required {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:15 error [b6645085] Listing create failed: paymentTermsId or price required {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error  Listing findById failed: Listing not found {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [e9a71e99] Listing listing-001 updated by user-001 {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [ddeb5d2f] Listing update failed: Listing not found {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [5aeeb62b] Listing update failed: Not owner {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [006ca612] Listing listing-001 deleted by user-001 {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [9430f5e2] Listing delete failed: Listing not found {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [ff706c2e] Listing delete failed: Not owner {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [8ab0e0e1] Listing update failed: Not owner {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [f4aae800] Listing delete failed: Not owner {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [430427f9] Listing listing-001 published by user-001 {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [68792a22] Listing listing-001 published by user-001 {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [ec5abdf3] Listing publish failed: Not owner {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [211e948f] Listing listing-001 paused by user-001 {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [15387355] Listing pause failed: Not owner {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [6d5ce01a] Listing listing-001 renewed by user-001 {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [e4204bbe] Listing renew failed: Not owner {
+        "service": "ListingsService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/messages/__tests__/messages.controller.spec.ts
+PASS src/properties/__tests__/properties.service.spec.ts
+  ÔùÅ Console
+
+    console.log
+      12:47:16 info [test-cor] Property prop-001 created by user-001 {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [test-cor] Property create failed: User not found {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [test-cor] Property create failed: Invalid propertyType. Must be one of: studio, house, apartment, villa, land, room, commercial, other {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [test-cor] Property create failed: Validation error: addressId: Address ID must be a valid CUID {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [test-cor] Property create failed: Validation error: addressId: Address ID must be a valid CUID {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [test-cor] Property create failed: Validation error: addressId: Required {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [test-cor] Property create failed: Validation error: addressId: Address ID must be a valid CUID {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error  Property findById failed: Property not found {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [test-cor] Property prop-001 updated by user-001 {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [test-cor] Property prop-001 updated by user-001 {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [test-cor] Property update failed: Invalid propertyType. Must be one of: studio, house, apartment, villa, land, room, commercial, other {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [test-cor] Property update failed: Property not found {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [test-cor] Property update failed: Not owner {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [test-cor] Property prop-001 deleted by user-001 {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [test-cor] Property delete failed: Property not found {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [test-cor] Property delete failed: Not owner {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [test-cor] Property search returned 1 of 1 properties {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [test-cor] Property search returned 1 of 1 properties {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [test-cor] Property update failed: Not owner {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 error [test-cor] Property delete failed: Not owner {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [test-cor] Property search returned 1 of 1 properties {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [test-cor] Property search returned 1 of 1 properties {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:16 info [test-cor] Property search returned 0 of 0 properties {
+        "service": "PropertiesService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/properties/__tests__/search-properties.dto.spec.ts
+PASS src/listings/__tests__/listings.controller.spec.ts
+PASS src/amenities/__tests__/amenities.controller.spec.ts
+PASS src/users/__tests__/users.dto.spec.ts
+PASS src/auth/__tests__/auth.service.spec.ts
+  ÔùÅ Console
+
+    console.log
+      12:47:18 info [trace-12] User login successful {
+        "service": "AuthService",
+        "userId": "user-123",
+        "email": "admin@example.com"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 warn [trace-12] Login attempt failed: user not found {
+        "service": "AuthService",
+        "email": "admin@example.com"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 warn [trace-12] Login attempt failed: invalid password {
+        "service": "AuthService",
+        "email": "admin@example.com"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 info [trace-12] User login successful {
+        "service": "AuthService",
+        "userId": "user-123",
+        "email": "admin@example.com"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 info [trace-12] Token refreshed successfully {
+        "service": "AuthService",
+        "userId": "user-123"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 warn [trace-12] Refresh token invalid or expired {
+        "service": "AuthService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 warn [trace-12] Refresh token invalid or expired {
+        "service": "AuthService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 warn [trace-12] Refresh token invalid or expired {
+        "service": "AuthService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 info [trace-12] User logged out {
+        "service": "AuthService",
+        "userId": "user-123"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 info [trace-45] User logged out {
+        "service": "AuthService",
+        "userId": "user-456"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/auth/__tests__/jwt.guard.spec.ts
+PASS src/auth/__tests__/roles.guard.spec.ts
+  ÔùÅ Console
+
+    console.log
+      12:47:18 warn [trace-12] Access denied: missing required roles {
+        "service": "RolesGuard",
+        "userId": "user-123",
+        "requiredRoles": [
+          "admin"
+        ],
+        "userRoles": [
+          "user"
+        ]
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 warn [trace-12] Access denied: missing required roles {
+        "service": "RolesGuard",
+        "userId": "user-123",
+        "requiredRoles": [
+          "admin"
+        ],
+        "userRoles": []
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 warn [trace-12] Access denied: missing required roles {
+        "service": "RolesGuard",
+        "userId": "user-123",
+        "requiredRoles": [
+          "admin",
+          "moderator"
+        ],
+        "userRoles": [
+          "user"
+        ]
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 warn [trace-12] Access denied: missing required roles {
+        "service": "RolesGuard",
+        "userId": "user-123",
+        "requiredRoles": [
+          "admin",
+          "moderator"
+        ],
+        "userRoles": [
+          "user"
+        ]
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 warn [trace-12] Access denied: missing required roles {
+        "service": "RolesGuard",
+        "userId": "user-123",
+        "requiredRoles": [
+          "admin"
+        ]
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:18 warn [trace-12] Access denied: missing required roles {
+        "service": "RolesGuard",
+        "userId": "user-123",
+        "requiredRoles": [
+          "admin"
+        ],
+        "userRoles": [
+          "Admin"
+        ]
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/prisma/__tests__/prisma.service.spec.ts
+  ÔùÅ Console
+
+    console.log
+      12:47:19 info  Ô£ô Prisma client connected to database {
+        "service": "PrismaService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:19 info  Ô£ô Prisma client disconnected {
+        "service": "PrismaService"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/admin/__tests__/admin.controller.spec.ts
+PASS src/messages/__tests__/messages.service.spec.ts
+PASS src/agencies/__tests__/agencies.service.spec.ts
+PASS src/users/__tests__/users.service.spec.ts
+  ÔùÅ Console
+
+    console.log
+      12:47:20 warn  User not found {
+        "service": "UsersService",
+        "userId": "nonexistent-user"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:20 warn  User not found {
+        "service": "UsersService",
+        "userId": ""
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:20 warn  User not found {
+        "service": "UsersService",
+        "userId": "user-@#$%^&*"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+    console.log
+      12:47:20 warn  User not found {
+        "service": "UsersService",
+        "userId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+
+      at Console.log (../../packages/logger/node_modules/winston/lib/winston/transports/console.js:87:23)
+
+PASS src/amenities/__tests__/amenities.service.spec.ts
+PASS src/use-cases/__tests__/listing.use-cases.service.spec.ts
+PASS src/auth/__tests__/jwt.strategy.spec.ts
+PASS src/admin/__tests__/admin.service.spec.ts
+PASS src/use-cases/__tests__/property.use-cases.service.spec.ts
+PASS src/common/middleware/__tests__/correlation-id.middleware.spec.ts
+PASS src/common/pipes/__tests__/validation.pipe.spec.ts
+PASS src/common/filters/__tests__/global-error.filter.spec.ts
+PASS src/__tests__/app.service.spec.ts
+PASS src/__tests__/app.controller.spec.ts
+PASS src/common/config/__tests__/throttler.config.spec.ts
+PASS src/common/utils/__tests__/correlation-id.util.spec.ts
+---------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------
+File                             | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                              
+---------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------
+All files                        |   85.81 |    68.05 |   71.86 |   85.58 |                                                                                
+ src                             |   42.85 |        0 |      40 |   39.13 |                                                                                
+  app.controller.ts              |     100 |      100 |     100 |     100 |                                                                                
+  app.module.ts                  |     100 |      100 |     100 |     100 |                                                                                
+  app.service.ts                 |     100 |      100 |     100 |     100 |                                                                                
+  main.ts                        |       0 |        0 |       0 |       0 | 2-94                                                                           
+  setup-env.ts                   |       0 |        0 |       0 |       0 | 5-17                                                                           
+ src/admin                       |   81.81 |    85.71 |     100 |   84.21 |                                                                                
+  admin.controller.ts            |     100 |      100 |     100 |     100 |                                                                                
+  admin.module.ts                |       0 |      100 |     100 |       0 | 6-15                                                                           
+  admin.service.ts               |   95.45 |    66.66 |     100 |      95 | 35                                                                             
+ src/agencies                    |   95.38 |    74.13 |      95 |   95.86 |                                                                                
+  agencies.controller.ts         |     100 |      100 |     100 |     100 |                                                                                
+  agencies.module.ts             |     100 |      100 |     100 |     100 |                                                                                
+  agencies.service.ts            |   93.87 |    72.22 |    92.3 |   94.62 | 210,293,351-386                                                                
+ src/agencies/dto                |   77.27 |      100 |     100 |   77.27 |                                                                                
+  add-agent.dto.ts               |     100 |      100 |     100 |     100 |                                                                                
+  create-agency.dto.ts           |     100 |      100 |     100 |     100 |                                                                                
+  invite-agent.dto.ts            |       0 |      100 |     100 |       0 | 6-17                                                                           
+  update-agency.dto.ts           |     100 |      100 |     100 |     100 |                                                                                
+ src/amenities                   |   68.67 |    48.27 |   31.57 |    67.1 |                                                                                
+  amenities.controller.ts        |   76.92 |      100 |      50 |      75 | 47-48,58-59,69-70                                                              
+  amenities.module.ts            |     100 |      100 |     100 |     100 |                                                                                
+  amenities.service.ts           |      60 |    48.27 |   23.07 |   59.57 | 42,46,104,109,143,156-168,181-243                                              
+ src/amenities/dto               |   74.28 |      100 |       0 |   74.28 |                                                                                
+  autocomplete-amenities.dto.ts  |      90 |      100 |       0 |      90 | 32                                                                             
+  search-amenities.dto.ts        |      68 |      100 |       0 |      68 | 35,41,53,59,65,71,77,90                                                        
+ src/auth                        |   88.46 |    79.16 |      80 |   89.25 |                                                                                
+  auth.controller.ts             |    91.3 |      100 |      80 |   90.47 | 69-70                                                                          
+  auth.module.ts                 |     100 |       50 |     100 |     100 | 22                                                                             
+  auth.service.ts                |   86.17 |    81.81 |      80 |   87.64 | 52-57,122-127,191                                                              
+ src/auth/decorators             |   85.71 |      100 |      75 |      80 |                                                                                
+  auth.decorators.ts             |     100 |      100 |     100 |     100 |                                                                                
+  current-user.decorator.ts      |      50 |      100 |       0 |      50 | 10-11                                                                          
+ src/auth/dto                    |     100 |      100 |     100 |     100 |                                                                                
+  auth.dto.ts                    |     100 |      100 |     100 |     100 |                                                                                
+  user-response.dto.ts           |     100 |      100 |     100 |     100 |                                                                                
+ src/auth/guards                 |     100 |      100 |     100 |     100 |                                                                                
+  jwt.guard.ts                   |     100 |      100 |     100 |     100 |                                                                                
+  roles.guard.ts                 |     100 |      100 |     100 |     100 |                                                                                
+ src/auth/schemas                |   85.71 |      100 |      50 |   85.71 |                                                                                
+  auth.schema.ts                 |   85.71 |      100 |      50 |   85.71 | 86                                                                             
+ src/auth/strategies             |     100 |      100 |     100 |     100 |                                                                                
+  jwt.strategy.ts                |     100 |      100 |     100 |     100 |                                                                                
+ src/boundaries                  |   68.75 |    34.78 |   57.14 |   67.12 |                                                                                
+  boundaries.controller.ts       |    90.9 |        0 |      80 |      90 | 44-45                                                                          
+  boundaries.module.ts           |     100 |      100 |     100 |     100 |                                                                                
+  boundaries.service.ts          |   57.14 |    38.09 |   44.44 |   56.52 | 50,129,139,150-153,187-194,244-287                                             
+  test-fixtures.ts               |       0 |      100 |     100 |       0 | 6-33                                                                           
+ src/boundaries/dto              |   71.87 |      100 |       0 |   71.87 |                                                                                
+  autocomplete-boundaries.dto.ts |   88.88 |      100 |       0 |   88.88 | 22                                                                             
+  search-boundaries.dto.ts       |   65.21 |      100 |       0 |   65.21 | 26,32,38,44,50,56,66,74                                                        
+ src/common/config               |     100 |      100 |     100 |     100 |                                                                                
+  throttler.config.ts            |     100 |      100 |     100 |     100 |                                                                                
+ src/common/filters              |     100 |    86.66 |     100 |     100 |                                                                                
+  global-error.filter.ts         |     100 |    86.66 |     100 |     100 | 34-35                                                                          
+ src/common/interceptors         |     100 |      100 |     100 |     100 |                                                                                
+  correlation-id.interceptor.ts  |     100 |      100 |     100 |     100 |                                                                                
+ src/common/middleware           |     100 |      100 |     100 |     100 |                                                                                
+  correlation-id.middleware.ts   |     100 |      100 |     100 |     100 |                                                                                
+ src/common/pipes                |     100 |    83.33 |     100 |     100 |                                                                                
+  validation.pipe.ts             |     100 |    83.33 |     100 |     100 | 22                                                                             
+ src/common/types                |       0 |      100 |     100 |       0 |                                                                                
+  index.ts                       |       0 |      100 |     100 |       0 | 6                                                                              
+ src/common/utils                |     100 |      100 |     100 |     100 |                                                                                
+  correlation-id.util.ts         |     100 |      100 |     100 |     100 |                                                                                
+ src/health                      |     100 |      100 |     100 |     100 |                                                                                
+  health.controller.ts           |     100 |      100 |     100 |     100 |                                                                                
+  health.module.ts               |     100 |      100 |     100 |     100 |                                                                                
+ src/listings                    |    87.5 |       60 |      85 |   88.12 |                                                                                
+  listings.controller.ts         |   89.28 |      100 |   66.66 |   88.46 | 101,111,125                                                                    
+  listings.module.ts             |     100 |      100 |     100 |     100 |                                                                                
+  listings.service.ts            |   86.42 |    58.02 |     100 |    87.5 | 57-84,141-143,221-232                                                          
+ src/listings/dto                |    92.3 |      100 |      40 |    92.3 |                                                                                
+  listing.dto.ts                 |    92.3 |      100 |      40 |    92.3 | 61,184,196                                                                     
+ src/messages                    |   95.91 |    76.66 |     100 |   95.65 |                                                                                
+  messages.controller.ts         |     100 |      100 |     100 |     100 |                                                                                
+  messages.module.ts             |     100 |      100 |     100 |     100 |                                                                                
+  messages.service.ts            |    94.2 |    76.66 |     100 |   94.02 | 160-162,247                                                                    
+ src/messages/dto                |   85.71 |        0 |       0 |   85.71 |                                                                                
+  create-message.dto.ts          |     100 |      100 |     100 |     100 |                                                                                
+  query-messages.dto.ts          |      75 |        0 |       0 |      75 | 13,24,29                                                                       
+ src/prisma                      |   88.88 |      100 |      60 |   85.71 |                                                                                
+  prisma.module.ts               |     100 |      100 |     100 |     100 |                                                                                
+  prisma.service.ts              |   84.61 |      100 |      60 |   81.81 | 25-26                                                                          
+ src/properties                  |   84.14 |    67.76 |   80.76 |   83.88 |                                                                                
+  properties.controller.ts       |   96.87 |      100 |    87.5 |   96.66 | 81                                                                             
+  properties.module.ts           |     100 |      100 |     100 |     100 |                                                                                
+  properties.service.ts          |   81.08 |    66.66 |   77.77 |   80.92 | 82,129,157-159,279,324,344-350,467-473,489,507,510,516-537,595,602,608,694-696 
+ src/properties/dto              |   98.85 |      100 |     100 |   98.82 |                                                                                
+  contact-owner.dto.ts           |     100 |      100 |     100 |     100 |                                                                                
+  property.dto.ts                |     100 |      100 |     100 |     100 |                                                                                
+  search-properties.dto.ts       |      98 |      100 |     100 |   97.91 | 171                                                                            
+ src/properties/schemas          |     100 |      100 |     100 |     100 |                                                                                
+  property.schema.ts             |     100 |      100 |     100 |     100 |                                                                                
+ src/users                       |     100 |      100 |     100 |     100 |                                                                                
+  users.controller.ts            |     100 |      100 |     100 |     100 |                                                                                
+  users.module.ts                |     100 |      100 |     100 |     100 |                                                                                
+  users.service.ts               |     100 |      100 |     100 |     100 |                                                                                
+ src/users/dto                   |     100 |      100 |     100 |     100 |                                                                                
+  change-password.dto.ts         |     100 |      100 |     100 |     100 |                                                                                
+  update-profile.dto.ts          |     100 |      100 |     100 |     100 |                                                                                
+---------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------
+Jest: "global" coverage threshold for branches (71%) not met: 68.05%
+Jest: "global" coverage threshold for functions (74%) not met: 71.86%
+
+Test Suites: 9 skipped, 36 passed, 36 of 45 total
+Tests:       51 skipped, 388 passed, 439 total
+Snapshots:   0 total
+Time:        14.699 s, estimated 21 s
+Ran all test suites.
+npm error Lifecycle script `test:cov` failed with error:
+npm error code 1
+npm error path C:\Users\fella\Desktop\projects\realestate-world\apps\backend
+npm error workspace @boilerplate/backend@0.0.0
+npm error location C:\Users\fella\Desktop\projects\realestate-world\apps\backend
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c jest --coverage
