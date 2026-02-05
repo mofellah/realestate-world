@@ -1,7 +1,7 @@
 /**
  * Integration test for property search boundary filtering
  * Tests that search correctly returns properties within selected boundaries
- * 
+ *
  * Note: Requires test database configuration (DATABASE_TEST_URL)
  * See issue #54 for integration test infrastructure setup
  */

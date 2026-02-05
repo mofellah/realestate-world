@@ -1,7 +1,7 @@
 /**
  * FilterPanel Component Tests
  * Tests filter controls, state management, and user interactions
- * 
+ *
  * Note: FilterPanel was redesigned (see FILTERPANEL_REDESIGN.md)
  * These tests are temporarily simplified pending full test refactor
  */

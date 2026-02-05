@@ -1,19 +1,25 @@
 /**
  * PHASE 2: Optimized Property Search Service
- * 
+ *
  * Key Improvements:
  * 1. Single composite SQL query (replaces 5+ separate queries)
  * 2. Native PostGIS geometry columns (no GeoJSON parsing)
  * 3. Distance-based sorting capability
  * 4. CTE-based query structure for clarity
  * 5. Proper use of GIST indexes
- * 
+ *
  * Performance: ~10x faster for spatial queries, ~5x for combined filters
- * 
+ *
  * Migration required: 20260205_add_geo_objects_geometry.sql
  */
 
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException, Inject } from "@nestjs/common";
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { Logger } from "@boilerplate/logger";
 import { REQUEST } from "@nestjs/core";
@@ -75,7 +81,7 @@ export class PropertiesServiceOptimized {
   /**
    * PHASE 2 OPTIMIZED SEARCH
    * Single composite SQL query with native PostGIS geometry
-   * 
+   *
    * Query Structure:
    * WITH filtered_properties AS (
    *   SELECT property IDs matching ALL filters using intersections
@@ -92,7 +98,7 @@ export class PropertiesServiceOptimized {
     try {
       // Validate input
       const validatedFilters = SearchPropertiesSchema.parse(filters);
-      
+
       const {
         minPrice = 0,
         maxPrice = 999999999,
@@ -110,7 +116,7 @@ export class PropertiesServiceOptimized {
         skip = 0,
         take = 20,
       } = validatedFilters;
-      
+
       // Sorting options (not in schema yet)
       const sortBy = (filters as any).sortBy || "newest";
       const sortOrder = (filters as any).sortOrder || "desc";
@@ -124,7 +130,7 @@ export class PropertiesServiceOptimized {
       // Log search parameters
       this.logger.info(
         `PHASE 2 OPTIMIZED SEARCH: type=${propertyType}, price=${minPrice}-${maxPrice}, spatial=${hasSpatial}, amenities=${hasAmenities}, boundaries=${hasBoundaries}`,
-        { correlationId }
+        { correlationId },
       );
 
       /**
@@ -139,12 +145,16 @@ export class PropertiesServiceOptimized {
           FROM "properties" p
           INNER JOIN "addresses" a ON p."addressId" = a.id
           INNER JOIN "geo_objects" g ON a."geoObjectId" = g.id
-          ${hasBoundaries ? Prisma.sql`
+          ${
+            hasBoundaries
+              ? Prisma.sql`
             INNER JOIN "boundaries" b ON b.id = ANY(${boundaries}::text[])
             WHERE g.geometry IS NOT NULL
               AND b.geometry IS NOT NULL
               AND ST_Within(g.geometry, b.geometry)
-          ` : Prisma.sql`WHERE true`}
+          `
+              : Prisma.sql`WHERE true`
+          }
         ),
         
         -- CTE 2: Filter by spatial radius (if specified)
@@ -154,14 +164,18 @@ export class PropertiesServiceOptimized {
           INNER JOIN "addresses" a ON p."addressId" = a.id
           INNER JOIN "geo_objects" g ON a."geoObjectId" = g.id
           WHERE p."isAvailable" = true
-          ${hasSpatial ? Prisma.sql`
+          ${
+            hasSpatial
+              ? Prisma.sql`
             AND g.geometry IS NOT NULL
             AND ST_DWithin(
               g.geometry::geography,
               ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography,
               ${radius}
             )
-          ` : Prisma.sql`AND true`}
+          `
+              : Prisma.sql`AND true`
+          }
         ),
         
         -- CTE 3: Filter by amenities (if specified)
@@ -170,7 +184,9 @@ export class PropertiesServiceOptimized {
           FROM "properties" p
           INNER JOIN "addresses" a ON p."addressId" = a.id
           INNER JOIN "geo_objects" p_geo ON a."geoObjectId" = p_geo.id
-          ${hasAmenities ? Prisma.sql`
+          ${
+            hasAmenities
+              ? Prisma.sql`
             INNER JOIN "amenities" am ON am.type = ANY(${amenities}::"AmenityTypeEnum"[])
             INNER JOIN "geo_objects" am_geo ON am."geoObjectId" = am_geo.id
             WHERE p_geo.geometry IS NOT NULL
@@ -180,14 +196,18 @@ export class PropertiesServiceOptimized {
                 p_geo.geometry::geography,
                 ${radius || 1000}
               )
-          ` : Prisma.sql`WHERE true`}
+          `
+              : Prisma.sql`WHERE true`
+          }
         ),
         
         -- CTE 4: Filter by price (if specified)
         price_properties AS (
           SELECT DISTINCT p.id
           FROM "properties" p
-          ${hasPrice ? Prisma.sql`
+          ${
+            hasPrice
+              ? Prisma.sql`
             INNER JOIN "listings" l ON p.id = l."propertyId" AND l.status = 'published'
               ${listingType ? Prisma.sql`AND l.type = ${listingType}` : Prisma.empty}
             INNER JOIN "payment_terms" pt ON l.id = pt."listingId"
@@ -197,7 +217,9 @@ export class PropertiesServiceOptimized {
               (op.amount IS NOT NULL AND op.amount >= ${minPrice} AND op.amount <= ${maxPrice})
               OR (pp."amountPerPeriod" IS NOT NULL AND pp."amountPerPeriod" >= ${minPrice} AND pp."amountPerPeriod" <= ${maxPrice})
             )
-          ` : Prisma.sql`WHERE true`}
+          `
+              : Prisma.sql`WHERE true`
+          }
         ),
         
         -- CTE 5: Intersect all filters
@@ -226,12 +248,16 @@ export class PropertiesServiceOptimized {
             p."createdAt",
             g.latitude,
             g.longitude,
-            ${hasSpatial ? Prisma.sql`
+            ${
+              hasSpatial
+                ? Prisma.sql`
               ST_Distance(
                 g.geometry::geography,
                 ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography
               ) as distance
-            ` : Prisma.sql`NULL::float as distance`},
+            `
+                : Prisma.sql`NULL::float as distance`
+            },
             COALESCE(op.amount, pp."amountPerPeriod", 0) as price
           FROM filtered_properties fp
           INNER JOIN "properties" p ON p.id = fp.id
@@ -284,7 +310,10 @@ export class PropertiesServiceOptimized {
         const messages = error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join("; ");
         throw new BadRequestException(`Validation error: ${messages}`);
       }
-      this.logger.error(`Property search failed: ${error instanceof Error ? error.message : String(error)}`, { correlationId });
+      this.logger.error(
+        `Property search failed: ${error instanceof Error ? error.message : String(error)}`,
+        { correlationId },
+      );
       throw error;
     }
   }

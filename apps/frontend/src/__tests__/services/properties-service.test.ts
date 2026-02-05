@@ -150,7 +150,10 @@ describe("PropertiesService", () => {
 
       const result = await propertiesService.searchProperties(params);
 
-      expect(apiClient.post).toHaveBeenCalledWith("/properties/search", expect.objectContaining(params));
+      expect(apiClient.post).toHaveBeenCalledWith(
+        "/properties/search",
+        expect.objectContaining(params),
+      );
       expect(result).toEqual(mockResults);
     });
 

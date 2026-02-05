@@ -1,10 +1,10 @@
 /**
  * Performance Benchmark: Phase 1 vs Phase 2
- * 
+ *
  * Compares query performance between:
  * - Phase 1: Multi-query with GeoJSON parsing
  * - Phase 2: Single composite query with native geometry
- * 
+ *
  * Run: npm run benchmark:search
  */
 
@@ -24,7 +24,7 @@ interface BenchmarkResult {
 
 async function benchmark() {
   console.log("🚀 Property Search Benchmark: Phase 1 vs Phase 2\n");
-  console.log("=" .repeat(80));
+  console.log("=".repeat(80));
 
   const results: BenchmarkResult[] = [];
 
@@ -42,7 +42,7 @@ async function benchmark() {
   // Phase 1: GeoJSON parsing
   const phase1Start1 = performance.now();
   const memBefore1 = process.memoryUsage().heapUsed;
-  
+
   const phase1Results1 = await prisma.$queryRaw<Array<{ id: string }>>`
     SELECT DISTINCT p.id
     FROM "properties" p
@@ -55,10 +55,10 @@ async function benchmark() {
         ${testRadius}
       )
   `;
-  
+
   const memAfter1 = process.memoryUsage().heapUsed;
   const phase1Time1 = performance.now() - phase1Start1;
-  
+
   results.push({
     phase: "Phase 1 (GeoJSON)",
     testName: "Spatial Search",
@@ -73,7 +73,7 @@ async function benchmark() {
   // Phase 2: Native geometry
   const phase2Start1 = performance.now();
   const memBefore2 = process.memoryUsage().heapUsed;
-  
+
   const phase2Results1 = await prisma.$queryRaw<Array<{ id: string }>>`
     SELECT DISTINCT p.id
     FROM "properties" p
@@ -86,10 +86,10 @@ async function benchmark() {
         ${testRadius}
       )
   `;
-  
+
   const memAfter2 = process.memoryUsage().heapUsed;
   const phase2Time1 = performance.now() - phase2Start1;
-  
+
   results.push({
     phase: "Phase 2 (Native)",
     testName: "Spatial Search",
@@ -111,7 +111,7 @@ async function benchmark() {
   // Phase 1: Multiple queries with intersection
   const phase1Start2 = performance.now();
   const memBefore1_2 = process.memoryUsage().heapUsed;
-  
+
   // Query 1: Spatial
   const spatialIds = await prisma.$queryRaw<Array<{ id: string }>>`
     SELECT DISTINCT p.id
@@ -156,17 +156,17 @@ async function benchmark() {
   `;
 
   // Intersection in application
-  const spatialSet = new Set(spatialIds.map(p => p.id));
-  const priceSet = new Set(priceIds.map(p => p.id));
-  const amenitySet = new Set(amenityIds.map(p => p.id));
-  
+  const spatialSet = new Set(spatialIds.map((p) => p.id));
+  const priceSet = new Set(priceIds.map((p) => p.id));
+  const amenitySet = new Set(amenityIds.map((p) => p.id));
+
   const intersected = spatialIds
-    .filter(p => priceSet.has(p.id) && amenitySet.has(p.id))
-    .map(p => p.id);
+    .filter((p) => priceSet.has(p.id) && amenitySet.has(p.id))
+    .map((p) => p.id);
 
   const memAfter1_2 = process.memoryUsage().heapUsed;
   const phase1Time2 = performance.now() - phase1Start2;
-  
+
   results.push({
     phase: "Phase 1 (Multi-query)",
     testName: "Combined Filters",
@@ -181,7 +181,7 @@ async function benchmark() {
   // Phase 2: Single composite query
   const phase2Start2 = performance.now();
   const memBefore2_2 = process.memoryUsage().heapUsed;
-  
+
   const phase2Results2 = await prisma.$queryRaw<Array<{ id: string }>>`
     WITH 
     spatial_properties AS (
@@ -223,10 +223,10 @@ async function benchmark() {
       AND p.id IN (SELECT id FROM price_properties)
       AND p.id IN (SELECT id FROM amenity_properties)
   `;
-  
+
   const memAfter2_2 = process.memoryUsage().heapUsed;
   const phase2Time2 = performance.now() - phase2Start2;
-  
+
   results.push({
     phase: "Phase 2 (CTE)",
     testName: "Combined Filters",
@@ -245,7 +245,7 @@ async function benchmark() {
   console.log("\n📊 BENCHMARK SUMMARY");
   console.log("=".repeat(80));
   console.log(
-    "Test                    | Phase        | Time (ms) | Results | Queries | Memory (KB)"
+    "Test                    | Phase        | Time (ms) | Results | Queries | Memory (KB)",
   );
   console.log("-".repeat(80));
 
