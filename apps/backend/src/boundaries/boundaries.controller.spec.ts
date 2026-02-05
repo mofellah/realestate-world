@@ -6,7 +6,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { BoundariesController } from "./boundaries.controller";
 import { BoundariesService } from "./boundaries.service";
-import { mockBoundaries, mockBoundaryTypes } from "./test-fixtures";
+import { mockBoundaries } from "./test-fixtures";
 
 describe("BoundariesController", () => {
   let controller: BoundariesController;

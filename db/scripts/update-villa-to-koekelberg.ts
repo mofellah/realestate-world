@@ -3,13 +3,13 @@
  * Using a point slightly offset from centroid for variety
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
   const property = await prisma.property.findUnique({
-    where: { id: 'cml6h4rdo0044x9ndgbpnm3zj' },
+    where: { id: "cml6h4rdo0044x9ndgbpnm3zj" },
     include: {
       address: {
         include: {
@@ -20,7 +20,7 @@ async function main() {
   });
 
   if (!property) {
-    console.log('Property not found');
+    console.log("Property not found");
     return;
   }
 
@@ -30,18 +30,18 @@ async function main() {
   await prisma.address.update({
     where: { id: property.address.id },
     data: {
-      streetName: 'Avenue du Panthéon',
-      streetNumber: '12',
-      postalCode: '1081',
-      city: 'Koekelberg',
-      region: 'Brussels',
-      country_code: 'BE',
+      streetName: "Avenue du Panthéon",
+      streetNumber: "12",
+      postalCode: "1081",
+      city: "Koekelberg",
+      region: "Brussels",
+      country_code: "BE",
     },
   });
 
   // Use coordinates slightly offset from centroid (about 100m north)
   const geoJson = {
-    type: 'Point',
+    type: "Point",
     coordinates: [4.324087298306575, 50.864], // [lng, lat]
   };
 
@@ -51,7 +51,7 @@ async function main() {
       geoJson: geoJson as any,
       latitude: 50.864,
       longitude: 4.324087298306575,
-      type: 'point',
+      type: "point",
     },
   });
 
@@ -77,7 +77,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('Error:', e);
+    console.error("Error:", e);
     process.exit(1);
   })
   .finally(async () => {

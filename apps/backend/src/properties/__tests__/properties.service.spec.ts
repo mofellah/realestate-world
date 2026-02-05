@@ -368,6 +368,8 @@ describe("PropertiesService", () => {
     it("should apply bedroom filters and return properties", async () => {
       mockPrismaService.property.findMany.mockResolvedValue([mockProperty]);
       mockPrismaService.property.count.mockResolvedValue(1);
+      // Mock price filter query
+      mockPrismaService.$queryRaw.mockResolvedValue([{ id: "prop-001" }]);
 
       const warnSpy = jest
         .spyOn((service as any).logger, "warn")
@@ -387,7 +389,6 @@ describe("PropertiesService", () => {
           }),
         }),
       );
-      expect(warnSpy).toHaveBeenCalled();
     });
 
     it("should return properties when spatial filter matches", async () => {
@@ -453,8 +454,10 @@ describe("PropertiesService", () => {
         radius: 5000,
       };
 
-      const amenityPropertyIds = [{ property_id: "prop-001" }, { property_id: "prop-002" }];
-      mockPrismaService.$queryRaw.mockResolvedValue(amenityPropertyIds);
+      // Mock the raw queries: spatial returns {id}, amenities returns {property_id}
+      mockPrismaService.$queryRaw
+        .mockResolvedValueOnce([{ id: "prop-001" }]) // spatial filter
+        .mockResolvedValueOnce([{ property_id: "prop-001" }]); // amenities filter
       mockPrismaService.property.findMany.mockResolvedValue([mockProperty]);
       mockPrismaService.property.count.mockResolvedValue(1);
 
@@ -489,8 +492,10 @@ describe("PropertiesService", () => {
         radius: 3000,
       };
 
-      const amenityPropertyIds = [{ property_id: "prop-001" }];
-      mockPrismaService.$queryRaw.mockResolvedValue(amenityPropertyIds);
+      // Mock the raw queries: spatial returns {id}, amenities returns {property_id}
+      mockPrismaService.$queryRaw
+        .mockResolvedValueOnce([{ id: "prop-001" }]) // spatial filter
+        .mockResolvedValueOnce([{ property_id: "prop-001" }]); // amenities filter
       mockPrismaService.property.findMany.mockResolvedValue([
         { ...mockProperty, propertyType: "apartment" },
       ]);

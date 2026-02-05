@@ -368,7 +368,7 @@ export async function seedBoundaryTypes() {
 
   // First pass: Create all types without parent relationships
   for (const typeData of boundaryTypes) {
-    const { parentCode, ...data } = typeData;
+    const { ...data } = typeData;
 
     const boundaryType = await prisma.boundaryType.upsert({
       where: {

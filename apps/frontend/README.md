@@ -1,4 +1,4 @@
-# Frontend (React 19 + Vite)
+# Frontend (React 18 + Vite)
 
 React SPA with Tailwind CSS, TypeScript, and Zustand state management.
 

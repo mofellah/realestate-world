@@ -13,12 +13,12 @@ This directory contains Docker Compose configurations for local development and 
 ### Development Stack
 - **Database**: PostgreSQL 18 + PostGIS extension
 - **Backend**: NestJS + Fastify (Node.js 20, hot-reload enabled, debugger on port 9229)
-- **Frontend**: React 19 + Vite (HMR enabled on port 8080)
+- **Frontend**: React 18 + Vite (HMR enabled on port 8080)
 
 ### Production Stack
 - **Database**: PostgreSQL 18 + PostGIS (persistent volumes)
 - **Backend**: NestJS + Fastify (production build, healthchecks)
-- **Frontend**: React 19 + Vite (nginx serving static build on port 8080)
+- **Frontend**: React 18 + Vite (nginx serving static build on port 8080)
 - **Nginx Reverse Proxy**: Routes /api to backend, serves frontend static files on port 80/443
 
 ## Prerequisites

@@ -16,8 +16,8 @@ export default function BoundarySearchDemo() {
         Multi-Select Boundary Search Demo
       </h1>
       <p style={{ color: "#6b7280", marginBottom: "2rem" }}>
-        Search and select multiple cities, municipalities, and regions. Display format: "Brussels,
-        Municipality" or "Flanders, State"
+        Search and select multiple cities, municipalities, and regions. Display format:
+        &quot;Brussels, Municipality&quot; or &quot;Flanders, State&quot;
       </p>
 
       <BoundarySearch

@@ -19,7 +19,6 @@ import {
   ApiBearerAuth,
   ApiParam,
   ApiQuery,
-  ApiBody,
 } from "@nestjs/swagger";
 import { PropertiesService } from "./properties.service";
 import { PropertyUseCasesService } from "../use-cases/property.use-cases.service";

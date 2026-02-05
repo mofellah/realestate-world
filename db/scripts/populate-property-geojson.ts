@@ -3,28 +3,28 @@
  * This adds approximate coordinates to properties so amenity filtering works
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 // Approximate coordinates for Brussels neighborhoods
 const cityCoordinates: Record<string, { lat: number; lng: number }> = {
-  'Brussels Center': { lat: 50.8503, lng: 4.3517 },
-  'Etterbeek': { lat: 50.8376, lng: 4.3889 },
-  'Ixelles': { lat: 50.8282, lng: 4.3661 },
-  'Schaerbeek': { lat: 50.8677, lng: 4.3731 },
-  'Saint-Gilles': { lat: 50.8279, lng: 4.3447 },
-  'Anderlecht': { lat: 50.8365, lng: 4.3081 },
-  'Molenbeek': { lat: 50.8554, lng: 4.3233 },
-  'Uccle': { lat: 50.7989, lng: 4.3347 },
-  'Forest': { lat: 50.8099, lng: 4.3248 },
-  'Woluwe': { lat: 50.8486, lng: 4.4244 },
-  'Woluwe-Saint-Pierre': { lat: 50.8422, lng: 4.4244 },
-  'Woluwe-Saint-Lambert': { lat: 50.8486, lng: 4.4175 },
+  "Brussels Center": { lat: 50.8503, lng: 4.3517 },
+  Etterbeek: { lat: 50.8376, lng: 4.3889 },
+  Ixelles: { lat: 50.8282, lng: 4.3661 },
+  Schaerbeek: { lat: 50.8677, lng: 4.3731 },
+  "Saint-Gilles": { lat: 50.8279, lng: 4.3447 },
+  Anderlecht: { lat: 50.8365, lng: 4.3081 },
+  Molenbeek: { lat: 50.8554, lng: 4.3233 },
+  Uccle: { lat: 50.7989, lng: 4.3347 },
+  Forest: { lat: 50.8099, lng: 4.3248 },
+  Woluwe: { lat: 50.8486, lng: 4.4244 },
+  "Woluwe-Saint-Pierre": { lat: 50.8422, lng: 4.4244 },
+  "Woluwe-Saint-Lambert": { lat: 50.8486, lng: 4.4175 },
 };
 
 async function main() {
-  console.log('Starting to populate property geoJson data...');
+  console.log("Starting to populate property geoJson data...");
 
   // Get all properties with addresses
   const properties = await prisma.property.findMany({
@@ -70,7 +70,7 @@ async function main() {
     const lngOffset = (Math.random() - 0.5) * 0.003;
 
     const geoJson = {
-      type: 'Point',
+      type: "Point",
       coordinates: [coords.lng + lngOffset, coords.lat + latOffset], // [lng, lat] for GeoJSON
     };
 
@@ -79,7 +79,7 @@ async function main() {
       where: { id: property.address.geoObject.id },
       data: {
         geoJson: geoJson as any,
-        type: 'point',
+        type: "point",
       },
     });
 
@@ -94,7 +94,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('Error:', e);
+    console.error("Error:", e);
     process.exit(1);
   })
   .finally(async () => {

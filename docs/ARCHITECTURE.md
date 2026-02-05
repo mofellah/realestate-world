@@ -8,7 +8,7 @@
 ## Overview
 
 This is a **monorepo-based, AI-optimized, BDD/TDD-first boilerplate** for building scalable web applications. It combines:
-- **React 19 + Vite** (frontend)
+- **React 18 + Vite** (frontend)
 - **NestJS + Fastify + Prisma** (backend & ORM)
 - **PostgreSQL 18** (database)
 - **npm workspaces** (monorepo coordination)
@@ -19,12 +19,12 @@ This is a **monorepo-based, AI-optimized, BDD/TDD-first boilerplate** for buildi
 
 ## Why These Choices?
 
-### Frontend: React 19 + Vite
+### Frontend: React 18 + Vite
 
-**React 19**
-- Latest stability and features (React Compiler, improved error boundaries)
-- Server Components preparation for future expansion
-- Largest ecosystem and community
+**React 18**
+- Stable, widely adopted, and compatible with current dependencies
+- Mature ecosystem and tooling
+- Strong community support
 
 **Vite**
 - Sub-100ms HMR (hot module reload) for fast feedback loops
@@ -203,7 +203,7 @@ boilerplate/
 │   │   ├── __tests__/          # Unit + integration tests
 │   │   ├── tsconfig.json      # Extends root
 │   │   └── package.json       # App-specific deps
-│   └── frontend/               # React 19 + Vite
+│   └── frontend/               # React 18 + Vite
 │       ├── src/
 │       │   ├── pages/          # Page components (routing)
 │       │   ├── components/     # Reusable components

@@ -137,9 +137,9 @@ describe("PropertiesService", () => {
   };
 
   describe("searchProperties", () => {
-    it("should make GET request with search parameters", async () => {
+    it("should make POST request with search parameters", async () => {
       const mockResults = [mockProperty];
-      (apiClient.get as jest.Mock).mockResolvedValue(mockResults);
+      (apiClient.post as jest.Mock).mockResolvedValue(mockResults);
 
       const params = {
         city: "New York",
@@ -150,24 +150,24 @@ describe("PropertiesService", () => {
 
       const result = await propertiesService.searchProperties(params);
 
-      expect(apiClient.get).toHaveBeenCalledWith(expect.stringContaining("/properties/search"));
+      expect(apiClient.post).toHaveBeenCalledWith("/properties/search", expect.objectContaining(params));
       expect(result).toEqual(mockResults);
     });
 
     it("should handle search without filters", async () => {
       const mockResults = [mockProperty];
-      (apiClient.get as jest.Mock).mockResolvedValue(mockResults);
+      (apiClient.post as jest.Mock).mockResolvedValue(mockResults);
 
       const result = await propertiesService.searchProperties({});
 
-      expect(apiClient.get).toHaveBeenCalledWith("/properties/search");
+      expect(apiClient.post).toHaveBeenCalledWith("/properties/search", {});
       expect(result).toEqual(mockResults);
     });
 
-    it("should build query string with multiple parameters", async () => {
-      (apiClient.get as jest.Mock).mockResolvedValue([]);
+    it("should send request body with multiple parameters", async () => {
+      (apiClient.post as jest.Mock).mockResolvedValue([]);
 
-      await propertiesService.searchProperties({
+      const params = {
         city: "New York",
         type: "apartment",
         bedrooms: 2,
@@ -176,33 +176,30 @@ describe("PropertiesService", () => {
         priceMax: 500000,
         skip: 0,
         take: 10,
-      });
+      };
 
-      const callArgs = (apiClient.get as jest.Mock).mock.calls[0][0];
-      expect(callArgs).toMatch(/city=New[+%20]York/);
-      expect(callArgs).toContain("type=apartment");
-      expect(callArgs).toContain("bedrooms=2");
-      expect(callArgs).toContain("priceMin=300000");
+      await propertiesService.searchProperties(params);
+
+      expect(apiClient.post).toHaveBeenCalledWith("/properties/search", params);
     });
 
     it("should handle location-based search with coordinates", async () => {
-      (apiClient.get as jest.Mock).mockResolvedValue([]);
+      (apiClient.post as jest.Mock).mockResolvedValue([]);
 
-      await propertiesService.searchProperties({
+      const params = {
         latitude: 40.7128,
         longitude: -74.006,
         radius: 5,
-      });
+      };
 
-      const callArgs = (apiClient.get as jest.Mock).mock.calls[0][0];
-      expect(callArgs).toContain("latitude=40.7128");
-      expect(callArgs).toMatch(/longitude=-74\.00[6]?0?/);
-      expect(callArgs).toContain("radius=5");
+      await propertiesService.searchProperties(params);
+
+      expect(apiClient.post).toHaveBeenCalledWith("/properties/search", params);
     });
 
     it("should throw error when API call fails", async () => {
       const error = new Error("API Error");
-      (apiClient.get as jest.Mock).mockRejectedValue(error);
+      (apiClient.post as jest.Mock).mockRejectedValue(error);
 
       await expect(propertiesService.searchProperties({ city: "New York" })).rejects.toThrow(
         "API Error",
@@ -448,7 +445,7 @@ describe("PropertiesService", () => {
   describe("error handling", () => {
     it("should propagate API errors", async () => {
       const error = new Error("Network Error");
-      (apiClient.get as jest.Mock).mockRejectedValue(error);
+      (apiClient.post as jest.Mock).mockRejectedValue(error);
 
       await expect(propertiesService.searchProperties({})).rejects.toThrow("Network Error");
     });

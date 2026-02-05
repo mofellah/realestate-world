@@ -186,7 +186,7 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({
         {/* No results message */}
         {isFocused && query.length >= 2 && !isLoading && suggestions.length === 0 && (
           <div className="no-results" data-testid="no-results">
-            No neighborhoods found for "{query}"
+            No neighborhoods found for &quot;{query}&quot;
           </div>
         )}
       </div>

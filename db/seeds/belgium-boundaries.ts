@@ -58,7 +58,7 @@ async function seedBelgiumBoundaries() {
     },
   });
 
-  const brussels = await prisma.boundary.create({
+  await prisma.boundary.create({
     data: {
       name: "Brussels",
       nameSlug: "brussels",

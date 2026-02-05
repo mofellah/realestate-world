@@ -13,23 +13,24 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .boundary-tag {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.375rem 0.75rem;
-  background-color: #3b82f6;
-  color: white;
-  border-radius: 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: background-color 0.2s;
+  padding: 0.35rem 0.75rem;
+  background-color: #f1f5f9;
+  color: #334155;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: background-color 0.2s, color 0.2s;
 
   &:hover {
-    background-color: #2563eb;
+    background-color: #e2e8f0;
+    color: #0f172a;
   }
 }
 
@@ -41,25 +42,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.15rem;
+  height: 1.15rem;
   padding: 0;
-  background: transparent;
+  background: #e2e8f0;
   border: none;
   border-radius: 50%;
-  color: white;
-  font-size: 1.25rem;
+  color: #475569;
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, color 0.2s;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: #cbd5f5;
+    color: #1d4ed8;
   }
 
   &:focus {
-    outline: 2px solid white;
+    outline: 2px solid #93c5fd;
     outline-offset: 1px;
   }
 }
@@ -72,26 +74,27 @@
 
 .boundary-search__input {
   width: 100%;
-  padding: 0.75rem 3rem 0.75rem 1rem;
-  font-size: 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 0.5rem;
+  padding: 0.65rem 2.75rem 0.65rem 1rem;
+  font-size: 0.95rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: #ffffff;
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
 
   &:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
   }
 
   &:disabled {
-    background-color: #f3f4f6;
+    background-color: #f1f5f9;
     cursor: not-allowed;
-    opacity: 0.6;
+    opacity: 0.7;
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: #94a3b8;
   }
 }
 
@@ -100,9 +103,9 @@
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  width: 1.25rem;
-  height: 1.25rem;
-  border: 2px solid #e5e7eb;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 2px solid #e2e8f0;
   border-top-color: #3b82f6;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
@@ -123,8 +126,8 @@
   margin-top: 0.5rem;
   background: white;
   border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-radius: 1rem;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
   z-index: 50;
   max-height: 20rem;
   overflow-y: auto;
@@ -154,11 +157,11 @@
 
   &:hover,
   &--highlighted {
-    background-color: #f3f4f6;
+    background-color: #f8fafc;
   }
 
   &:active {
-    background-color: #e5e7eb;
+    background-color: #e2e8f0;
   }
 }
 
@@ -170,8 +173,8 @@
 
 .boundary-search__item-name {
   font-size: 0.9375rem;
-  font-weight: 500;
-  color: #111827;
+  font-weight: 600;
+  color: #0f172a;
 }
 
 .boundary-search__item-meta {
@@ -183,8 +186,8 @@
 /* Selection Counter */
 .boundary-search__counter {
   margin-top: 0.5rem;
-  font-size: 0.8125rem;
-  color: #6b7280;
+  font-size: 0.75rem;
+  color: #94a3b8;
   text-align: right;
 }
 

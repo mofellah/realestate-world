@@ -3,22 +3,22 @@
  * This ensures boundary filtering returns results
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Creating test properties within Brussels boundaries...');
+  console.log("Creating test properties within Brussels boundaries...");
 
   // Get all Brussels boundaries with geometry
   const boundaries = await prisma.boundary.findMany({
     where: {
-      country_code: 'BE',
+      country_code: "BE",
       geometry: { not: null },
       OR: [
-        { name: { contains: 'Brussel', mode: 'insensitive' } },
-        { name: { contains: 'Brussels', mode: 'insensitive' } },
-        { cityName: { contains: 'Bruxelles', mode: 'insensitive' } },
+        { name: { contains: "Brussel", mode: "insensitive" } },
+        { name: { contains: "Brussels", mode: "insensitive" } },
+        { cityName: { contains: "Bruxelles", mode: "insensitive" } },
       ],
     },
     select: {
@@ -34,7 +34,7 @@ async function main() {
   // Get a user to assign as property owner
   const user = await prisma.user.findFirst();
   if (!user) {
-    console.error('No user found - please create a user first');
+    console.error("No user found - please create a user first");
     return;
   }
 
@@ -48,7 +48,7 @@ async function main() {
 
     // Create a property at the boundary's centroid
     const geoJson = {
-      type: 'Point',
+      type: "Point",
       coordinates: [boundary.centroidLon, boundary.centroidLat],
     };
 
@@ -56,7 +56,7 @@ async function main() {
       // Create geo_object
       const geoObject = await prisma.geoObject.create({
         data: {
-          type: 'point',
+          type: "point",
           geoJson: geoJson as any,
           latitude: boundary.centroidLat,
           longitude: boundary.centroidLon,
@@ -67,10 +67,10 @@ async function main() {
       const address = await prisma.address.create({
         data: {
           streetName: `Test Street`,
-          streetNumber: '1',
+          streetNumber: "1",
           city: boundary.name,
-          postalCode: '1000',
-          country_code: 'BE',
+          postalCode: "1000",
+          country_code: "BE",
           geoObjectId: geoObject.id,
         },
       });
@@ -80,7 +80,7 @@ async function main() {
         data: {
           title: `Test Property in ${boundary.name}`,
           description: `A test property located within the ${boundary.name} boundary for testing spatial queries.`,
-          propertyType: 'apartment',
+          propertyType: "apartment",
           surfaceArea: 75,
           bedrooms: 2,
           bathrooms: 1,
@@ -97,23 +97,23 @@ async function main() {
       // Create a published listing
       const paymentTerms = await prisma.paymentTerms.create({
         data: {
-          currency: 'EUR',
-          termType: 'periodic',
+          currency: "EUR",
+          termType: "periodic",
         },
       });
 
-      const periodicPayment = await prisma.periodicPayment.create({
+      await prisma.periodicPayment.create({
         data: {
           amountPerPeriod: 850,
-          periodType: 'month',
+          periodType: "month",
           paymentTermsId: paymentTerms.id,
         },
       });
 
       await prisma.listing.create({
         data: {
-          type: 'rental',
-          status: 'published',
+          type: "rental",
+          status: "published",
           propertyId: property.id,
           createdBy: user.id,
           paymentTermsId: paymentTerms.id,
@@ -135,7 +135,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('Error:', e);
+    console.error("Error:", e);
     process.exit(1);
   })
   .finally(async () => {

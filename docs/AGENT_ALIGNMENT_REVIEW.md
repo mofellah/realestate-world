@@ -76,7 +76,7 @@ The current agent framework has **good foundational structure** but is **misalig
 - ✅ Doesn't make assumptions without checking docs
 
 **Recommendations**:
-1. Update tech stack: React 19, NestJS, Fastify, Prisma (not PostGIS, osm2pgsql)
+1. Update tech stack: React 18, NestJS, Fastify, Prisma (not PostGIS, osm2pgsql)
 2. Replace old layer references with monorepo structure (apps/, packages/, db/)
 3. Add CRITICAL: "Read AGENT_FRAMEWORK.md for decisions (DR-001-010) + code patterns"
 4. Add BDD/TDD workflow:
@@ -377,7 +377,7 @@ orchestrator.agent.md      ← Route work, enforce standards
 
 ### Before Using Any Agent
 
-- [ ] Agent understands new boilerplate (React 19, NestJS, PostgreSQL, Prisma)
+- [ ] Agent understands new boilerplate (React 18, NestJS, PostgreSQL, Prisma)
 - [ ] Agent reads ARCHITECTURE.md for system design
 - [ ] Agent reads PROJECT_CONTEXT.md for database + auth flows
 - [ ] Agent reads AGENT_FRAMEWORK.md for decisions (DR-001-010) + patterns

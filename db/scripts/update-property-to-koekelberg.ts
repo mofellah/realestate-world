@@ -3,7 +3,7 @@
  * Coordinates: 50.8554, 4.3289 (center of Koekelberg)
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -20,7 +20,7 @@ async function main() {
   });
 
   if (!property) {
-    console.log('No properties found');
+    console.log("No properties found");
     return;
   }
 
@@ -30,19 +30,19 @@ async function main() {
   await prisma.address.update({
     where: { id: property.address.id },
     data: {
-      streetName: 'Rue François Delcoigne',
-      streetNumber: '58',
-      postalCode: '1081',
-      city: 'Koekelberg',
-      region: 'Brussels',
-      country_code: 'BE',
+      streetName: "Rue François Delcoigne",
+      streetNumber: "58",
+      postalCode: "1081",
+      city: "Koekelberg",
+      region: "Brussels",
+      country_code: "BE",
     },
   });
 
   // Update geo coordinates to be in Koekelberg
   // Using the exact centroid from the Koekelberg boundary geometry
   const geoJson = {
-    type: 'Point',
+    type: "Point",
     coordinates: [4.324087298306575, 50.86299239185761], // [lng, lat] - exact centroid of Koekelberg
   };
 
@@ -52,7 +52,7 @@ async function main() {
       geoJson: geoJson as any,
       latitude: 50.86299239185761,
       longitude: 4.324087298306575,
-      type: 'point',
+      type: "point",
     },
   });
 
@@ -78,7 +78,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('Error:', e);
+    console.error("Error:", e);
     process.exit(1);
   })
   .finally(async () => {

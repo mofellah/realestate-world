@@ -7,6 +7,7 @@ import {
 } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
 import { PrismaService } from "../prisma/prisma.service";
+import { Prisma } from "@prisma/client";
 import { Logger } from "@boilerplate/logger";
 import { ZodError } from "zod";
 import crypto from "crypto";
@@ -431,6 +432,7 @@ export class PropertiesService {
     minPrice?: number;
     maxPrice?: number;
     propertyType?: string;
+    listingType?: "sale" | "rental" | "short_term" | "lease"; // ✅ ADDED: Was used but missing from signature
     minBedrooms?: number;
     maxBedrooms?: number;
     minBathrooms?: number;
@@ -480,16 +482,12 @@ export class PropertiesService {
         isAvailable: true, // Only show available properties
       };
 
-      // Price filters (via active listings)
-      // NOTE: Price is stored in PaymentTerms (onetimePayment/periodicPayment), not directly on Listing
-      // For MVP, price filtering is done on frontend after fetching results
-      // TODO: Implement server-side price filtering via PaymentTerms join
-      const listingsWhere: any = { status: "published" };
-      
-      // For now, just ensure we have published listings
-      where.listings = { some: listingsWhere };
+      // ✅ CRITICAL FIX: Track all filter results to INTERSECT them properly
+      // Previously: boundary filter set where.id, then spatial filter overwrote it (bug)
+      // Now: collect IDs from each filter and intersect at end
+      const filterResults: string[][] = [];
 
-      // Property filters
+      // Property type filter
       if (validatedFilters.propertyType) {
         where.propertyType = validatedFilters.propertyType;
       }
@@ -506,10 +504,17 @@ export class PropertiesService {
         where.bathrooms = { ...where.bathrooms, lte: validatedFilters.maxBathrooms };
       }
 
+      // Listing type filter
+      const listingWhere: any = { status: "published" };
+      if (validatedFilters.listingType) {
+        listingWhere.type = validatedFilters.listingType;
+      }
+      where.listings = { some: listingWhere };
+
+      // ========== SPATIAL & GEO FILTERS - INTERSECT NOT OVERWRITE ==========
+
       // Boundary filter (properties within selected boundaries)
       if (validatedFilters.boundaries && validatedFilters.boundaries.length > 0) {
-        // Use spatial query with PostGIS to find properties within boundary geometries
-        // boundaries.geometry is now native PostGIS geometry(MultiPolygon, 4326) with GIST index
         const propertiesInBoundaries = await this.prisma.$queryRaw<Array<{ id: string }>>`
           SELECT DISTINCT p.id
           FROM "properties" p
@@ -534,18 +539,11 @@ export class PropertiesService {
         this.logger.debug(`Found ${boundaryPropertyIds.length} properties in boundaries`, {
           correlationId,
         });
-        where.id = { in: boundaryPropertyIds };
+        filterResults.push(boundaryPropertyIds); // ✅ Collect, don't overwrite
       }
 
-      // Location filters (via address)
-      const addressWhere: any = {};
-      // Note: city and country filters are removed from schema to keep MVP simple
-      // Can be extended later if needed
-
-      // Spatial filter (PostGIS ST_DWithin)
+      // Spatial filter (PostGIS ST_DWithin) - RADIUS SEARCH
       if (latitude !== undefined && longitude !== undefined && radius !== undefined) {
-        // Use raw SQL for PostGIS spatial query
-        // Convert JSONB geo_json to geography by casting through text -> geometry -> geography
         const spatialProperties = await this.prisma.$queryRaw<Array<{ id: string }>>`
           SELECT DISTINCT p.id
           FROM "properties" p
@@ -561,25 +559,24 @@ export class PropertiesService {
 
         const spatialIds = spatialProperties.map((p: { id: string }) => p.id);
 
-        // If no properties in radius, return empty
         if (spatialIds.length === 0) {
           return { properties: [], total: 0 };
         }
 
-        where.id = { in: spatialIds };
+        filterResults.push(spatialIds); // ✅ Collect, don't overwrite
       }
 
       // Amenity filter (find properties near requested amenities)
       if (amenities && amenities.length > 0) {
-        // Query: Find amenities matching requested types, then find properties near those amenities
         const amenitiesInRadius = await this.prisma.$queryRaw<Array<{ property_id: string }>>`
           SELECT DISTINCT p.id as property_id
           FROM "properties" p
           INNER JOIN "addresses" a ON p."addressId" = a.id
           INNER JOIN "geo_objects" p_geo ON a."geoObjectId" = p_geo.id
-          INNER JOIN "amenities" am ON true
+          INNER JOIN "amenities" am ON am.type = ANY(${amenities}:"AmenityTypeEnum"[])
           INNER JOIN "geo_objects" am_geo ON am."geoObjectId" = am_geo.id
-          WHERE am.type = ANY(${amenities}::"AmenityTypeEnum"[])
+          WHERE p_geo."geoJson" IS NOT NULL
+            AND am_geo."geoJson" IS NOT NULL
             AND ST_DWithin(
               ST_GeomFromGeoJSON(am_geo."geoJson"::text)::geography,
               ST_GeomFromGeoJSON(p_geo."geoJson"::text)::geography,
@@ -595,35 +592,62 @@ export class PropertiesService {
           return { properties: [], total: 0 };
         }
 
-        // Filter to only properties with nearby amenities
-        if (where.id && where.id.in) {
-          where.id.in = where.id.in.filter((id: string) => amenityPropertyIds.includes(id));
-        } else {
-          where.id = { in: amenityPropertyIds };
-        }
+        filterResults.push(amenityPropertyIds); // ✅ Collect, don't overwrite
       }
 
-      // Apply address filters if any
-      if (Object.keys(addressWhere).length > 0) {
-        where.address = addressWhere;
-      }
-
-      // Price filtering via listings - note that price is in paymentTerms now
-      // For MVP, we'll include all published listings and filter on frontend
-      // A more complex implementation would need raw SQL to filter by payment terms
-      const listingWhere: any = { status: "published" };
-
-      // Listing type filter
-      if (validatedFilters.listingType) {
-        listingWhere.type = validatedFilters.listingType;
-      }
-
-      // TODO: Price filtering requires complex query because price is in polymorphic paymentTerms
-      // For now, returning all published listings - frontend can filter by price
+      // ========== PRICE FILTER (SERVER-SIDE) ==========
+      // ✅ TODO #57: Price filtering now implemented!
       if (validatedFilters.minPrice !== undefined || validatedFilters.maxPrice !== undefined) {
-        // This would require joining payment_terms and checking both onetime and periodic amounts
-        // Keeping it simple for MVP - will enhance later
-        this.logger.warn("Price filtering not yet implemented - returning all published listings");
+        this.logger.info(
+          `Applying price filter: ${validatedFilters.minPrice} - ${validatedFilters.maxPrice}`,
+          { correlationId },
+        );
+
+        const priceFilterIds = await this.prisma.$queryRaw<Array<{ id: string }>>`
+          SELECT DISTINCT p.id
+          FROM "properties" p
+          INNER JOIN "listings" l ON p.id = l."propertyId" AND l.status = 'published'
+            ${validatedFilters.listingType ? Prisma.sql`AND l.type = ${validatedFilters.listingType}` : Prisma.empty}
+          INNER JOIN "payment_terms" pt ON l.id = pt."listingId"
+          LEFT JOIN "onetime_payment_terms" op ON pt.id = op."paymentTermsId"
+          LEFT JOIN "periodic_payment_terms" pp ON pt.id = pp."paymentTermsId"
+          WHERE (
+            (op.amount IS NOT NULL AND op.amount >= ${validatedFilters.minPrice || 0} AND op.amount <= ${validatedFilters.maxPrice || 999999999})
+            OR (pp."amountPerPeriod" IS NOT NULL AND pp."amountPerPeriod" >= ${validatedFilters.minPrice || 0} AND pp."amountPerPeriod" <= ${validatedFilters.maxPrice || 999999999})
+          )
+        `;
+
+        if (priceFilterIds.length === 0) {
+          this.logger.info(`No properties match price filter`, { correlationId });
+          return { properties: [], total: 0 };
+        }
+
+        filterResults.push(priceFilterIds.map((p: { id: string }) => p.id)); // ✅ Collect for intersection
+      }
+
+      // ========== INTERSECT ALL FILTERS ==========
+      // ✅ CRITICAL FIX: If multiple spatial/price filters exist, intersect them
+      if (filterResults.length > 0) {
+        // Start with first filter result
+        let intersectionIds = filterResults[0];
+
+        // Intersect with remaining filters
+        for (let i = 1; i < filterResults.length; i++) {
+          const nextFilterIds = new Set(filterResults[i]);
+          intersectionIds = intersectionIds.filter((id) => nextFilterIds.has(id));
+        }
+
+        if (intersectionIds.length === 0) {
+          this.logger.info(`No properties match all spatial/price filters combined`, {
+            correlationId,
+          });
+          return { properties: [], total: 0 };
+        }
+
+        this.logger.debug(`After filter intersection: ${intersectionIds.length} properties match`, {
+          correlationId,
+        });
+        where.id = { in: intersectionIds };
       }
 
       // Get properties with published listings
@@ -693,7 +717,9 @@ export class PropertiesService {
         this.prisma.property.count({ where }),
       ]);
 
-      this.logger.info(`Property search returned ${properties.length} of ${total} properties`);
+      this.logger.info(`Property search returned ${properties.length} of ${total} properties`, {
+        correlationId,
+      });
       return { properties, total };
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Unknown";

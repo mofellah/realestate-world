@@ -19,7 +19,7 @@ This document is your **decision registry**. Before you implement anything, chec
 
 ### Decision Quick Digest (DR-001–DR-010)
 - DR-001 Monorepo: npm workspaces; apps/*, packages/*, db/
-- DR-002 Frontend: React 19 + Vite; Tailwind + SCSS/PostCSS
+- DR-002 Frontend: React 18 + Vite; Tailwind + SCSS/PostCSS
 - DR-003 Backend: NestJS + Fastify; Prisma ORM
 - DR-004 Database: PostgreSQL 18; Prisma migrations/seeds
 - DR-005 Auth: JWT (access/refresh) + RBAC; bcrypt
@@ -59,11 +59,11 @@ This document is your **decision registry**. Before you implement anything, chec
 
 ---
 
-### DR-002: Frontend Framework (React 19 + Vite)
+### DR-002: Frontend Framework (React 18 + Vite)
 
 | Aspect | Decision | Rationale |
 |--------|----------|-----------|
-| **Framework** | React 19 (not Next.js, Svelte, Vue) | Latest stability, largest ecosystem, server components ready |
+| **Framework** | React 18 (not Next.js, Svelte, Vue) | Stable, widely adopted, strong ecosystem |
 | **Build Tool** | Vite (not webpack, esbuild) | <100ms HMR, native ESM, instant dev startup |
 | **Styling** | Tailwind CSS + SCSS/PostCSS | Utility-first + advanced theming, minimal bundle |
 | **State Mgmt** | TBD (Zustand or Redux Toolkit) | To be decided in Phase 3 |
@@ -71,7 +71,7 @@ This document is your **decision registry**. Before you implement anything, chec
 | **Location** | `apps/frontend/` | See ARCHITECTURE.md for full structure |
 
 **What This Means:**
-- `npm run dev --workspace=@mono/frontend` starts Vite dev server on port 3000
+- `npm run dev --workspace=@boilerplate/frontend` starts Vite dev server on port 5173
 - Hot Module Replacement preserves state on file changes
 - `vite.config.ts` configures build, env, aliases
 - `apps/frontend/src/main.tsx` is the entry point

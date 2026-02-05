@@ -26,7 +26,7 @@ A **subscription-based real estate platform** enabling property owners, agencies
 ## 🎯 What This Is
 
 A **production-ready real estate platform** with:
-- ✅ **Modern stack**: React 19 (Vite), NestJS (Fastify), PostgreSQL + PostGIS, Prisma ORM
+- ✅ **Modern stack**: React 18 (Vite), NestJS (Fastify), PostgreSQL + PostGIS, Prisma ORM
 - ✅ **Monorepo ready**: npm workspaces, shared packages (types, utils, config, logger)
 - ✅ **Secure auth**: JWT + refresh tokens + role-based access control (RBAC)
 - ✅ **Map-first UI**: Interactive property search with clustering, filters, proximity search
@@ -41,7 +41,7 @@ A **production-ready real estate platform** with:
 
 ```
 apps/
-├── frontend/          React 19 + Vite + Tailwind CSS
+├── frontend/          React 18 + Vite + Tailwind CSS
 └── backend/           NestJS + Fastify + Prisma
 
 packages/
@@ -208,7 +208,7 @@ Key documents:
 
 | Layer | Tech |
 |-------|------|
-| **Frontend** | React 19, Vite, TypeScript, Tailwind CSS, SCSS |
+| **Frontend** | React 18, Vite, TypeScript, Tailwind CSS, SCSS |
 | **Backend** | NestJS, Fastify, TypeScript, Prisma ORM |
 | **Database** | PostgreSQL 18, Prisma migrations |
 | **Auth** | JWT (access + refresh), bcrypt, RBAC |

@@ -13,7 +13,35 @@ export default function SearchPage() {
   const [showList, setShowList] = useState<boolean>(true);
   const [showMap, setShowMap] = useState<boolean>(true);
   const [center] = useState<[number, number]>([4.3517, 50.8503]); // Brussels
-  const [filterPanelOpen, setFilterPanelOpen] = useState(true);
+  const [filterPanelOpen] = useState(true);
+
+  const getPrimaryListing = (property: any) => property.listings?.[0];
+
+  const getListingLabel = (property: any) => {
+    const listing = getPrimaryListing(property);
+    if (!listing?.type) return "Listing";
+    const label = listing.type.toString().replace("_", " ").toLowerCase();
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  };
+
+  const getPriceValue = (property: any) => {
+    const listing = getPrimaryListing(property);
+    const paymentTerms = listing?.paymentTerms;
+    if (!paymentTerms) return null;
+
+    if (paymentTerms.amount) return paymentTerms.amount;
+    if (paymentTerms.amountPerPeriod) return paymentTerms.amountPerPeriod;
+    if (paymentTerms.onetimePayment?.amount) return paymentTerms.onetimePayment.amount;
+    if (paymentTerms.periodicPayment?.amountPerPeriod)
+      return paymentTerms.periodicPayment.amountPerPeriod;
+    return null;
+  };
+
+  const getPricePerSqm = (property: any) => {
+    const priceValue = getPriceValue(property);
+    if (!priceValue || !property.surfaceArea) return null;
+    return Math.round(priceValue / property.surfaceArea);
+  };
 
   // Helper function to format price
   const formatPrice = (property: any) => {
@@ -48,9 +76,14 @@ export default function SearchPage() {
   };
 
   useEffect(() => {
-    // Initial search - run only once on mount
-    search(filters, center);
-  }, []);
+    const debounceId = window.setTimeout(() => {
+      search(filters, center);
+    }, 300);
+
+    return () => {
+      window.clearTimeout(debounceId);
+    };
+  }, [filters, center, search]);
 
   useEffect(() => {
     // Properties loaded and updated
@@ -78,49 +111,56 @@ export default function SearchPage() {
   };
 
   return (
-    <div data-testid="search-page" className="h-screen flex flex-col bg-gray-50">
+    <div data-testid="search-page" className="min-h-screen flex flex-col bg-slate-50">
       {/* Header with Controls */}
-      <div className="bg-white shadow-sm border-b border-gray-200 flex-shrink-0">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold">Search Properties</h1>
-              <p className="text-gray-600 text-sm">{total} properties found</p>
+      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-20 flex-shrink-0">
+        <div className="container mx-auto px-4 py-4 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="space-y-1">
+              <p className="text-xs uppercase tracking-wide text-gray-500">Search results</p>
+              <div className="flex items-center flex-wrap gap-2">
+                <h1 className="text-2xl font-semibold text-gray-900">Properties</h1>
+                <span className="inline-flex items-center rounded-full bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-1">
+                  {total} listings
+                </span>
+              </div>
+              <p className="text-sm text-gray-500">Browse listings and refine your search.</p>
             </div>
-            <div className="flex space-x-2">
-              <button
-                data-testid="filter-toggle"
-                onClick={() => setFilterPanelOpen(!filterPanelOpen)}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
-                  filterPanelOpen
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
-                }`}
-              >
-                {filterPanelOpen ? "Hide" : "Show"} Filters
+            <div className="flex flex-wrap items-center gap-2">
+              <button className="px-4 py-2 rounded-full border border-blue-200 text-blue-700 text-sm font-semibold hover:bg-blue-50 transition">
+                Create alert
               </button>
-              <button
-                data-testid="view-toggle-list"
-                onClick={() => setShowList(!showList)}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
-                  showList
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
-                }`}
-              >
-                📋 {showList ? "Hide" : "Show"} List
-              </button>
-              <button
-                data-testid="view-toggle-map"
-                onClick={() => setShowMap(!showMap)}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
-                  showMap
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
-                }`}
-              >
-                🗺️ {showMap ? "Hide" : "Show"} Map
-              </button>
+              <div className="relative">
+                <select className="appearance-none px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-700 bg-white pr-8">
+                  <option>Sort: Relevance</option>
+                  <option>Price (low to high)</option>
+                  <option>Price (high to low)</option>
+                  <option>Newest</option>
+                </select>
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  ▾
+                </span>
+              </div>
+              <div className="flex items-center rounded-full border border-gray-200 bg-gray-50 p-1">
+                <button
+                  data-testid="view-toggle-list"
+                  onClick={() => setShowList(!showList)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                    showList ? "bg-white text-gray-900 shadow" : "text-gray-500"
+                  }`}
+                >
+                  List
+                </button>
+                <button
+                  data-testid="view-toggle-map"
+                  onClick={() => setShowMap(!showMap)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                    showMap ? "bg-white text-gray-900 shadow" : "text-gray-500"
+                  }`}
+                >
+                  Map
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -142,7 +182,7 @@ export default function SearchPage() {
           <div
             className={`${
               showMap ? "w-1/2" : "w-full"
-            } overflow-y-auto bg-gray-50 border-r border-gray-200`}
+            } overflow-y-auto bg-slate-50 border-r border-gray-200`}
           >
             <div className="container mx-auto px-4 py-6">
               {error && (
@@ -174,7 +214,7 @@ export default function SearchPage() {
                     </div>
                   )}
                 >
-                  <div data-testid="listing-grid" className="grid grid-cols-1 gap-6">
+                  <div data-testid="listing-grid" className="grid grid-cols-1 gap-5">
                     {properties.length === 0 ? (
                       <div className="col-span-full text-center py-8 text-gray-500">
                         No properties found. Try adjusting your filters.
@@ -185,43 +225,83 @@ export default function SearchPage() {
                           key={property.id}
                           to={`/property/${property.id}`}
                           data-testid="listing-card"
-                          className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden flex"
+                          className="group bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow overflow-hidden flex border border-gray-100"
                         >
-                          <div className="w-48 h-48 bg-gray-200 flex-shrink-0">
-                            <div className="h-full flex items-center justify-center text-gray-400">
+                          <div className="w-44 h-44 bg-gray-100 flex-shrink-0 relative">
+                            <div className="h-full flex items-center justify-center text-gray-400 text-sm">
                               No Image
                             </div>
                           </div>
-                          <div className="p-4 flex-1">
-                            <h3 className="font-semibold text-lg mb-2">{property.title}</h3>
+                          <div className="p-5 flex-1">
+                            <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                              <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-gray-600">
+                                {getListingLabel(property)}
+                              </span>
+                              {getPrimaryListing(property)?.createdAt && (
+                                <span>
+                                  Listed{" "}
+                                  {new Date(
+                                    getPrimaryListing(property).createdAt,
+                                  ).toLocaleDateString()}
+                                </span>
+                              )}
+                            </div>
+                            <h3 className="font-semibold text-lg text-gray-900 mb-1 group-hover:text-blue-700 transition">
+                              {property.title}
+                            </h3>
                             <p
-                              data-testid="property-type"
-                              className="text-gray-500 text-xs uppercase mb-1"
+                              data-testid="property-address"
+                              className="text-gray-600 text-sm mb-3"
                             >
-                              {property.propertyType || "Property"}
-                            </p>
-                            <p data-testid="property-address" className="text-gray-600 text-sm mb-2">
                               {typeof property.address === "string"
                                 ? property.address
                                 : property.address?.city || "No location"}
                             </p>
-                            <p
-                              data-testid="property-price"
-                              className="text-xl font-bold text-blue-600 mb-2"
-                            >
-                              {formatPrice(property)}
-                            </p>
-                            <div className="flex space-x-4 text-sm text-gray-500">
-                              {property.bedrooms && (
-                                <span data-testid="property-bedrooms">🛏️ {property.bedrooms}</span>
+                            <div className="flex flex-wrap items-baseline gap-2 mb-3">
+                              <p
+                                data-testid="property-price"
+                                className="text-xl font-bold text-gray-900"
+                              >
+                                {formatPrice(property)}
+                              </p>
+                              {getPricePerSqm(property) && (
+                                <span className="text-sm text-gray-500">
+                                  {getPricePerSqm(property)?.toLocaleString()} €/m²
+                                </span>
                               )}
-                              {property.bathrooms && <span>🚿 {property.bathrooms}</span>}
-                              {property.surfaceArea && <span>📏 {property.surfaceArea}m²</span>}
+                            </div>
+                            <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                              <span data-testid="property-type">
+                                {property.propertyType || "Property"}
+                              </span>
+                              {property.bedrooms && (
+                                <span data-testid="property-bedrooms">
+                                  {property.bedrooms} beds
+                                </span>
+                              )}
+                              {property.bathrooms && <span>{property.bathrooms} baths</span>}
+                              {property.surfaceArea && <span>{property.surfaceArea} m²</span>}
                             </div>
                           </div>
                         </Link>
                       ))
                     )}
+                  </div>
+                  <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-gray-500">
+                    <span>
+                      Showing {properties.length} of {total} results
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button className="px-3 py-1.5 rounded-full border border-gray-200 text-gray-400 cursor-not-allowed">
+                        Prev
+                      </button>
+                      <button className="px-3 py-1.5 rounded-full border border-gray-200 bg-white text-gray-700">
+                        1
+                      </button>
+                      <button className="px-3 py-1.5 rounded-full border border-gray-200 text-gray-400 cursor-not-allowed">
+                        Next
+                      </button>
+                    </div>
                   </div>
                 </ErrorBoundary>
               )}

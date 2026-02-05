@@ -81,7 +81,8 @@ export default function PropertyDetailPage() {
     if (!property?.listings || property.listings.length === 0) return "Price on request";
 
     const firstListing = property.listings[0];
-    if (!firstListing?.paymentTerms || firstListing.paymentTerms.length === 0) return "Price on request";
+    if (!firstListing?.paymentTerms || firstListing.paymentTerms.length === 0)
+      return "Price on request";
 
     const term = firstListing.paymentTerms[0];
     if (!term) return "Price on request";

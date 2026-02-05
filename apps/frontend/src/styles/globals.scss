@@ -9,6 +9,8 @@
   --color-primary: #3b82f6;
   --color-primary-dark: #1e40af;
   --color-primary-light: #dbeafe;
+  --color-primary-foreground: #ffffff;
+  --color-secondary-bg: #f1f5f9;
   --color-error: #ef4444;
   --color-error-dark: #dc2626;
   --color-success: #10b981;
@@ -21,11 +23,23 @@
   --color-bg: #ffffff;
   --color-bg-light: #f9fafb;
   --color-bg-lighter: #f3f4f6;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #ffffff;
+  --color-muted: #e2e8f0;
   --color-border: #e5e7eb;
   --color-border-light: #f3f4f6;
   --color-shadow: rgba(0, 0, 0, 0.1);
   --color-shadow-dark: rgba(0, 0, 0, 0.2);
+  --color-ring: rgba(59, 130, 246, 0.25);
   --spacing-unit: 8px;
+  --border-radius-sm: 6px;
+  --border-radius-md: 10px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 24px;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 20px 45px rgba(15, 23, 42, 0.12);
+  --transition-duration: 0.2s;
 }
 
 /* CSS Variables for Dark Theme */
@@ -33,6 +47,8 @@
   --color-primary: #60a5fa;
   --color-primary-dark: #3b82f6;
   --color-primary-light: #1e3a8a;
+  --color-primary-foreground: #0b1120;
+  --color-secondary-bg: #1f2937;
   --color-error: #fca5a5;
   --color-error-dark: #f87171;
   --color-success: #6ee7b7;
@@ -45,11 +61,23 @@
   --color-bg: #111827;
   --color-bg-light: #1f2937;
   --color-bg-lighter: #374151;
+  --color-surface: #111827;
+  --color-surface-elevated: #1f2937;
+  --color-muted: #273449;
   --color-border: #4b5563;
   --color-border-light: #374151;
   --color-shadow: rgba(0, 0, 0, 0.3);
   --color-shadow-dark: rgba(0, 0, 0, 0.5);
+  --color-ring: rgba(96, 165, 250, 0.3);
   --spacing-unit: 8px;
+  --border-radius-sm: 6px;
+  --border-radius-md: 10px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 24px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 20px 45px rgba(0, 0, 0, 0.45);
+  --transition-duration: 0.2s;
 }
 
 * {
@@ -68,10 +96,11 @@ html, body, #root {
 }
 
 body {
-  background-color: var(--color-bg-light);
+  background-color: var(--color-bg);
   color: var(--color-text);
   line-height: 1.5;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color var(--transition-duration) ease,
+              color var(--transition-duration) ease;
 }
 
 /* Form Reset */
@@ -145,7 +174,7 @@ input[type="date"],
 input[type="time"],
 textarea,
 select {
-  background-color: var(--color-bg);
+  background-color: var(--color-surface);
   color: var(--color-text);
   border-color: var(--color-border);
 
@@ -155,13 +184,7 @@ select {
 
   &:focus {
     border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-ring);
     outline: none;
   }
-}
-
-body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  transition: background-color var(--transition-duration) ease,
-              color var(--transition-duration) ease;
 }
