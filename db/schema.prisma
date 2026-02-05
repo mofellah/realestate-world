@@ -81,19 +81,6 @@ enum AgencyRoleType {
   support_agent
 }
 
-enum AdminBoundaryType {
-  admin_level_1   // Top-level administrative division (e.g., states in federal countries)
-  admin_level_2   // Countries
-  admin_level_3   // Regions
-  admin_level_4   // States/Provinces
-  admin_level_5   // Districts
-  admin_level_6   // Counties
-  admin_level_7   // Municipalities
-  admin_level_8   // Cities/Towns
-  admin_level_9   // City districts
-  admin_level_10  // Suburbs/Neighborhoods
-}
-
 enum AmenityTypeEnum {
   hospital
   school
@@ -290,19 +277,44 @@ model User {
 }
 
 // ============================================================================
-// 3. GEO OBJECT MODEL (Geographical data - points, polygons)
+// 3. GEO OBJECT MODEL (Geographical data - points and simple polygons)
 // ============================================================================
+// DESIGN: GeoObject is for SIMPLE geographic features (points, user polygons)
+// USE FOR: Address locations, amenity POIs, user-defined search areas
+// DON'T USE FOR: Administrative boundaries (use Boundary model instead)
+//
+// PERFORMANCE: Point queries are fast with lat/lon index
+// For complex administrative boundaries, use Boundary model with PostGIS geometry
 
 model GeoObject {
   id            String        @id @default(cuid())
   type          GeoObjectType
   
-  // Coordinates (for points)
+  // Coordinates (for points) - INDEXED for fast spatial queries
   latitude      Float?
   longitude     Float?
   
-  // For polygons/multipolygons (GeoJSON)
+  // For simple polygons/multipolygons (GeoJSON format)
+  // Example: User-defined search area, property parcel
   geoJson       Json?
+  
+  // Native PostGIS geometry column (PHASE 2 OPTIMIZATION)
+  // PostGIS type: geometry(Geometry, 4326) - supports Point, Polygon, MultiPolygon
+  // Eliminates GeoJSON parsing overhead (~10x faster spatial queries)
+  // Migration: 20260205_add_geo_objects_geometry.sql
+  // GIST index: geo_objects_geometry_gist_idx
+  geometry      Bytes?        // PostGIS geometry(Geometry, 4326) - mapped as Bytes in Prisma
+  
+  // Bounding box for spatial indexing (denormalized for performance)
+  // Calculated from geoJson or single point
+  minLat        Float?
+  minLon        Float?
+  maxLat        Float?
+  maxLon        Float?
+  
+  // Centroid (for distance calculations, map markers)
+  centroidLat   Float?
+  centroidLon   Float?
   
   name          String?
   metadata      Json?
@@ -314,10 +326,11 @@ model GeoObject {
   addresses     Address[]     @relation("AddressGeoObject")
   amenities     Amenity[]     @relation("AmenityGeoObject")
   geographicalAreas GeographicalArea[] @relation("AreaGeoObject")
-  adminBoundaries AdminBoundary[] @relation("BoundaryGeoObject")
 
   @@index([type])
   @@index([latitude, longitude])
+  @@index([minLat, minLon, maxLat, maxLon]) // Bounding box index
+  @@index([centroidLat, centroidLon])       // Centroid index
   @@map("geo_objects")
 }
 
@@ -758,35 +771,149 @@ model GeographicalArea {
 }
 
 // ============================================================================
-// 10. ADMIN BOUNDARY MODEL (Official administrative jurisdictions)
+// 10. BOUNDARY TYPE MODEL (Country-Specific Administrative Divisions)
+// ============================================================================
+// 
+// Purpose: Define boundary types per country (e.g., prefecture in Japan, 
+//          state in US, province in Canada, département in France)
+// 
+// Examples:
+//   - Japan: country → prefecture (都道府県) → city (市) → ward (区)
+//   - France: country → région → département → commune
+//   - Belgium: country → region → province → municipality
+//   - US: country → state → county → city
 // ============================================================================
 
-model AdminBoundary {
+model BoundaryType {
+  id               String        @id @default(cuid())
+  
+  // Type identification
+  code             String        // Internal code: 'prefecture', 'state', 'municipality', etc.
+  name             String        // Display name in English
+  localName        String?       // Display name in local language (e.g., "都道府県" for prefecture)
+  pluralName       String?       // Plural form (e.g., "prefectures", "states")
+  
+  // Country-specific
+  countryCode      String        // ISO 3166-1 alpha-2 (BE, FR, JP, US, etc.)
+  
+  // Hierarchy (level in administrative structure)
+  level            Int           // 0=country, 1=top-level division, 2=second level, etc.
+  parentTypeId     String?       // Parent boundary type in hierarchy
+  parentType       BoundaryType? @relation("BoundaryTypeHierarchy", fields: [parentTypeId], references: [id], onDelete: SetNull)
+  childTypes       BoundaryType[] @relation("BoundaryTypeHierarchy")
+  
+  // OSM mapping (for data import)
+  osmAdminLevel    Int?          // OSM admin_level (2=country, 4=state, 7=municipality, etc.)
+  osmBoundaryTag   String?       // OSM boundary tag value (e.g., 'administrative')
+  
+  // Display and search
+  abbreviation     String?       // Short form (e.g., "Pref." for prefecture, "Dept." for département)
+  description      String?       // Explanation of this boundary type
+  icon             String?       // Icon identifier for UI
+  color            String?       // Color for map visualization
+  
+  // Flags
+  isOfficial       Boolean       @default(true)  // Official government boundary vs custom
+  isActive         Boolean       @default(true)  // Enable/disable without deleting
+  
+  // Usage
+  boundaries       Boundary[]    @relation("BoundaryTypeBoundaries")
+  
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@unique([code, countryCode]) // Unique code per country
+  @@index([countryCode])
+  @@index([level])
+  @@index([osmAdminLevel])
+  @@map("boundary_types")
+}
+
+// ============================================================================
+// 11. BOUNDARY MODEL (Unified administrative and non-administrative boundaries)
+// ============================================================================
+// DESIGN: Boundary has EMBEDDED geometry (not via GeoObject reference)
+// RATIONALE: 
+// 1. Performance: Avoid JOIN for spatial queries (PostGIS index locality)
+// 2. Query patterns: Boundaries are queried BY geometry frequently
+// 3. Data integrity: Geometry + metadata together prevents orphaned records
+// 4. PostGIS optimization: ST_Contains, ST_Intersects work best on same table
+//
+// SPATIAL INDEXES: Use PostGIS GIST index on geometry column in migration
+// BOUNDING BOX: Denormalized for fast pre-filtering before expensive ST_Contains
+//
+// Example migration SQL:
+// CREATE INDEX idx_boundaries_geometry ON boundaries USING GIST (geometry);
+// CREATE INDEX idx_boundaries_bbox ON boundaries (minLat, minLon, maxLat, maxLon);
+
+model Boundary {
   id             String        @id @default(cuid())
   name           String
-  officialCode   String?
-  boundaryType   AdminBoundaryType
+  nameSlug       String        // URL-friendly version
+  alternateNames String[]      // Common variations, abbreviations, translations
+  
+  // Type and classification (references BoundaryType table)
+  boundaryTypeId String
+  boundaryType   BoundaryType  @relation("BoundaryTypeBoundaries", fields: [boundaryTypeId], references: [id], onDelete: Restrict)
+  officialCode   String?       // OSM ID, FIPS code, postal code, etc.
   country_code   String
   
-  // Hierarchy
-  parentBoundaryId String?
-  parentBoundary  AdminBoundary? @relation("BoundaryHierarchy", fields: [parentBoundaryId], references: [id], onDelete: SetNull)
-  childBoundaries AdminBoundary[] @relation("BoundaryHierarchy")
+  // Hierarchy (self-referential for multi-level boundaries)
+  parentId       String?
+  parent         Boundary?     @relation("BoundaryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children       Boundary[]    @relation("BoundaryHierarchy")
   
-  // Geographical representation
-  geoObjectId    String?
-  geoObject      GeoObject?    @relation("BoundaryGeoObject", fields: [geoObjectId], references: [id], onDelete: SetNull)
+  // Denormalized hierarchy fields for fast queries (avoid N+1)
+  cityName       String?       // Nearest city
+  regionName     String?       // State/province/region
+  countryName    String?       // Country name
   
-  population     Int?
+  // PostGIS geometry (native PostGIS type with GIST index)
+  // Prisma maps this as Bytes, but in PostgreSQL it's: geometry(MultiPolygon, 4326)
+  // Migration 20260203_convert_boundary_geometry.sql converted from bytea to geometry
+  // Spatial index: boundaries_geometry_gist_idx for fast ST_Within, ST_Contains queries
+  geometry       Bytes?        // PostGIS geometry(MultiPolygon, 4326) - mapped as Bytes in Prisma
+  
+  // Bounding box for fast pre-filtering (indexed, denormalized from geometry)
+  // Use for: "Find boundaries near point" before expensive ST_Contains
+  minLat         Float?
+  minLon         Float?
+  maxLat         Float?
+  maxLon         Float?
+  
+  // Centroid for distance calculations and point-in-polygon fallback
+  // Use for: "Nearest boundary", map markers, distance sorting
+  centroidLat    Float?
+  centroidLon    Float?
+  
+  // Metadata and statistics
+  population     Int?          // Population count (from OSM or census)
+  area_sqkm      Float?        // Area in square kilometers
+  propertyCount  Int           @default(0) // Cached property count (updated nightly)
+  avgPrice       Float?        // Cached average listing price (updated nightly)
+  
+  // Search optimization
+  searchRank     Int           @default(0) // Popularity rank (0-1000, higher = more popular)
+  isPopular      Boolean       @default(false) // Featured/popular flag (top 100 boundaries)
+  isOfficial     Boolean       @default(true) // Official (OSM, census) vs user-defined
+  
+  // Flexible metadata storage
+  metadata       Json?         // OSM tags, demographic data, boundary source, etc.
   
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
+  @@index([boundaryTypeId])
   @@index([country_code])
-  @@index([boundaryType])
-  @@index([geoObjectId])
-  @@unique([name, country_code, boundaryType])
-  @@map("admin_boundaries")
+  @@index([nameSlug])
+  @@index([searchRank])
+  @@index([isPopular])
+  @@index([cityName])
+  @@index([minLat, minLon, maxLat, maxLon]) // Bounding box index for spatial pre-filter
+  @@index([centroidLat, centroidLon])       // Centroid index for distance queries
+  @@index([parentId])
+  @@unique([nameSlug, boundaryTypeId, country_code]) // Unique slug per type per country
+  @@map("boundaries")
 }
 
 // ============================================================================

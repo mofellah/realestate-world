@@ -27,6 +27,24 @@ interface Property {
   surfaceArea?: number;
   areaSquareMeters?: number;
   price?: number;
+  listings?: Array<{
+    id: string;
+    type: "sale" | "rental" | "short_term" | "lease";
+    status: string;
+    publishedAt?: string;
+    paymentTerms?: {
+      id: string;
+      currency: string;
+      termType: string;
+      onetimePayment?: {
+        amount: number;
+      };
+      periodicPayment?: {
+        amountPerPeriod: number;
+        periodType: string;
+      };
+    };
+  }>;
 }
 
 interface SearchResult {
@@ -45,38 +63,65 @@ export function useMapSearch() {
     setError(null);
 
     try {
-      // Build query params
-      const params = new URLSearchParams();
+      // Build request body
+      const body: any = {
+        take: 100,
+      };
 
-      // Request all properties (up to 100)
-      params.append("take", "100");
-
-      if (filters.priceMin) params.append("priceMin", filters.priceMin.toString());
-      if (filters.priceMax) params.append("priceMax", filters.priceMax.toString());
-      if (filters.type) params.append("type", filters.type);
-      if (filters.bedrooms) params.append("bedrooms", filters.bedrooms.toString());
-      if (filters.bathrooms) params.append("bathrooms", filters.bathrooms.toString());
+      if (filters.priceMin) body.minPrice = filters.priceMin;
+      if (filters.priceMax) body.maxPrice = filters.priceMax;
+      if (filters.type) body.propertyType = filters.type;
+      if (filters.listingType) body.listingType = filters.listingType;
+      if (filters.bedrooms) body.minBedrooms = filters.bedrooms;
+      if (filters.bathrooms) body.minBathrooms = filters.bathrooms;
 
       if (filters.amenities && filters.amenities.length > 0) {
-        params.append("amenities", filters.amenities.join(","));
+        body.amenities = filters.amenities;
+      }
+
+      if (filters.boundaries && filters.boundaries.length > 0) {
+        body.boundaries = filters.boundaries.map((b) => b.id);
       }
 
       if (filters.distanceMetric) {
-        params.append("distanceMetric", filters.distanceMetric);
+        body.distanceMetric = filters.distanceMetric;
       }
 
       // Spatial filter (PostGIS ST_DWithin)
       if (filters.radius && center) {
-        params.append("latitude", center[1].toString());
-        params.append("longitude", center[0].toString());
-        params.append("radius", (filters.radius * 1000).toString()); // km to meters
+        body.latitude = center[1];
+        body.longitude = center[0];
+        body.radius = filters.radius * 1000; // km to meters
       }
 
-      const url = `/properties/search?${params.toString()}`;
-      const response = await apiClient.get<SearchResult>(url);
+      const response = await apiClient.post<SearchResult>("/properties/search", body);
 
-      setProperties(response.properties);
-      setTotal(response.total);
+      let filtered = response.properties;
+
+      if (filters.listingType) {
+        filtered = filtered.filter((property) =>
+          property.listings?.some((listing) => listing.type === filters.listingType),
+        );
+      }
+
+      if (filters.priceMin !== undefined || filters.priceMax !== undefined) {
+        filtered = filtered.filter((property) => {
+          const listing = property.listings?.[0];
+          const paymentTerms = listing?.paymentTerms;
+          const amount =
+            paymentTerms?.onetimePayment?.amount ??
+            paymentTerms?.periodicPayment?.amountPerPeriod ??
+            null;
+
+          if (amount === null) return false;
+          if (filters.priceMin !== undefined && amount < filters.priceMin) return false;
+          if (filters.priceMax !== undefined && amount > filters.priceMax) return false;
+          return true;
+        });
+      }
+
+      setProperties(filtered);
+      setTotal(filtered.length);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Search failed";
       console.error("[useMapSearch] Error:", errorMessage);

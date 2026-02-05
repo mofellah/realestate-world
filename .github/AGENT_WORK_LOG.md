@@ -95,6 +95,142 @@
 3. **Optional**: Add Tegola server configuration for local development
 
 ---
+
+## Phase X - Coder Report
+
+**Status**: ✅ Complete  
+**Timestamp**: 2026-02-05 00:00 UTC  
+**Agent**: Coder  
+**Task**: Add client-side safeguards for listing type and price filters in map search
+
+### What Was Done
+
+- Added client-side filtering for `listingType` and price range in `useMapSearch`: ✅ Completed
+
+### Verification Results
+
+- **Build**: ⚠️ Not run (not requested)
+- **Linting**: ⚠️ Not run (not requested)
+- **Type Check**: ⚠️ Not run (not requested)
+- **Tests**: ⚠️ Not run (not requested)
+
+### Deliverables
+
+- apps/frontend/src/hooks/useMapSearch.ts - Filter response by listing type and price range
+
+### Blockers / Limitations / Errors
+
+- None
+
+### Recommended Next Steps
+
+- Run frontend build or tests if needed
+
+
+## Phase UX - Coder Report
+
+**Status**: ✅ Complete  
+**Timestamp**: 2026-02-03 00:00 UTC  
+**Agent**: Coder  
+**Task**: Refine search filters and chips
+
+### What Was Done
+
+- Reworked filter panel controls: reset action, amenity pill toggles, and distance metric pills.
+- Improved proximity section copy and layout.
+- Enhanced active filter chips with boundaries, amenities, and distance metric.
+
+### Verification Results
+
+- **Build**: Not run
+- **Linting**: Not run
+- **Type Check**: Not run
+- **Tests**: Not run
+
+### Deliverables
+
+- apps/frontend/src/components/Map/FilterPanel.tsx - refined filter UI
+- apps/frontend/src/pages/SearchPage.tsx - richer active filter chips
+
+### Blockers / Limitations / Errors
+
+- None
+
+### Recommended Next Steps
+
+- Review density of filter pills and adjust order based on priority.
+
+---
+
+## Phase UX - Coder Report
+
+**Status**: ✅ Complete  
+**Timestamp**: 2026-02-03 00:00 UTC  
+**Agent**: Coder  
+**Task**: Enhance search page toward Vizzit layout
+
+### What Was Done
+
+- Added a primary search bar row with BoundarySearch and CTA.
+- Added quick filter pill row and active filter chip display.
+- Added results footer with count and pagination placeholders.
+- Synced FilterPanel local state with external filter changes.
+
+### Verification Results
+
+- **Build**: Not run
+- **Linting**: Not run
+- **Type Check**: Not run
+- **Tests**: Not run
+
+### Deliverables
+
+- apps/frontend/src/pages/SearchPage.tsx - search bar, pills, results footer
+- apps/frontend/src/components/Map/FilterPanel.tsx - state sync updates
+
+### Blockers / Limitations / Errors
+
+- None
+
+### Recommended Next Steps
+
+- Adjust card density and map/list proportions if needed.
+
+---
+
+## Phase UX - Coder Report
+
+**Status**: ✅ Complete  
+**Timestamp**: 2026-02-03 00:00 UTC  
+**Agent**: Coder  
+**Task**: Add global theme tokens and unify base styling
+
+### What Was Done
+
+- Expanded global theme variables for colors, surfaces, shadows, radii, and transitions.
+- Added missing tokens used by ThemeToggle (`--color-secondary-bg`, `--border-radius-md`, `--transition-duration`).
+- Consolidated body styles and improved focus ring styling for form inputs.
+
+### Verification Results
+
+- **Build**: Not run
+- **Linting**: Not run
+- **Type Check**: Not run
+- **Tests**: Not run
+
+### Deliverables
+
+- apps/frontend/src/styles/globals.scss - global theme tokens and base styling updates
+
+### Blockers / Limitations / Errors
+
+- None
+
+### Recommended Next Steps
+
+- Proceed with applying theme tokens to remaining UI components as needed.
+
+---
 ## Phase 12 - Coder Agent Report: Coverage Threshold Adjustment
 
 **Status**: ✅ Complete  

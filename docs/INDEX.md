@@ -129,7 +129,7 @@ boilerplate/
 │   │   │   ├── health/             # Health check
 │   │   │   └── common/             # Guards, interceptors, pipes
 │   │   └── __tests__/              # Unit + integration tests
-│   └── frontend/                   # React 19 + Vite
+│   └── frontend/                   # React 18 + Vite
 │       ├── src/
 │       │   ├── pages/              # Route pages
 │       │   ├── components/         # UI components
@@ -171,7 +171,7 @@ See [docs/AGENT_FRAMEWORK.md](./AGENT_FRAMEWORK.md) for detailed rationale.
 | Decision | Choice | Why |
 |----------|--------|-----|
 | **Monorepo** | npm workspaces | Zero extra tooling, npm 7+ native |
-| **Frontend** | React 19 + Vite | Latest, fast HMR, large ecosystem |
+| **Frontend** | React 18 + Vite | Stable, fast HMR, large ecosystem |
 | **Backend** | NestJS + Fastify | Modular, fast, TypeScript-first |
 | **ORM** | Prisma | Type-safe, auto-migrations, great DX |
 | **Database** | PostgreSQL 18 | Proven at scale, ACID, PostGIS ready |
@@ -187,7 +187,7 @@ See [docs/AGENT_FRAMEWORK.md](./AGENT_FRAMEWORK.md) for detailed rationale.
 
 | Layer | Technologies |
 |-------|--------------|
-| **Frontend** | React 19, Vite, TypeScript, Tailwind CSS, SCSS |
+| **Frontend** | React 18, Vite, TypeScript, Tailwind CSS, SCSS |
 | **Backend** | NestJS, Fastify, TypeScript, Prisma ORM |
 | **Database** | PostgreSQL 18, Prisma migrations |
 | **Auth** | JWT (HS256), bcrypt, RBAC |
@@ -213,7 +213,7 @@ See [docs/AGENT_FRAMEWORK.md](./AGENT_FRAMEWORK.md) for detailed rationale.
 - Add logging + error handling
 
 ### Phase 3: Frontend (React + Vite)
-- Initialize React 19 + Vite
+- Initialize React 18 + Vite
 - Setup Tailwind + SCSS
 - Implement API client + auth service
 - Build health check page

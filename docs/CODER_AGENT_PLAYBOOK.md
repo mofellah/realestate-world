@@ -23,7 +23,7 @@
 
 ## Monorepo Map
 - apps/backend: NestJS + Fastify + Prisma; tests in src/**/__tests__/ (unit + integration).
-- apps/frontend: React 19 + Vite; tests in src/__tests__/ (RTL/Jest); Cypress E2E in apps/frontend/e2e.
+- apps/frontend: React 18 + Vite; tests in src/__tests__/ (RTL/Jest); Cypress E2E in apps/frontend/e2e.
 - packages/: shared types, utils, config (zod env), logger (Winston + trace ID).
 - db/: Prisma schema, migrations, seeds.
 - ops/compose/: docker-compose.dev.yml (dev, HMR, inspector), docker-compose.prod.yml (nginx).
@@ -46,7 +46,7 @@
 - Type check: npm run type-check
 - Backend tests: npm run test --workspace=@boilerplate/backend -- --coverage
 - Frontend tests: npm run test --workspace=@boilerplate/frontend -- --coverage
-- E2E: npm run e2e:run (after backend/frontend running) or use workflow e2e.yml
+- E2E: npm run e2e (after backend/frontend running) or use workflow e2e.yml
 - Dev stack: docker compose -f ops/compose/docker-compose.dev.yml up
 
 ---

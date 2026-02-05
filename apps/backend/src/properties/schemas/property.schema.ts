@@ -16,6 +16,8 @@ export const PropertyTypeEnum = z.enum([
   "other",
 ]);
 
+export const ListingTypeEnum = z.enum(["sale", "rental", "short_term", "lease"]);
+
 /**
  * Create Property Schema
  * All validations with helpful error messages
@@ -134,6 +136,8 @@ export const SearchPropertiesSchema = z
 
     propertyType: PropertyTypeEnum.optional(),
 
+    listingType: ListingTypeEnum.optional(),
+
     minBedrooms: z.number().int().min(0).optional(),
 
     maxBedrooms: z.number().int().min(0).optional(),
@@ -147,6 +151,8 @@ export const SearchPropertiesSchema = z
     maxPrice: z.number().min(0).optional(),
 
     amenities: z.array(z.string()).optional(),
+
+    boundaries: z.array(z.string()).optional(),
 
     distanceMetric: z.enum(["walking", "driving", "direct"]).optional(),
 

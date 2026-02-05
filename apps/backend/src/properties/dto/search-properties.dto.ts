@@ -34,6 +34,16 @@ export class SearchPropertiesDto {
   @IsIn(["studio", "house", "apartment", "villa", "land", "room", "commercial", "other"])
   propertyType?: string;
 
+  // Listing type filter
+  @ApiPropertyOptional({
+    description: "Listing type (sale, rental, short_term, lease)",
+    enum: ["sale", "rental", "short_term", "lease"],
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(["sale", "rental", "short_term", "lease"])
+  listingType?: string;
+
   // Also accept 'type' as alias for backward compatibility
   @IsOptional()
   @IsString()
@@ -172,6 +182,16 @@ export class SearchPropertiesDto {
   })
   @IsArray()
   amenities?: string[];
+
+  // Boundary IDs filter (array of boundary IDs to search within)
+  @ApiPropertyOptional({
+    description: "Boundary IDs to filter by (properties must be within these boundaries)",
+    type: [String],
+    example: ["boundary-id-1", "boundary-id-2"],
+  })
+  @IsOptional()
+  @IsArray()
+  boundaries?: string[];
 
   // Pagination
   @ApiPropertyOptional({ description: "Skip N records", minimum: 0, default: 0 })

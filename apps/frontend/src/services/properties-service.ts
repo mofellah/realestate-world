@@ -10,18 +10,19 @@ import { apiClient } from "./api-client";
 // ============================================================================
 
 export interface SearchPropertiesParams {
-  priceMin?: number;
-  priceMax?: number;
-  type?: string;
-  bedrooms?: number;
-  bathrooms?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  propertyType?: string;
+  minBedrooms?: number;
+  maxBedrooms?: number;
+  minBathrooms?: number;
+  maxBathrooms?: number;
   latitude?: number;
   longitude?: number;
   radius?: number;
   amenities?: string[];
   distanceMetric?: "walking" | "driving" | "direct";
-  city?: string;
-  country?: string;
+  boundaries?: string[];
   skip?: number;
   take?: number;
 }
@@ -104,30 +105,12 @@ class PropertiesService {
    * Search properties with filters
    */
   async searchProperties(params: SearchPropertiesParams): Promise<PropertySearchResult[]> {
-    const queryString = new URLSearchParams();
+    // Clean params - remove undefined values
+    const cleanParams = Object.fromEntries(
+      Object.entries(params).filter(([_, v]) => v !== undefined),
+    );
 
-    if (params.priceMin !== undefined) queryString.append("priceMin", params.priceMin.toString());
-    if (params.priceMax !== undefined) queryString.append("priceMax", params.priceMax.toString());
-    if (params.type) queryString.append("type", params.type);
-    if (params.bedrooms !== undefined) queryString.append("bedrooms", params.bedrooms.toString());
-    if (params.bathrooms !== undefined)
-      queryString.append("bathrooms", params.bathrooms.toString());
-    if (params.latitude !== undefined) queryString.append("latitude", params.latitude.toString());
-    if (params.longitude !== undefined)
-      queryString.append("longitude", params.longitude.toString());
-    if (params.radius !== undefined) queryString.append("radius", params.radius.toString());
-    if (params.amenities && params.amenities.length > 0)
-      queryString.append("amenities", params.amenities.join(","));
-    if (params.distanceMetric) queryString.append("distanceMetric", params.distanceMetric);
-    if (params.city) queryString.append("city", params.city);
-    if (params.country) queryString.append("country", params.country);
-    if (params.skip !== undefined) queryString.append("skip", params.skip.toString());
-    if (params.take !== undefined) queryString.append("take", params.take.toString());
-
-    const query = queryString.toString();
-    const endpoint = query ? `/properties/search?${query}` : "/properties/search";
-
-    return apiClient.get<PropertySearchResult[]>(endpoint);
+    return apiClient.post<PropertySearchResult[]>("/properties/search", cleanParams);
   }
 
   /**

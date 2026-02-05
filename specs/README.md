@@ -13,7 +13,7 @@
 
 **Revenue**: Owners pay to list (€20–50/month), agencies pay wholesale (€500–5000/month), investors pay for premium features.
 
-**MVP Deliverable**: Full-stack React 19 + NestJS application with map search, property listing, agency management, and contact workflow.
+**MVP Deliverable**: Full-stack React 18 + NestJS application with map search, property listing, agency management, and contact workflow.
 
 **Success Metrics (Month 3)**:
 - 10,000+ active searchers

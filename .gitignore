@@ -50,3 +50,4 @@ cypress/videos
 *.temp
 apps/frontend/linting.txt
 data/belgium-latest.osm.pbf
+.playwright-mcp/.playwright-mcp/*.png

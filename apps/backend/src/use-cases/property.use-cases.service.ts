@@ -17,11 +17,14 @@ export class PropertyUseCasesService {
     propertyType?: string;
     minBedrooms?: number;
     maxBedrooms?: number;
+    minBathrooms?: number;
+    maxBathrooms?: number;
     latitude?: number;
     longitude?: number;
     radius?: number;
     amenities?: string[];
     distanceMetric?: string;
+    boundaries?: string[];
     skip?: number;
     take?: number;
   }) {

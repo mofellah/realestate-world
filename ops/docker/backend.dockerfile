@@ -62,6 +62,7 @@ RUN npm ci --workspace=apps/backend --omit=dev --include-workspace-root
 COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
 COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/db/schema.prisma ./db/schema.prisma
 
 # Set environment

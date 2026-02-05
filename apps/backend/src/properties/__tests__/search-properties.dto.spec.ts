@@ -102,6 +102,33 @@ describe("SearchPropertiesDto", () => {
     });
   });
 
+  describe("Listing Type Filter", () => {
+    const validListingTypes = ["sale", "rental", "short_term", "lease"];
+
+    validListingTypes.forEach((listingType) => {
+      it(`should accept valid listingType: ${listingType}`, async () => {
+        const dto = plainToInstance(SearchPropertiesDto, { listingType });
+        const errors = await validate(dto);
+        expect(errors.length).toBe(0);
+        expect(dto.listingType).toBe(listingType);
+      });
+    });
+
+    it("should reject invalid listingType", async () => {
+      const dto = plainToInstance(SearchPropertiesDto, { listingType: "invalid" });
+      const errors = await validate(dto);
+      expect(errors.length).toBeGreaterThan(0);
+      expect(errors[0].property).toBe("listingType");
+    });
+
+    it("should work without listingType filter", async () => {
+      const dto = plainToInstance(SearchPropertiesDto, {});
+      const errors = await validate(dto);
+      expect(errors.length).toBe(0);
+      expect(dto.listingType).toBeUndefined();
+    });
+  });
+
   describe("Bedrooms Filters", () => {
     it("should accept valid minBedrooms", async () => {
       const dto = plainToInstance(SearchPropertiesDto, { minBedrooms: "2" });
@@ -311,6 +338,38 @@ describe("SearchPropertiesDto", () => {
     });
   });
 
+  describe("Boundaries Filter", () => {
+    it("should accept array of boundary IDs", async () => {
+      const dto = plainToInstance(SearchPropertiesDto, {
+        boundaries: ["boundary-1", "boundary-2"],
+      });
+      const errors = await validate(dto);
+      expect(errors.length).toBe(0);
+      expect(dto.boundaries).toEqual(["boundary-1", "boundary-2"]);
+    });
+
+    it("should accept single boundary ID", async () => {
+      const dto = plainToInstance(SearchPropertiesDto, { boundaries: ["boundary-1"] });
+      const errors = await validate(dto);
+      expect(errors.length).toBe(0);
+      expect(dto.boundaries).toEqual(["boundary-1"]);
+    });
+
+    it("should accept empty boundaries array", async () => {
+      const dto = plainToInstance(SearchPropertiesDto, { boundaries: [] });
+      const errors = await validate(dto);
+      expect(errors.length).toBe(0);
+      expect(dto.boundaries).toEqual([]);
+    });
+
+    it("should work without boundaries", async () => {
+      const dto = plainToInstance(SearchPropertiesDto, {});
+      const errors = await validate(dto);
+      expect(errors.length).toBe(0);
+      expect(dto.boundaries).toBeUndefined();
+    });
+  });
+
   describe("Amenities Filter", () => {
     it("should transform comma-separated string to array", async () => {
       const dto = plainToInstance(SearchPropertiesDto, { amenities: "schools,parks,restaurants" });
@@ -432,6 +491,7 @@ describe("SearchPropertiesDto", () => {
         radius: "5000",
         distanceMetric: "walking",
         amenities: "schools,parks",
+        boundaries: ["boundary-1", "boundary-2"],
         skip: "0",
         take: "20",
       });
@@ -449,6 +509,7 @@ describe("SearchPropertiesDto", () => {
       expect(dto.radius).toBe(5000);
       expect(dto.distanceMetric).toBe("walking");
       expect(dto.amenities).toEqual(["schools", "parks"]);
+      expect(dto.boundaries).toEqual(["boundary-1", "boundary-2"]);
       expect(dto.skip).toBe(0);
       expect(dto.take).toBe(20);
     });
@@ -492,6 +553,7 @@ describe("SearchPropertiesDto", () => {
       expect(dto.radius).toBeUndefined();
       expect(dto.distanceMetric).toBeUndefined();
       expect(dto.amenities).toBeUndefined();
+      expect(dto.boundaries).toBeUndefined();
       expect(dto.skip).toBeUndefined();
       expect(dto.take).toBeUndefined();
     });

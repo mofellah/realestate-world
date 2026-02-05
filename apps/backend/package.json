@@ -16,7 +16,8 @@
     "test:cov": "jest --coverage",
     "test:unit": "jest --testPathPattern=__tests__/services|__tests__/fixtures",
     "test:integration": "jest --testPathPattern=__tests__/integration",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "benchmark:search": "ts-node -r tsconfig-paths/register scripts/benchmark-search.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.2",
