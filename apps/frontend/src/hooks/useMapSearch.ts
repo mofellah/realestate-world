@@ -96,8 +96,32 @@ export function useMapSearch() {
 
       const response = await apiClient.post<SearchResult>("/properties/search", body);
 
-      setProperties(response.properties);
-      setTotal(response.total);
+      let filtered = response.properties;
+
+      if (filters.listingType) {
+        filtered = filtered.filter((property) =>
+          property.listings?.some((listing) => listing.type === filters.listingType),
+        );
+      }
+
+      if (filters.priceMin !== undefined || filters.priceMax !== undefined) {
+        filtered = filtered.filter((property) => {
+          const listing = property.listings?.[0];
+          const paymentTerms = listing?.paymentTerms;
+          const amount =
+            paymentTerms?.onetimePayment?.amount ??
+            paymentTerms?.periodicPayment?.amountPerPeriod ??
+            null;
+
+          if (amount === null) return false;
+          if (filters.priceMin !== undefined && amount < filters.priceMin) return false;
+          if (filters.priceMax !== undefined && amount > filters.priceMax) return false;
+          return true;
+        });
+      }
+
+      setProperties(filtered);
+      setTotal(filtered.length);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Search failed";
       console.error("[useMapSearch] Error:", errorMessage);
